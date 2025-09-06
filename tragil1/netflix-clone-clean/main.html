@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Browse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a href="main.html" class="navbar-brand me-4">
+                    <img src="images/better.png" alt="NETFLIX" class="logo-nav">
+                </a>
+                
+                <div class="navbar-nav d-none d-lg-flex me-auto">
+                    <a class="nav-link text-white active" href="main.html" style="margin-right: 20px;">Home</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">TV Shows</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">Movies</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">Games</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">New & Popular</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">My List</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">Browse by Languages</a>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <div class="search-icon me-3" style="color: white; font-size: 18px; cursor: pointer;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="notifications-icon me-3" style="color: white; font-size: 18px; cursor: pointer;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="dropdown">
+                        <div class="profile-dropdown-container d-flex align-items-center" data-bs-toggle="dropdown" style="cursor: pointer;">
+                            <div class="profile-icon" id="currentProfileAvatar" style="width: 32px; height: 32px; background-color: #666; border-radius: 4px; overflow: hidden;">
+                                <img id="profileImage" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            </div>
+                            <div class="dropdown-arrow ms-1" style="color: white; font-size: 12px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 9L12 15L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="profiles.html">Switch Profiles</a></li>
+                            <li><a class="dropdown-item" href="#">Account</a></li>
+                            <li><a class="dropdown-item" href="#">Help Center</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="netflixLogout()">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <!-- Hero Section -->
+        <div class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://occ-0-2794-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABXYqjKlOlz6xlkwvtdV-YwdBm-GJnPkKoGJJzPaJGXXbT7gzPqQ8wbX4pIoSCu0jD3PL8c9wgkBDBkDpbBu9bkBkP9U.jpg'); background-size: cover; background-position: center; height: 80vh; display: flex; align-items: center; margin-bottom: 60px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 text-white mb-4" style="font-weight: 700;">Stranger Things</h1>
+                        <p class="lead text-white mb-4">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</p>
+                        <div class="hero-buttons">
+                            <button class="btn btn-light btn-lg me-3" style="padding: 12px 24px; border-radius: 4px;">
+                                ▶️ Play
+                            </button>
+                            <button class="btn btn-secondary btn-lg" style="padding: 12px 24px; border-radius: 4px; background-color: rgba(109, 109, 110, 0.7); border: none;">
+                                ℹ️ More Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <!-- Trending Now Section -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h3 class="text-white mb-4">Trending Now</h3>
+                    <div class="row">
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Movie 1
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Movie 2
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Movie 3
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Movie 4
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Movie 5
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Movie 6
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular on Netflix Section -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h3 class="text-white mb-4">Popular on Netflix</h3>
+                    <div class="row">
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Show 1
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Show 2
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Show 3
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Show 4
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Show 5
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
+                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                                Show 6
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    
+            <!-- Mobile Menu for smaller screens -->
+            <div class="d-md-none mt-4">
+                <h4 class="text-white mb-3">Browse Categories</h4>
+                <div class="list-group list-group-flush">
+                    <a href="main.html" class="list-group-item list-group-item-dark active" style="background-color: #333; color: white; border-color: #333;">
+                        🏠 Home
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        📺 TV Shows
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        🎬 Movies
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        🔥 New & Popular
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        📝 My List
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        🌍 Browse by Languages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/login.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Profile ID to avatar mapping
+            const profileAvatars = {
+                'paul': 'https://i.pravatar.cc/150?img=1',
+                'alon': 'https://i.pravatar.cc/150?img=8', 
+                'ronni': 'https://i.pravatar.cc/150?img=9',
+                'anna': 'https://i.pravatar.cc/150?img=5',
+                'noa': 'https://i.pravatar.cc/150?img=10'
+            };
+            
+            // Load current profile avatar
+            const profileId = localStorage.getItem('netflix:profileId');
+            const profileImage = document.getElementById('profileImage');
+            
+            if (profileId && profileAvatars[profileId] && profileImage) {
+                profileImage.src = profileAvatars[profileId];
+                profileImage.style.display = 'block';
+            }
+        });
+    </script>
+    
+</body>
+</html>
