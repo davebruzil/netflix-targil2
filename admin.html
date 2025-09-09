@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-container {
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--netflix-red) 0%, #b20710 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .content-form {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .content-table {
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-dark {
+            --bs-table-bg: #222;
+            --bs-table-border-color: #444;
+        }
+
+        .btn-netflix-outline {
+            color: var(--netflix-red);
+            border-color: var(--netflix-red);
+        }
+
+        .btn-netflix-outline:hover {
+            background-color: var(--netflix-red);
+            color: white;
+        }
+
+        .upload-area {
+            border: 2px dashed #666;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--netflix-red);
+            background-color: rgba(229, 9, 20, 0.1);
+        }
+
+        .upload-progress {
+            display: none;
+        }
+
+        .api-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        .api-status.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .api-status.error {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .api-status.loading {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .episode-row {
+            background-color: #333;
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .external-rating {
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding-top: 80px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .content-form {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Access Control Modal -->
+    <div class="modal fade" id="accessModal" tabindex="-1" aria-labelledby="accessModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: #141414; border: none;">
+                <div class="modal-header" style="border-bottom: 1px solid #333;">
+                    <h5 class="modal-title text-white" id="accessModalLabel">Admin Access Required</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="text-light">You don't have admin privileges. Please contact your administrator.</p>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #333;">
+                    <button type="button" class="btn btn-netflix" onclick="window.location.href='main.html'">Go to Main</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a href="main.html" class="navbar-brand me-4">
+                    <img src="images/better.png" alt="NETFLIX" class="logo-nav">
+                </a>
+                
+                <div class="navbar-nav d-none d-lg-flex me-auto">
+                    <a class="nav-link text-white" href="main.html" style="margin-right: 20px;">Home</a>
+                    <a class="nav-link text-white active" href="admin.html" style="margin-right: 20px;">⚙️ Admin</a>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <div class="dropdown">
+                        <div class="profile-dropdown-container d-flex align-items-center" data-bs-toggle="dropdown" style="cursor: pointer;">
+                            <div class="profile-icon" id="currentProfileAvatar" style="width: 32px; height: 32px; background-color: #666; border-radius: 4px; overflow: hidden;">
+                                <img id="profileImage" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            </div>
+                            <div class="dropdown-arrow ms-1" style="color: white; font-size: 12px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 9L12 15L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="profiles.html">Switch Profiles</a></li>
+                            <li><a class="dropdown-item" href="main.html">Main Page</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="netflixLogout()">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1 class="mb-3">Content Management Admin Panel</h1>
+            <p class="mb-0">Manage Netflix content, upload new movies and series, and control the content library.</p>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs nav-fill mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="add-content-tab" data-bs-toggle="tab" data-bs-target="#add-content" type="button" role="tab">
+                    📹 Add Content
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="manage-content-tab" data-bs-toggle="tab" data-bs-target="#manage-content" type="button" role="tab">
+                    📚 Manage Library
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    📊 Analytics
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="adminTabsContent">
+            <!-- Add Content Tab -->
+            <div class="tab-pane fade show active" id="add-content" role="tabpanel">
+                <div class="content-form">
+                    <h3 class="text-white mb-4">Add New Content</h3>
+                    
+                    <form id="content-form">
+                        <!-- Content Type -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="content-type" class="form-label text-white">Content Type</label>
+                                <select class="form-control" id="content-type" required>
+                                    <option value="">Select content type</option>
+                                    <option value="movie">Movie</option>
+                                    <option value="series">TV Series</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="content-title" class="form-label text-white">Title</label>
+                                <input type="text" class="form-control" id="content-title" placeholder="Enter title" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="content-year" class="form-label text-white">Year</label>
+                                <input type="number" class="form-control" id="content-year" placeholder="2023" min="1900" max="2030" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="content-genre" class="form-label text-white">Genre</label>
+                                <input type="text" class="form-control" id="content-genre" placeholder="Action, Drama, Comedy" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="content-director" class="form-label text-white">Director</label>
+                                <input type="text" class="form-control" id="content-director" placeholder="Director name" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content-actors" class="form-label text-white">Cast (comma separated)</label>
+                            <input type="text" class="form-control" id="content-actors" placeholder="Actor 1, Actor 2, Actor 3" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content-synopsis" class="form-label text-white">Synopsis</label>
+                            <textarea class="form-control" id="content-synopsis" rows="3" placeholder="Enter plot summary" required></textarea>
+                        </div>
+
+                        <!-- External API Integration -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="imdb-id" class="form-label text-white">IMDB ID (for automatic data fetch)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="imdb-id" placeholder="tt1234567">
+                                    <button class="btn btn-netflix-outline" type="button" id="fetch-imdb-btn">
+                                        Fetch Data
+                                    </button>
+                                </div>
+                                <span id="api-status" class="api-status" style="display: none;"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="content-rating" class="form-label text-white">Rating</label>
+                                <div class="rating-display">
+                                    <input type="number" class="form-control" id="content-rating" placeholder="8.5" min="0" max="10" step="0.1" required>
+                                    <span id="external-rating" class="external-rating"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Uploads -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Poster Image</label>
+                                <div class="upload-area" id="poster-upload-area">
+                                    <input type="file" id="poster-file" accept="image/*" style="display: none;">
+                                    <div class="upload-content">
+                                        <div class="mb-2">🖼️</div>
+                                        <div>Click or drag poster image here</div>
+                                        <small class="text-muted">JPG, PNG, WebP (Max 5MB)</small>
+                                    </div>
+                                </div>
+                                <div class="upload-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar bg-netflix" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Video File</label>
+                                <div class="upload-area" id="video-upload-area">
+                                    <input type="file" id="video-file" accept="video/mp4" style="display: none;">
+                                    <div class="upload-content">
+                                        <div class="mb-2">🎬</div>
+                                        <div>Click or drag video file here</div>
+                                        <small class="text-muted">MP4 only (Max 500MB)</small>
+                                    </div>
+                                </div>
+                                <div class="upload-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar bg-netflix" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Episodes Section (for TV Series) -->
+                        <div id="episodes-section" style="display: none;">
+                            <h5 class="text-white mb-3">Episodes</h5>
+                            <div id="episodes-container">
+                                <!-- Episodes will be added here -->
+                            </div>
+                            <button type="button" class="btn btn-outline-light mt-2" id="add-episode-btn">
+                                + Add Episode
+                            </button>
+                        </div>
+
+                        <!-- Duration (for movies) -->
+                        <div id="duration-section" class="mb-3">
+                            <label for="content-duration" class="form-label text-white">Duration (minutes)</label>
+                            <input type="number" class="form-control" id="content-duration" placeholder="120" min="1">
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-netflix me-3">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" style="display: none;"></span>
+                                Add Content
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="reset-form-btn">Reset Form</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Manage Content Tab -->
+            <div class="tab-pane fade" id="manage-content" role="tabpanel">
+                <div class="content-table">
+                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom border-secondary">
+                        <h3 class="text-white mb-0">Content Library</h3>
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control" id="search-content" placeholder="Search content..." style="width: 250px;">
+                            <select class="form-control" id="filter-type" style="width: 120px;">
+                                <option value="">All Types</option>
+                                <option value="movie">Movies</option>
+                                <option value="series">Series</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Year</th>
+                                    <th>Genre</th>
+                                    <th>Rating</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="content-table-body">
+                                <!-- Content will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="no-content-message" class="text-center p-4 text-light" style="display: none;">
+                        <h5>No content found</h5>
+                        <p>Try adjusting your search or filter criteria.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body text-center">
+                                <h2 class="text-netflix" id="total-content">0</h2>
+                                <p class="mb-0">Total Content</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body text-center">
+                                <h2 class="text-netflix" id="total-movies">0</h2>
+                                <p class="mb-0">Movies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body text-center">
+                                <h2 class="text-netflix" id="total-series">0</h2>
+                                <p class="mb-0">TV Series</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body text-center">
+                                <h2 class="text-netflix" id="avg-rating">0</h2>
+                                <p class="mb-0">Avg Rating</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-table">
+                    <div class="p-3 border-bottom border-secondary">
+                        <h4 class="text-white mb-0">Most Popular Content</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Rating</th>
+                                    <th>Views</th>
+                                </tr>
+                            </thead>
+                            <tbody id="popular-content-body">
+                                <!-- Popular content will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Content Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background-color: #141414; border: none;">
+                <div class="modal-header" style="border-bottom: 1px solid #333;">
+                    <h5 class="modal-title text-white" id="editModalLabel">Edit Content</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-form">
+                        <input type="hidden" id="edit-content-id">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="edit-title" class="form-label text-white">Title</label>
+                                <input type="text" class="form-control" id="edit-title" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit-year" class="form-label text-white">Year</label>
+                                <input type="number" class="form-control" id="edit-year" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="edit-genre" class="form-label text-white">Genre</label>
+                                <input type="text" class="form-control" id="edit-genre" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit-rating" class="form-label text-white">Rating</label>
+                                <input type="number" class="form-control" id="edit-rating" min="0" max="10" step="0.1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit-synopsis" class="form-label text-white">Synopsis</label>
+                            <textarea class="form-control" id="edit-synopsis" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #333;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-netflix" id="save-edit-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check admin access
+            checkAdminAccess();
+            
+            // Load profile avatar
+            loadProfileAvatar();
+            
+            // Initialize admin panel
+            if (window.AdminController) {
+                window.adminController = new AdminController();
+            }
+        });
+
+        function checkAdminAccess() {
+            const email = localStorage.getItem('netflix:email');
+            if (!email || !NetflixData.isAdmin(email)) {
+                const modal = new bootstrap.Modal(document.getElementById('accessModal'));
+                modal.show();
+                return false;
+            }
+            return true;
+        }
+
+        function loadProfileAvatar() {
+            const profileAvatars = {
+                'paul': 'https://i.pravatar.cc/150?img=1',
+                'alon': 'https://i.pravatar.cc/150?img=8', 
+                'ronni': 'https://i.pravatar.cc/150?img=9',
+                'anna': 'https://i.pravatar.cc/150?img=5',
+                'noa': 'https://i.pravatar.cc/150?img=10'
+            };
+            
+            const profileId = localStorage.getItem('netflix:profileId');
+            const profileImage = document.getElementById('profileImage');
+            
+            if (profileId && profileAvatars[profileId] && profileImage) {
+                profileImage.src = profileAvatars[profileId];
+                profileImage.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

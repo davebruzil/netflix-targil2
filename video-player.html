@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Netflix - Video Player</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+        }
+
+        #main-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 20px 30px 30px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .video-container:hover .video-controls,
+        .video-controls.show {
+            opacity: 1;
+        }
+
+        .progress-container {
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #e50914;
+            border-radius: 2px;
+            width: 0%;
+            position: relative;
+        }
+
+        .progress-handle {
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: #e50914;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-container:hover .progress-handle {
+            opacity: 1;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .controls-left,
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .play-pause-btn {
+            font-size: 32px;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e50914;
+            cursor: pointer;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        .episode-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .next-episode-btn {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            z-index: 150;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .next-episode-btn:hover {
+            background: white;
+            color: black;
+        }
+
+        .playback-speed-menu {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            border-radius: 4px;
+            padding: 8px 0;
+            min-width: 120px;
+            display: none;
+        }
+
+        .speed-option {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .speed-option:hover,
+        .speed-option.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            z-index: 50;
+            display: none;
+        }
+
+        /* Fullscreen styles */
+        .video-container:-webkit-full-screen {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .video-container:-moz-full-screen {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .video-container:fullscreen {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .video-controls {
+                padding: 15px 20px 20px;
+            }
+
+            .control-btn {
+                font-size: 20px;
+                padding: 6px;
+            }
+
+            .play-pause-btn {
+                font-size: 28px;
+            }
+
+            .volume-slider {
+                width: 60px;
+            }
+
+            .back-button,
+            .episode-info {
+                top: 10px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container" id="video-container">
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()">
+            ← Back
+        </button>
+
+        <!-- Episode Info -->
+        <div id="episode-info" class="episode-info" style="display: none;">
+            <div id="episode-title"></div>
+            <div id="episode-number"></div>
+        </div>
+
+        <!-- Video Element -->
+        <video id="main-video" preload="metadata">
+            <source src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="loading-spinner">
+            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="error-message">
+            <h4>Video Error</h4>
+            <p>Unable to load the video. Please try again later.</p>
+            <button class="btn btn-netflix mt-3" onclick="goBack()">Go Back</button>
+        </div>
+
+        <!-- Next Episode Button -->
+        <button id="next-episode-btn" class="next-episode-btn">
+            Next Episode →
+        </button>
+
+        <!-- Video Controls -->
+        <div class="video-controls" id="video-controls">
+            <!-- Progress Bar -->
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-bar-fill">
+                        <div class="progress-handle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Row -->
+            <div class="controls-row">
+                <!-- Left Controls -->
+                <div class="controls-left">
+                    <button class="control-btn play-pause-btn" id="play-pause-btn" title="Play/Pause">
+                        ▶️
+                    </button>
+
+                    <button class="control-btn" id="skip-back-btn" title="Skip back 10 seconds">
+                        ⏪
+                    </button>
+
+                    <button class="control-btn" id="skip-forward-btn" title="Skip forward 10 seconds">
+                        ⏩
+                    </button>
+
+                    <div class="volume-container">
+                        <button class="control-btn" id="volume-btn" title="Mute/Unmute">
+                            🔊
+                        </button>
+                        <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="100">
+                    </div>
+
+                    <div class="time-display">
+                        <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+                    </div>
+                </div>
+
+                <!-- Right Controls -->
+                <div class="controls-right">
+                    <div class="position-relative">
+                        <button class="control-btn" id="speed-btn" title="Playback speed">
+                            1x
+                        </button>
+                        <div class="playback-speed-menu" id="speed-menu">
+                            <button class="speed-option" data-speed="0.5">0.5x</button>
+                            <button class="speed-option" data-speed="0.75">0.75x</button>
+                            <button class="speed-option active" data-speed="1">1x</button>
+                            <button class="speed-option" data-speed="1.25">1.25x</button>
+                            <button class="speed-option" data-speed="1.5">1.5x</button>
+                            <button class="speed-option" data-speed="2">2x</button>
+                        </div>
+                    </div>
+
+                    <button class="control-btn" id="fullscreen-btn" title="Fullscreen">
+                        ⛶
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/video-player.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeVideoPlayer();
+        });
+
+        function goBack() {
+            // Save current progress before going back
+            if (window.videoPlayerController) {
+                window.videoPlayerController.saveProgress();
+            }
+            
+            // Try to go back in history, otherwise go to main page
+            if (document.referrer && document.referrer.includes(window.location.origin)) {
+                window.history.back();
+            } else {
+                window.location.href = 'main.html';
+            }
+        }
+
+        function initializeVideoPlayer() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const contentId = urlParams.get('id');
+            const episodeId = urlParams.get('episode');
+            const startTime = parseInt(urlParams.get('t')) || 0;
+
+            if (!contentId) {
+                showError('No content ID provided');
+                return;
+            }
+
+            const content = NetflixData.getContentById(contentId);
+            if (!content) {
+                showError('Content not found');
+                return;
+            }
+
+            // Initialize video player controller
+            window.videoPlayerController = new VideoPlayerController(content, episodeId, startTime);
+        }
+
+        function showError(message) {
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('error-message').querySelector('p').textContent = message;
+        }
+    </script>
+</body>
+</html>

@@ -63,17 +63,17 @@
     
     <main class="main-content">
         <!-- Hero Section -->
-        <div class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://occ-0-2794-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABXYqjKlOlz6xlkwvtdV-YwdBm-GJnPkKoGJJzPaJGXXbT7gzPqQ8wbX4pIoSCu0jD3PL8c9wgkBDBkDpbBu9bkBkP9U.jpg'); background-size: cover; background-position: center; height: 80vh; display: flex; align-items: center; margin-bottom: 60px;">
+        <div id="hero-section" class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://occ-0-2794-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABXYqjKlOlz6xlkwvtdV-YwdBm-GJnPkKoGJJzPaJGXXbT7gzPqQ8wbX4pIoSCu0jD3PL8c9wgkBDBkDpbBu9bkBkP9U.jpg'); background-size: cover; background-position: center; height: 80vh; display: flex; align-items: center; margin-bottom: 60px;">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6">
-                        <h1 class="display-4 text-white mb-4" style="font-weight: 700;">Stranger Things</h1>
-                        <p class="lead text-white mb-4">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</p>
+                        <h1 id="hero-title" class="display-4 text-white mb-4" style="font-weight: 700;">Stranger Things</h1>
+                        <p id="hero-synopsis" class="lead text-white mb-4">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</p>
                         <div class="hero-buttons">
-                            <button class="btn btn-light btn-lg me-3" style="padding: 12px 24px; border-radius: 4px;">
+                            <button id="hero-play-btn" class="btn btn-light btn-lg me-3" style="padding: 12px 24px; border-radius: 4px;">
                                 ▶️ Play
                             </button>
-                            <button class="btn btn-secondary btn-lg" style="padding: 12px 24px; border-radius: 4px; background-color: rgba(109, 109, 110, 0.7); border: none;">
+                            <button id="hero-more-info-btn" class="btn btn-secondary btn-lg" style="padding: 12px 24px; border-radius: 4px; background-color: rgba(109, 109, 110, 0.7); border: none;">
                                 ℹ️ More Info
                             </button>
                         </div>
@@ -82,84 +82,116 @@
             </div>
         </div>
 
-        <div class="container-fluid">
-            <!-- Trending Now Section -->
-            <div class="row mb-5">
-                <div class="col-12">
-                    <h3 class="text-white mb-4">Trending Now</h3>
-                    <div class="row">
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Movie 1
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Movie 2
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Movie 3
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Movie 4
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Movie 5
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Movie 6
-                            </div>
-                        </div>
+        <!-- Netflix-style Content Rows -->
+        <div class="netflix-content">
+            <!-- Continue Watching Section -->
+            <div id="continue-watching-section" class="netflix-row" style="display: none;">
+                <div class="row-header">
+                    <h2 class="row-title">Continue Watching for <span id="profile-name-display"></span></h2>
+                </div>
+                <div class="row-slider">
+                    <div id="continue-watching-content" class="slider-content">
+                        <!-- Continue watching content will be populated here -->
                     </div>
                 </div>
             </div>
 
-            <!-- Popular on Netflix Section -->
-            <div class="row mb-5">
-                <div class="col-12">
-                    <h3 class="text-white mb-4">Popular on Netflix</h3>
-                    <div class="row">
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Show 1
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Show 2
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Show 3
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Show 4
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Show 5
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2 mb-3 d-none d-lg-block">
-                            <div class="movie-card" style="background-color: #333; border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
-                                Show 6
-                            </div>
-                        </div>
+            <!-- Trending Now Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">Trending Now</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="trending-content" class="slider-content">
+                        <!-- Trending content will be populated here -->
                     </div>
                 </div>
             </div>
+
+            <!-- Netflix Originals Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">Netflix Originals</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="originals-content" class="slider-content">
+                        <!-- Originals content will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movies Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">Popular Movies</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="movies-content" class="slider-content">
+                        <!-- Movies content will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TV Shows Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">TV Shows</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="series-content" class="slider-content">
+                        <!-- Series content will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action & Adventure Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">Action & Adventure</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="action-content" class="slider-content">
+                        <!-- Action content will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comedies Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">Comedies</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="comedy-content" class="slider-content">
+                        <!-- Comedy content will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horror Movies Section -->
+            <div class="netflix-row">
+                <div class="row-header">
+                    <h2 class="row-title">Horror Movies</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="horror-content" class="slider-content">
+                        <!-- Horror content will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- My List Section -->
+            <div id="my-list-section" class="netflix-row" style="display: none;">
+                <div class="row-header">
+                    <h2 class="row-title">My List</h2>
+                </div>
+                <div class="row-slider">
+                    <div id="my-list-content" class="slider-content">
+                        <!-- My list content will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
                     
             <!-- Mobile Menu for smaller screens -->
             <div class="d-md-none mt-4">
@@ -190,6 +222,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/login.js"></script>
+    <script src="js/data.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -209,6 +242,248 @@
             if (profileId && profileAvatars[profileId] && profileImage) {
                 profileImage.src = profileAvatars[profileId];
                 profileImage.style.display = 'block';
+            }
+
+            // Initialize main page content
+            initializeMainPage();
+        });
+
+        function initializeMainPage() {
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (!profileId) return;
+
+            // Load hero content
+            loadHeroContent(profileId);
+            
+            // Load continue watching
+            loadContinueWatching(profileId);
+            
+            // Load trending content
+            loadTrendingContent();
+            
+            // Load movies
+            loadMovies();
+            
+            // Load TV shows
+            loadTVShows();
+            
+            // Load my list
+            loadMyList(profileId);
+        }
+
+        function loadHeroContent(profileId) {
+            // Get featured content (first from trending)
+            const allContent = NetflixData.getAllContent();
+            const featuredContent = allContent[0]; // Stranger Things by default
+            
+            if (!featuredContent) return;
+
+            // Update hero section
+            const heroSection = document.getElementById('hero-section');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSynopsis = document.getElementById('hero-synopsis');
+            const heroPlayBtn = document.getElementById('hero-play-btn');
+            const heroMoreInfoBtn = document.getElementById('hero-more-info-btn');
+
+            heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${featuredContent.poster}')`;
+            heroTitle.textContent = featuredContent.title;
+            heroSynopsis.textContent = featuredContent.synopsis;
+
+            // Check if there's progress for this content
+            const progress = NetflixData.getContentProgress(profileId, featuredContent.id);
+            if (progress.currentTime > 0 && !progress.completed) {
+                heroPlayBtn.innerHTML = '▶️ Resume';
+                heroPlayBtn.onclick = () => playContent(featuredContent.id, progress.currentTime);
+            } else {
+                heroPlayBtn.innerHTML = '▶️ Play';
+                heroPlayBtn.onclick = () => playContent(featuredContent.id);
+            }
+
+            heroMoreInfoBtn.onclick = () => {
+                window.location.href = `content-detail.html?id=${featuredContent.id}`;
+            };
+        }
+
+        function loadContinueWatching(profileId) {
+            const continueWatching = NetflixData.getContinueWatching(profileId, 6);
+            const section = document.getElementById('continue-watching-section');
+            const container = document.getElementById('continue-watching-content');
+
+            if (continueWatching.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            container.innerHTML = '';
+
+            continueWatching.forEach(content => {
+                const progressPercentage = (content.progress.currentTime / content.duration) * 100;
+                const card = createContentCard(content, true, progressPercentage);
+                container.appendChild(card);
+            });
+        }
+
+        function loadTrendingContent() {
+            const allContent = NetflixData.getAllContent();
+            // Sort by rating for trending
+            const trending = allContent.sort((a, b) => b.rating - a.rating).slice(0, 6);
+            
+            populateContentSection('trending-content', trending);
+        }
+
+        function loadMovies() {
+            const movies = NetflixData.getContentByType('movie').slice(0, 6);
+            populateContentSection('movies-content', movies);
+        }
+
+        function loadTVShows() {
+            const series = NetflixData.getContentByType('series').slice(0, 6);
+            populateContentSection('series-content', series);
+        }
+
+        function loadMyList(profileId) {
+            const userLikes = NetflixData.getUserLikes(profileId);
+            const section = document.getElementById('my-list-section');
+            const container = document.getElementById('my-list-content');
+
+            if (userLikes.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            container.innerHTML = '';
+
+            const likedContent = userLikes.map(id => NetflixData.getContentById(id)).filter(Boolean);
+            likedContent.forEach(content => {
+                const card = createContentCard(content);
+                container.appendChild(card);
+            });
+        }
+
+        function populateContentSection(containerId, content) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            content.forEach(item => {
+                const card = createContentCard(item);
+                container.appendChild(card);
+            });
+        }
+
+        function createNetflixCard(content, showProgress = false, progressPercentage = 0, featured = false) {
+            const card = document.createElement('div');
+            card.className = `netflix-card ${featured ? 'featured' : ''}`;
+            card.onclick = () => goToContentDetail(content.id);
+
+            const progressBar = showProgress && progressPercentage > 0 ? 
+                `<div class="progress-indicator" style="width: ${progressPercentage}%;"></div>` : '';
+
+            card.innerHTML = `
+                <img src="${content.thumbnail}" alt="${content.title}" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="fallback-title">${content.title}</div>
+                ${progressBar}
+            `;
+
+            return card;
+        }
+
+        function createContentCard(content, showProgress = false, progressPercentage = 0) {
+            return createNetflixCard(content, showProgress, progressPercentage, false);
+        }
+
+        function goToContentDetail(contentId) {
+            window.location.href = `content-detail.html?id=${contentId}`;
+        }
+
+        function playContent(contentId, startTime = 0) {
+            const url = `video-player.html?id=${contentId}${startTime > 0 ? `&t=${startTime}` : ''}`;
+            window.location.href = url;
+        }
+
+        // Update initializeMainPage function  
+        function initializeMainPage() {
+            const profileId = localStorage.getItem('netflix:profileId');
+            const profileName = localStorage.getItem('netflix:profileName');
+            if (!profileId) return;
+
+            // Update profile name display
+            const profileNameDisplay = document.getElementById('profile-name-display');
+            if (profileNameDisplay && profileName) {
+                profileNameDisplay.textContent = profileName;
+            }
+
+            // Load hero content
+            loadHeroContent(profileId);
+            
+            // Load continue watching
+            loadContinueWatching(profileId);
+            
+            // Load all content categories
+            loadTrendingContent();
+            loadOriginalsContent();
+            loadMovies();
+            loadTVShows();
+            loadActionContent();
+            loadComedyContent();
+            loadHorrorContent();
+            loadMyList(profileId);
+        }
+
+        // New content loading functions for different categories
+        function loadOriginalsContent() {
+            const allContent = NetflixData.getAllContent();
+            const originals = allContent.filter(content => 
+                content.title.includes('Stranger Things') || 
+                content.title.includes('Crown') || 
+                content.title.includes('Ozark')
+            ).slice(0, 10);
+            populateContentSection('originals-content', originals);
+        }
+
+        function loadActionContent() {
+            const actionContent = NetflixData.getContentByGenre('Action').slice(0, 10);
+            populateContentSection('action-content', actionContent);
+        }
+
+        function loadComedyContent() {
+            const comedyContent = NetflixData.getContentByGenre('Comedy').slice(0, 10);
+            populateContentSection('comedy-content', comedyContent);
+        }
+
+        function loadHorrorContent() {
+            const horrorContent = NetflixData.getContentByGenre('Horror').slice(0, 10);
+            populateContentSection('horror-content', horrorContent);
+        }
+
+        // Update populateContentSection to use Netflix cards
+        function populateContentSection(containerId, content) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            content.forEach(item => {
+                const card = createNetflixCard(item);
+                container.appendChild(card);
+            });
+        }
+
+        // Navigation menu updates
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add admin link if user is admin
+            const email = localStorage.getItem('netflix:email');
+            if (email && NetflixData.isAdmin(email)) {
+                const navbar = document.querySelector('.navbar-nav');
+                if (navbar) {
+                    const adminLink = document.createElement('a');
+                    adminLink.className = 'nav-link text-white';
+                    adminLink.href = 'admin.html';
+                    adminLink.style.marginRight = '20px';
+                    adminLink.textContent = '⚙️ Admin';
+                    navbar.appendChild(adminLink);
+                }
             }
         });
     </script>

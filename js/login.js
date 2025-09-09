@@ -28,6 +28,20 @@
     };
 
     const isAuthenticated = () => localStorage.getItem(STORAGE_KEYS.AUTH) === 'true';
+    
+    const isAdminUser = () => {
+        const email = localStorage.getItem(STORAGE_KEYS.EMAIL);
+        if (!email) return false;
+        
+        // Check if NetflixData is available
+        if (typeof NetflixData !== 'undefined') {
+            return NetflixData.isAdmin(email);
+        }
+        
+        // Fallback admin check
+        const adminEmails = ['admin@netflix.com', 'dev@netflix.com'];
+        return adminEmails.includes(email);
+    };
 
     const getBasePath = () => {
         const pathname = window.location.pathname;
@@ -48,7 +62,8 @@
     const handleAuthGuards = () => {
         const page = getPageName();
         const onLogin = page === 'index.html';
-        const onProtected = page === 'main.html' || page === 'profiles.html' || page === 'welcome.html';
+        const onProtected = page === 'main.html' || page === 'profiles.html' || page === 'welcome.html' || page === 'content-detail.html' || page === 'video-player.html';
+        const onAdmin = page === 'admin.html';
 
         if (onLogin && isAuthenticated()) {
             redirectTo('profiles.html');
@@ -56,6 +71,11 @@
         }
 
         if (onProtected && !isAuthenticated()) {
+            redirectTo('index.html');
+            return true;
+        }
+
+        if (onAdmin && (!isAuthenticated() || !isAdminUser())) {
             redirectTo('index.html');
             return true;
         }
@@ -136,6 +156,10 @@
     window.netflixLogout = () => {
         clearAuth();
         redirectTo('index.html');
+    };
+    
+    window.isNetflixAdmin = () => {
+        return isAuthenticated() && isAdminUser();
     };
 
     document.addEventListener('DOMContentLoaded', () => {
