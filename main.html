@@ -82,24 +82,24 @@
             </div>
         </div>
 
-        <!-- Search and Controls -->
-        <div class="container-fluid mb-4">
+        <!-- Search and Controls (Netflix Style) -->
+        <div class="container-fluid mb-4" style="max-width: 1400px;">
             <div class="row">
                 <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center">
-                        <div class="flex-grow-1">
+                    <div class="netflix-search-controls d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                        <div class="search-container flex-grow-1" style="max-width: 400px;">
                             <input 
                                 type="text" 
                                 id="searchInput" 
-                                class="form-control search-input" 
-                                placeholder="🔍 Search movies and shows..."
-                                style="background-color: #333; border: 1px solid #555; color: white; border-radius: 4px; padding: 12px 16px;"
+                                class="form-control netflix-search" 
+                                placeholder="🔍 Search titles..."
+                                style="background: rgba(51, 51, 51, 0.7); border: 1px solid #555; color: white; border-radius: 2px; padding: 8px 40px 8px 14px; font-size: 14px;"
                             >
                         </div>
                         <button 
                             id="sortButton" 
-                            class="btn btn-outline-light"
-                            style="border-radius: 4px; padding: 10px 20px; min-width: 150px;"
+                            class="btn netflix-sort-btn"
+                            style="background: rgba(109, 109, 110, 0.7); border: none; color: white; border-radius: 2px; padding: 8px 16px; font-size: 14px; font-weight: 500;"
                         >
                             🔤 Sort A-Z
                         </button>
@@ -108,16 +108,70 @@
             </div>
         </div>
 
-        <div class="container-fluid">
-            <!-- Dynamic Content Feed -->
-            <div class="row mb-5">
-                <div class="col-12">
-                    <h3 class="text-white mb-4">Netflix Content</h3>
-                    <div class="row" id="contentFeed">
+        <!-- Netflix Content Sections -->
+        <div class="netflix-content-container" style="max-width: 1400px; margin: 0 auto;">
+            
+            <!-- Continue Watching Section -->
+            <div class="netflix-row mb-4" id="continueWatchingSection">
+                <div class="row-header d-flex align-items-center mb-3">
+                    <h3 class="row-title text-white m-0" style="font-size: 20px; font-weight: 700;">Continue Watching for <span id="profileNameDisplay">User</span></h3>
+                </div>
+                <div class="row-content">
+                    <div class="netflix-slider" id="continueWatchingSlider">
                         <!-- Dynamic content will be inserted here -->
                     </div>
                 </div>
             </div>
+
+            <!-- Trending Now Section -->
+            <div class="netflix-row mb-4" id="trendingSection">
+                <div class="row-header d-flex align-items-center mb-3">
+                    <h3 class="row-title text-white m-0" style="font-size: 20px; font-weight: 700;">Trending Now</h3>
+                </div>
+                <div class="row-content">
+                    <div class="netflix-slider" id="trendingSlider">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Movies Section -->
+            <div class="netflix-row mb-4" id="moviesSection">
+                <div class="row-header d-flex align-items-center mb-3">
+                    <h3 class="row-title text-white m-0" style="font-size: 20px; font-weight: 700;">Popular Movies</h3>
+                </div>
+                <div class="row-content">
+                    <div class="netflix-slider" id="moviesSlider">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Series Section -->
+            <div class="netflix-row mb-4" id="seriesSection">
+                <div class="row-header d-flex align-items-center mb-3">
+                    <h3 class="row-title text-white m-0" style="font-size: 20px; font-weight: 700;">Popular Series</h3>
+                </div>
+                <div class="row-content">
+                    <div class="netflix-slider" id="seriesSlider">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results Section (Hidden by default) -->
+            <div class="netflix-row mb-4" id="searchResultsSection" style="display: none;">
+                <div class="row-header d-flex align-items-center mb-3">
+                    <h3 class="row-title text-white m-0" style="font-size: 20px; font-weight: 700;">Search Results</h3>
+                </div>
+                <div class="row-content">
+                    <div class="netflix-slider" id="searchResultsSlider">
+                        <!-- Search results will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
                     
             <!-- Mobile Menu for smaller screens -->
             <div class="d-md-none mt-4">
@@ -150,37 +204,52 @@
     <script src="js/login.js"></script>
     
     <script>
-        // Mock Data Catalog
+        // Enhanced Mock Data Catalog with Netflix Categories
         const CONTENT_DATA = [
-            { id: 1, title: "Stranger Things", category: "Series", description: "When a young boy vanishes, a small town uncovers mysteries.", likes: 1250, image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=300&h=200&fit=crop" },
-            { id: 2, title: "The Crown", category: "Series", description: "The reign of Queen Elizabeth II after World War II.", likes: 980, image: "https://images.unsplash.com/photo-1580130775562-0ef92da028de?w=300&h=200&fit=crop" },
-            { id: 3, title: "Breaking Bad", category: "Series", description: "A high school teacher turns to manufacturing drugs.", likes: 2100, image: "https://images.unsplash.com/photo-1489599165726-e77b26de1925?w=300&h=200&fit=crop" },
-            { id: 4, title: "Avengers Endgame", category: "Movie", description: "The Avengers must reverse Thanos' actions.", likes: 3200, image: "https://images.unsplash.com/photo-1567744726458-d5c7e8ad38e0?w=300&h=200&fit=crop" },
-            { id: 5, title: "Black Mirror", category: "Series", description: "Dark anthology series about modern technology.", likes: 1800, image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=200&fit=crop" },
-            { id: 6, title: "The Matrix", category: "Movie", description: "A computer hacker learns about the nature of reality.", likes: 2850, image: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=200&fit=crop" },
-            { id: 7, title: "Dark", category: "Series", description: "A missing child causes four families' secrets to unravel.", likes: 1650, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop" },
-            { id: 8, title: "Inception", category: "Movie", description: "A thief enters people's dreams to steal secrets.", likes: 2400, image: "https://images.unsplash.com/photo-1489599165726-e77b26de1925?w=300&h=200&fit=crop" },
-            { id: 9, title: "Money Heist", category: "Series", description: "A group of robbers assault the Royal Mint of Spain.", likes: 2900, image: "https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?w=300&h=200&fit=crop" },
-            { id: 10, title: "Spider-Man", category: "Movie", description: "A teenager gains spider powers and becomes a superhero.", likes: 1950, image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop" },
-            { id: 11, title: "Ozark", category: "Series", description: "A family launders money for a Mexican drug cartel.", likes: 1750, image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=200&fit=crop" },
-            { id: 12, title: "The Witcher", category: "Series", description: "A monster hunter struggles to find his place.", likes: 2200, image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop" }
+            // Continue Watching (Recently viewed content with progress)
+            { id: 1, title: "Stranger Things", category: "Series", description: "When a young boy vanishes, a small town uncovers mysteries.", likes: 1250, image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=400&h=225&fit=crop", section: "continue", progress: 65 },
+            { id: 2, title: "The Crown", category: "Series", description: "The reign of Queen Elizabeth II after World War II.", likes: 980, image: "https://images.unsplash.com/photo-1580130775562-0ef92da028de?w=400&h=225&fit=crop", section: "continue", progress: 23 },
+            { id: 3, title: "Breaking Bad", category: "Series", description: "A high school teacher turns to manufacturing drugs.", likes: 2100, image: "https://images.unsplash.com/photo-1489599165726-e77b26de1925?w=400&h=225&fit=crop", section: "continue", progress: 89 },
+            
+            // Trending Now
+            { id: 4, title: "Wednesday", category: "Series", description: "A supernatural mystery comedy horror coming-of-age series.", likes: 3200, image: "https://images.unsplash.com/photo-1567744726458-d5c7e8ad38e0?w=400&h=225&fit=crop", section: "trending" },
+            { id: 5, title: "Glass Onion", category: "Movie", description: "A detective investigates a murder mystery at a Greek island.", likes: 1800, image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=225&fit=crop", section: "trending" },
+            { id: 6, title: "The Sandman", category: "Series", description: "A mythic figure is captured and must rebuild his realm.", likes: 2850, image: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&h=225&fit=crop", section: "trending" },
+            { id: 7, title: "Dahmer", category: "Series", description: "The story of one of America's most notorious serial killers.", likes: 1650, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop", section: "trending" },
+            
+            // Popular Movies
+            { id: 8, title: "Top Gun: Maverick", category: "Movie", description: "After thirty years, Maverick is still pushing the envelope.", likes: 2400, image: "https://images.unsplash.com/photo-1489599165726-e77b26de1925?w=400&h=225&fit=crop", section: "movies" },
+            { id: 9, title: "The Adam Project", category: "Movie", description: "A time-traveling fighter pilot teams up with his younger self.", likes: 2900, image: "https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?w=400&h=225&fit=crop", section: "movies" },
+            { id: 10, title: "Red Notice", category: "Movie", description: "An FBI profiler pursues the world's most wanted art thief.", likes: 1950, image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop", section: "movies" },
+            { id: 11, title: "Don't Look Up", category: "Movie", description: "Two astronomers try to warn humanity about an approaching comet.", likes: 1750, image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=225&fit=crop", section: "movies" },
+            
+            // Popular Series
+            { id: 12, title: "The Witcher", category: "Series", description: "A monster hunter struggles to find his place.", likes: 2200, image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=225&fit=crop", section: "series" },
+            { id: 13, title: "Ozark", category: "Series", description: "A family launders money for a Mexican drug cartel.", likes: 1870, image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=400&h=225&fit=crop", section: "series" },
+            { id: 14, title: "Squid Game", category: "Series", description: "Players compete in deadly children's games for a cash prize.", likes: 3500, image: "https://images.unsplash.com/photo-1580130775562-0ef92da028de?w=400&h=225&fit=crop", section: "series" },
+            { id: 15, title: "Money Heist", category: "Series", description: "A group of robbers assault the Royal Mint of Spain.", likes: 2650, image: "https://images.unsplash.com/photo-1489599165726-e77b26de1925?w=400&h=225&fit=crop", section: "series" }
         ];
 
-        // Netflix Feed Application
+        // Netflix Feed Application with Horizontal Scrolling
         class NetflixFeed {
             constructor() {
                 this.allContent = [...CONTENT_DATA];
-                this.displayedContent = [...this.allContent];
                 this.likedItems = this.getLikedFromStorage();
                 this.searchTerm = '';
                 this.isAlphaSorted = false;
+                this.sections = {
+                    continue: this.allContent.filter(item => item.section === 'continue'),
+                    trending: this.allContent.filter(item => item.section === 'trending'),
+                    movies: this.allContent.filter(item => item.section === 'movies'),
+                    series: this.allContent.filter(item => item.section === 'series')
+                };
                 
                 this.init();
             }
 
             init() {
                 this.loadProfile();
-                this.renderContent();
+                this.renderAllSections();
                 this.setupEventListeners();
             }
 
@@ -194,11 +263,17 @@
                 };
                 
                 const profileId = localStorage.getItem('netflix:profileId');
+                const profileName = localStorage.getItem('netflix:profileName') || 'User';
                 const profileImage = document.getElementById('profileImage');
+                const profileNameDisplay = document.getElementById('profileNameDisplay');
                 
                 if (profileId && profileAvatars[profileId] && profileImage) {
                     profileImage.src = profileAvatars[profileId];
                     profileImage.style.display = 'block';
+                }
+                
+                if (profileNameDisplay) {
+                    profileNameDisplay.textContent = profileName;
                 }
             }
 
@@ -207,7 +282,7 @@
                 const searchInput = document.getElementById('searchInput');
                 searchInput.addEventListener('input', (e) => {
                     this.searchTerm = e.target.value.toLowerCase().trim();
-                    this.filterAndRender();
+                    this.handleSearch();
                 });
 
                 // Sort functionality
@@ -217,23 +292,53 @@
                 });
             }
 
-            filterAndRender() {
-                let filtered = this.allContent;
-
-                // Apply search filter
+            handleSearch() {
+                const searchResultsSection = document.getElementById('searchResultsSection');
+                const allSections = document.querySelectorAll('.netflix-row:not(#searchResultsSection)');
+                
                 if (this.searchTerm) {
-                    filtered = filtered.filter(item => 
-                        item.title.toLowerCase().includes(this.searchTerm)
-                    );
+                    // Hide all normal sections
+                    allSections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    // Show search results
+                    searchResultsSection.style.display = 'block';
+                    this.renderSearchResults();
+                } else {
+                    // Show all normal sections
+                    allSections.forEach(section => {
+                        section.style.display = 'block';
+                    });
+                    
+                    // Hide search results
+                    searchResultsSection.style.display = 'none';
+                    this.renderAllSections();
                 }
+            }
 
-                // Apply sorting
+            renderSearchResults() {
+                let filtered = this.allContent.filter(item => 
+                    item.title.toLowerCase().includes(this.searchTerm)
+                );
+
                 if (this.isAlphaSorted) {
                     filtered.sort((a, b) => a.title.localeCompare(b.title));
                 }
 
-                this.displayedContent = filtered;
-                this.renderContent();
+                const searchSlider = document.getElementById('searchResultsSlider');
+                
+                if (filtered.length === 0) {
+                    searchSlider.innerHTML = `
+                        <div style="color: #666; text-align: center; width: 100%; padding: 40px;">
+                            <h4>No results found</h4>
+                            <p>Try adjusting your search terms</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                searchSlider.innerHTML = filtered.map(item => this.createNetflixCard(item)).join('');
             }
 
             toggleAlphaSort() {
@@ -248,124 +353,64 @@
                     sortButton.classList.remove('active');
                 }
                 
-                this.filterAndRender();
+                // Re-render current view
+                if (this.searchTerm) {
+                    this.renderSearchResults();
+                } else {
+                    this.renderAllSections();
+                }
             }
 
-            createMovieCard(item) {
+            createNetflixCard(item) {
                 const isLiked = this.likedItems.has(item.id);
                 const likeCount = item.likes + (isLiked ? 1 : 0);
+                const progress = item.progress || 0;
 
                 return `
-                    <div class="col-6 col-md-4 col-lg-3 col-xl-2 mb-4" data-id="${item.id}">
-                        <div class="movie-card position-relative" style="
-                            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('${item.image}');
-                            background-size: cover;
-                            background-position: center;
-                            border-radius: 8px;
-                            height: 280px;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                            border: 2px solid transparent;
-                            overflow: hidden;
-                        ">
-                            <div class="like-button position-absolute" style="
-                                top: 10px;
-                                right: 10px;
-                                background: rgba(0,0,0,0.7);
-                                border: none;
-                                border-radius: 50%;
-                                width: 40px;
-                                height: 40px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                cursor: pointer;
-                                transition: all 0.2s ease;
-                                z-index: 2;
-                            " onclick="netflixFeed.toggleLike(${item.id}, event)">
-                                <span style="font-size: 18px; color: ${isLiked ? '#e50914' : 'white'};">
+                    <div class="netflix-card" data-id="${item.id}">
+                        <div class="netflix-card-image" style="background-image: url('${item.image}')">
+                            ${progress > 0 ? `<div style="position: absolute; bottom: 0; left: 0; height: 3px; background: var(--netflix-red); width: ${progress}%; z-index: 2;"></div>` : ''}
+                            
+                            <div class="netflix-card-overlay"></div>
+                            
+                            <button class="netflix-like-btn ${isLiked ? 'liked' : ''}" onclick="netflixFeed.toggleLike(${item.id}, event)">
+                                <span style="font-size: 14px;">
                                     ${isLiked ? '❤️' : '🤍'}
                                 </span>
-                            </div>
+                            </button>
                             
-                            <div class="movie-info position-absolute" style="
-                                bottom: 0;
-                                left: 0;
-                                right: 0;
-                                padding: 20px 15px 15px;
-                                background: linear-gradient(transparent, rgba(0,0,0,0.9));
-                                color: white;
-                            ">
-                                <h5 style="
-                                    font-size: 16px;
-                                    font-weight: 600;
-                                    margin-bottom: 8px;
-                                    line-height: 1.2;
-                                ">${item.title}</h5>
-                                <p style="
-                                    font-size: 12px;
-                                    color: #ccc;
-                                    margin-bottom: 8px;
-                                    line-height: 1.3;
-                                    overflow: hidden;
-                                    display: -webkit-box;
-                                    -webkit-line-clamp: 2;
-                                    -webkit-box-orient: vertical;
-                                ">${item.description}</p>
-                                <div style="
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                    font-size: 11px;
-                                ">
-                                    <span style="
-                                        background: rgba(230, 9, 20, 0.8);
-                                        padding: 2px 8px;
-                                        border-radius: 12px;
-                                        font-weight: 500;
-                                    ">${item.category}</span>
-                                    <span style="color: #aaa;">
+                            <div class="netflix-card-info">
+                                <div class="netflix-card-title">${item.title}</div>
+                                <div class="netflix-card-meta">
+                                    <span class="netflix-card-category">${item.category}</span>
+                                    <span class="netflix-card-likes">
                                         ❤️ <span class="like-count-${item.id}">${likeCount}</span>
                                     </span>
                                 </div>
+                                <div class="netflix-card-description">${item.description}</div>
                             </div>
                         </div>
                     </div>
                 `;
             }
 
-            renderContent() {
-                const contentFeed = document.getElementById('contentFeed');
-                
-                if (this.displayedContent.length === 0) {
-                    contentFeed.innerHTML = `
-                        <div class="col-12 text-center py-5">
-                            <h4 style="color: #666;">No results found</h4>
-                            <p style="color: #999;">Try adjusting your search terms</p>
-                        </div>
-                    `;
-                    return;
+            renderSection(sectionId, content) {
+                const slider = document.getElementById(sectionId);
+                if (!slider) return;
+
+                let sectionContent = [...content];
+                if (this.isAlphaSorted) {
+                    sectionContent.sort((a, b) => a.title.localeCompare(b.title));
                 }
 
-                contentFeed.innerHTML = this.displayedContent.map(item => this.createMovieCard(item)).join('');
-                this.addHoverEffects();
+                slider.innerHTML = sectionContent.map(item => this.createNetflixCard(item)).join('');
             }
 
-            addHoverEffects() {
-                const movieCards = document.querySelectorAll('.movie-card');
-                movieCards.forEach(card => {
-                    card.addEventListener('mouseenter', function() {
-                        this.style.transform = 'scale(1.05)';
-                        this.style.borderColor = '#e50914';
-                        this.style.boxShadow = '0 8px 25px rgba(229, 9, 20, 0.3)';
-                    });
-                    
-                    card.addEventListener('mouseleave', function() {
-                        this.style.transform = 'scale(1)';
-                        this.style.borderColor = 'transparent';
-                        this.style.boxShadow = 'none';
-                    });
-                });
+            renderAllSections() {
+                this.renderSection('continueWatchingSlider', this.sections.continue);
+                this.renderSection('trendingSlider', this.sections.trending);
+                this.renderSection('moviesSlider', this.sections.movies);
+                this.renderSection('seriesSlider', this.sections.series);
             }
 
             toggleLike(itemId, event) {
@@ -374,29 +419,29 @@
                 const likeButton = event.currentTarget;
                 const heartIcon = likeButton.querySelector('span');
                 
-                // Animate button
-                likeButton.style.transform = 'scale(1.2)';
+                // Add animation class
+                likeButton.classList.add('netflix-like-animation');
                 setTimeout(() => {
-                    likeButton.style.transform = 'scale(1)';
-                }, 150);
+                    likeButton.classList.remove('netflix-like-animation');
+                }, 300);
 
                 if (this.likedItems.has(itemId)) {
                     this.likedItems.delete(itemId);
                     heartIcon.textContent = '🤍';
-                    heartIcon.style.color = 'white';
+                    likeButton.classList.remove('liked');
                 } else {
                     this.likedItems.add(itemId);
                     heartIcon.textContent = '❤️';
-                    heartIcon.style.color = '#e50914';
+                    likeButton.classList.add('liked');
                 }
 
                 // Update like count
                 const item = this.allContent.find(item => item.id === itemId);
                 const newCount = item.likes + (this.likedItems.has(itemId) ? 1 : 0);
-                const likeCountEl = document.querySelector(`.like-count-${itemId}`);
-                if (likeCountEl) {
-                    likeCountEl.textContent = newCount;
-                }
+                const likeCountElements = document.querySelectorAll(`.like-count-${itemId}`);
+                likeCountElements.forEach(el => {
+                    el.textContent = newCount;
+                });
 
                 // Save to localStorage
                 this.saveLikesToStorage();
