@@ -890,8 +890,8 @@ body {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: rgba(0, 0, 0, 0.7);
-    border: none;
+    background: rgba(109, 109, 110, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     width: 32px;
     height: 32px;
@@ -900,24 +900,32 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    opacity: 0;
-    transform: scale(0.8);
+    opacity: 0.7;
+    transform: scale(0.9);
     z-index: 5;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
 }
 
 .netflix-card:hover .netflix-like-btn {
     opacity: 1;
     transform: scale(1);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: white;
 }
 
 .netflix-like-btn:hover {
     background: rgba(229, 9, 20, 0.9);
+    border-color: rgba(229, 9, 20, 1);
     transform: scale(1.1);
+    color: white;
 }
 
 .netflix-like-btn.liked {
     opacity: 1;
     background: rgba(229, 9, 20, 0.9);
+    border-color: rgba(229, 9, 20, 1);
+    color: white;
 }
 
 /* Search and Controls Netflix Style */
@@ -1283,18 +1291,29 @@ body {
     background: rgba(109, 109, 110, 0.7);
     border: 2px solid rgba(255, 255, 255, 0.5);
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 4px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     transition: all 0.2s;
+    height: 48px;
+    min-width: 48px;
+    font-weight: 500;
+    line-height: 1;
 }
 
 .movie-list-btn:hover,
 .movie-like-btn:hover {
     border-color: white;
     background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.movie-like-btn.liked {
+    background: rgba(229, 9, 20, 0.9);
+    border-color: rgba(229, 9, 20, 1);
     color: white;
 }
 

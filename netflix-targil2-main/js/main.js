@@ -178,6 +178,9 @@ class NetflixFeed {
 
         // Load content from API
         await this.loadAllContent();
+
+        // Load featured hero movie
+        this.loadFeaturedHero();
     }
 
     loadProfile() {
@@ -669,6 +672,50 @@ class NetflixFeed {
     }
 
     navigateToMovie(movieId) {
+        window.location.href = `movie-profile.html?id=${movieId}`;
+    }
+
+    loadFeaturedHero() {
+        // Wait a bit to ensure content is loaded
+        setTimeout(() => {
+            if (this.allContent.length > 0) {
+                // Get a random movie from all content
+                const randomIndex = Math.floor(Math.random() * this.allContent.length);
+                const featuredMovie = this.allContent[randomIndex];
+                this.setHeroContent(featuredMovie);
+            }
+        }, 1000);
+    }
+
+    setHeroContent(movie) {
+        const heroSection = document.getElementById('heroSection');
+        const heroTitle = document.getElementById('heroTitle');
+        const heroDescription = document.getElementById('heroDescription');
+        const heroMoreInfoBtn = document.getElementById('heroMoreInfoBtn');
+
+        // Set background image
+        if (movie.backdrop) {
+            heroSection.style.backgroundImage = `linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.8) 80%, rgba(0, 0, 0, 0.95) 100%), url('${movie.backdrop}')`;
+        }
+
+        // Set title and description
+        heroTitle.textContent = movie.title;
+        heroDescription.textContent = movie.description;
+
+        // Store movie ID for buttons
+        heroSection.setAttribute('data-movie-id', movie.id);
+    }
+}
+
+// Global functions for hero buttons
+function playFeaturedMovie() {
+    alert('Play functionality would be implemented here');
+}
+
+function openFeaturedMovieProfile() {
+    const heroSection = document.getElementById('heroSection');
+    const movieId = heroSection.getAttribute('data-movie-id');
+    if (movieId) {
         window.location.href = `movie-profile.html?id=${movieId}`;
     }
 }

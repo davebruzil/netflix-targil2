@@ -225,13 +225,21 @@ class MovieProfile {
         const likeBtn = document.getElementById('movieLikeBtn');
         const heartIcon = likeBtn.querySelector('span');
 
+        // Add animation class
+        likeBtn.classList.add('netflix-like-animation');
+        setTimeout(() => {
+            likeBtn.classList.remove('netflix-like-animation');
+        }, 300);
+
         if (this.likedItems.has(this.movieData.id)) {
             this.likedItems.delete(this.movieData.id);
             heartIcon.textContent = '♡';
+            likeBtn.classList.remove('liked');
             likeBtn.classList.remove('btn-danger');
         } else {
             this.likedItems.add(this.movieData.id);
             heartIcon.textContent = '♥';
+            likeBtn.classList.add('liked');
             likeBtn.classList.add('btn-danger');
         }
 

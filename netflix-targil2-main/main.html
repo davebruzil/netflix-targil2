@@ -64,18 +64,18 @@
     
     <main class="main-content">
         <!-- Hero Section -->
-        <div class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://occ-0-2794-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABXYqjKlOlz6xlkwvtdV-YwdBm-GJnPkKoGJJzPaJGXXbT7gzPqQ8wbX4pIoSCu0jD3PL8c9wgkBDBkDpbBu9bkBkP9U.jpg'); background-size: cover; background-position: center; height: 80vh; display: flex; align-items: center; margin-bottom: 60px;">
-            <div class="container">
+        <div class="hero-section" id="heroSection" style="background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.8) 80%, rgba(0, 0, 0, 0.95) 100%); background-size: cover; background-position: center; background-repeat: no-repeat; height: 100vh; width: 100vw; position: relative; left: 50%; transform: translateX(-50%); display: flex; align-items: flex-end; margin-bottom: 60px;">
+            <div class="container" style="padding-bottom: 80px;">
                 <div class="row">
                     <div class="col-lg-6">
-                        <h1 class="display-4 text-white mb-4" style="font-weight: 700;">Stranger Things</h1>
-                        <p class="lead text-white mb-4">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</p>
+                        <h1 class="display-4 text-white mb-4" style="font-weight: 700;" id="heroTitle">Loading...</h1>
+                        <p class="lead text-white mb-4" id="heroDescription">Loading featured content...</p>
                         <div class="hero-buttons">
-                            <button class="btn btn-light btn-lg me-3" style="padding: 12px 24px; border-radius: 4px;">
-                                ▶️ Play
+                            <button class="btn btn-light btn-lg me-3" style="padding: 12px 24px; border-radius: 4px; height: 48px; line-height: 1;" onclick="playFeaturedMovie()">
+                                <span>▶</span> Play
                             </button>
-                            <button class="btn btn-secondary btn-lg" style="padding: 12px 24px; border-radius: 4px; background-color: rgba(109, 109, 110, 0.7); border: none;">
-                                ℹ️ More Info
+                            <button class="btn btn-lg" style="padding: 12px 24px; border-radius: 4px; background-color: rgba(109, 109, 110, 0.7); border: none; color: white; font-weight: 500; height: 48px; line-height: 1;" id="heroMoreInfoBtn" onclick="openFeaturedMovieProfile()">
+                                <span>ℹ</span> More Info
                             </button>
                         </div>
                     </div>
