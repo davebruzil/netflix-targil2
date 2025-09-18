@@ -26,10 +26,39 @@
                 </div>
                 
                 <div class="d-flex align-items-center">
-                    <div class="search-icon me-3" style="color: white; font-size: 18px; cursor: pointer;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                    <!-- Authentic Netflix Header Search -->
+                    <div class="netflix-header-search position-relative me-3">
+                        <div class="search-trigger" id="searchTrigger">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="netflix-search-box" id="netflixSearchBox">
+                            <div class="search-input-wrapper">
+                                <svg class="search-icon-input" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <input 
+                                    type="text" 
+                                    id="netflixHeaderInput" 
+                                    placeholder="Search titles, people, genres"
+                                    autocomplete="off"
+                                >
+                                <button class="clear-search" id="clearHeaderSearch" type="button">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Search Results Dropdown -->
+                        <div class="netflix-search-dropdown" id="searchDropdown">
+                            <div class="search-results-container" id="searchResultsContainer">
+                                <!-- Dynamic search results will be inserted here -->
+                            </div>
+                        </div>
                     </div>
                     <div class="notifications-icon me-3" style="color: white; font-size: 18px; cursor: pointer;">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -278,18 +307,221 @@
             }
 
             setupEventListeners() {
-                // Search functionality
+                // Main search functionality
                 const searchInput = document.getElementById('searchInput');
                 searchInput.addEventListener('input', (e) => {
                     this.searchTerm = e.target.value.toLowerCase().trim();
+                    this.syncSearchInputs();
                     this.handleSearch();
                 });
+
+                // Header search functionality
+                this.setupHeaderSearch();
 
                 // Sort functionality
                 const sortButton = document.getElementById('sortButton');
                 sortButton.addEventListener('click', () => {
                     this.toggleAlphaSort();
                 });
+            }
+
+            setupHeaderSearch() {
+                const searchTrigger = document.getElementById('searchTrigger');
+                const netflixSearchBox = document.getElementById('netflixSearchBox');
+                const netflixHeaderInput = document.getElementById('netflixHeaderInput');
+                const clearHeaderSearch = document.getElementById('clearHeaderSearch');
+                const searchDropdown = document.getElementById('searchDropdown');
+
+                // Open search box on trigger click
+                searchTrigger.addEventListener('click', () => {
+                    this.openNetflixSearch();
+                });
+
+                // Netflix header search input functionality
+                netflixHeaderInput.addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value.toLowerCase().trim();
+                    this.syncSearchInputs();
+                    this.showSearchDropdown();
+                    this.updateClearButton();
+                });
+
+                // Clear search functionality
+                clearHeaderSearch.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.clearNetflixSearch();
+                });
+
+                // Focus and blur events
+                netflixHeaderInput.addEventListener('focus', () => {
+                    if (this.searchTerm) {
+                        this.showSearchDropdown();
+                    }
+                });
+
+                netflixHeaderInput.addEventListener('blur', (e) => {
+                    // Delay hiding dropdown to allow for clicks on results
+                    setTimeout(() => {
+                        if (!searchDropdown.matches(':hover')) {
+                            this.hideSearchDropdown();
+                        }
+                    }, 150);
+                });
+
+                // Close search when clicking outside
+                document.addEventListener('click', (e) => {
+                    const netflixHeaderSearch = document.querySelector('.netflix-header-search');
+                    
+                    if (!netflixHeaderSearch.contains(e.target)) {
+                        if (!netflixHeaderInput.value) {
+                            this.closeNetflixSearch();
+                        } else {
+                            this.hideSearchDropdown();
+                        }
+                    }
+                });
+
+                // Handle escape key
+                netflixHeaderInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        if (netflixHeaderInput.value) {
+                            this.clearNetflixSearch();
+                        } else {
+                            this.closeNetflixSearch();
+                        }
+                    }
+                });
+            }
+
+            openNetflixSearch() {
+                const netflixSearchBox = document.getElementById('netflixSearchBox');
+                const netflixHeaderInput = document.getElementById('netflixHeaderInput');
+                
+                netflixSearchBox.classList.add('active');
+                setTimeout(() => {
+                    netflixHeaderInput.focus();
+                }, 300);
+            }
+
+            closeNetflixSearch() {
+                const netflixSearchBox = document.getElementById('netflixSearchBox');
+                const netflixHeaderInput = document.getElementById('netflixHeaderInput');
+                
+                netflixSearchBox.classList.remove('active');
+                netflixHeaderInput.blur();
+                this.hideSearchDropdown();
+            }
+
+            clearNetflixSearch() {
+                const netflixHeaderInput = document.getElementById('netflixHeaderInput');
+                const mainSearchInput = document.getElementById('searchInput');
+                
+                netflixHeaderInput.value = '';
+                mainSearchInput.value = '';
+                this.searchTerm = '';
+                this.handleSearch();
+                this.hideSearchDropdown();
+                this.updateClearButton();
+            }
+
+            updateClearButton() {
+                const clearBtn = document.getElementById('clearHeaderSearch');
+                const netflixHeaderInput = document.getElementById('netflixHeaderInput');
+                
+                if (netflixHeaderInput.value) {
+                    clearBtn.classList.add('visible');
+                } else {
+                    clearBtn.classList.remove('visible');
+                }
+            }
+
+            showSearchDropdown() {
+                const searchDropdown = document.getElementById('searchDropdown');
+                const searchResultsContainer = document.getElementById('searchResultsContainer');
+                
+                if (this.searchTerm) {
+                    const filtered = this.allContent.filter(item => 
+                        item.title.toLowerCase().includes(this.searchTerm)
+                    );
+
+                    if (filtered.length === 0) {
+                        searchResultsContainer.innerHTML = `
+                            <div class="no-results">
+                                No titles found for "${this.searchTerm}"
+                            </div>
+                        `;
+                    } else {
+                        const results = filtered.slice(0, 6); // Limit to 6 results
+                        searchResultsContainer.innerHTML = results.map(item => 
+                            this.createSearchResultItem(item)
+                        ).join('');
+                    }
+                    
+                    searchDropdown.classList.add('visible');
+                } else {
+                    this.hideSearchDropdown();
+                }
+            }
+
+            hideSearchDropdown() {
+                const searchDropdown = document.getElementById('searchDropdown');
+                searchDropdown.classList.remove('visible');
+            }
+
+            createSearchResultItem(item) {
+                const isLiked = this.likedItems.has(item.id);
+                const likeCount = item.likes + (isLiked ? 1 : 0);
+                
+                return `
+                    <div class="search-result-item" onclick="netflixFeed.selectSearchResult(${item.id})">
+                        <div class="search-result-image" style="background-image: url('${item.image}')"></div>
+                        <div class="search-result-info">
+                            <div class="search-result-title">${item.title}</div>
+                            <div class="search-result-meta">
+                                <span class="search-result-category">${item.category}</span>
+                                <span>❤️ ${likeCount}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            selectSearchResult(itemId) {
+                // When clicking on a search result, highlight the item and close search
+                this.hideSearchDropdown();
+                this.closeNetflixSearch();
+                
+                // Scroll to and highlight the selected item
+                const itemCard = document.querySelector(`[data-id="${itemId}"]`);
+                if (itemCard) {
+                    itemCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    itemCard.style.transform = 'scale(1.05)';
+                    itemCard.style.boxShadow = '0 0 20px rgba(229, 9, 20, 0.5)';
+                    
+                    setTimeout(() => {
+                        itemCard.style.transform = '';
+                        itemCard.style.boxShadow = '';
+                    }, 2000);
+                }
+            }
+
+            syncSearchInputs() {
+                const netflixHeaderInput = document.getElementById('netflixHeaderInput');
+                const mainSearchInput = document.getElementById('searchInput');
+                
+                // Update both inputs to match current search term
+                if (netflixHeaderInput.value !== this.searchTerm) {
+                    netflixHeaderInput.value = this.searchTerm;
+                }
+                if (mainSearchInput.value !== this.searchTerm) {
+                    mainSearchInput.value = this.searchTerm;
+                }
+
+                // Auto-open Netflix search if there's a search term from main input
+                if (this.searchTerm && !document.getElementById('netflixSearchBox').classList.contains('active')) {
+                    this.openNetflixSearch();
+                }
+                
+                this.updateClearButton();
             }
 
             handleSearch() {
