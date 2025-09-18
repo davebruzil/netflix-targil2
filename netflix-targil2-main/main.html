@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Browse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a href="main.html" class="navbar-brand me-4">
+                    <img src="images/better.png" alt="NETFLIX" class="logo-nav">
+                </a>
+                
+                <div class="navbar-nav d-none d-lg-flex me-auto">
+                    <a class="nav-link text-white active" href="main.html" style="margin-right: 20px;">Home</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">TV Shows</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">Movies</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">Games</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">New & Popular</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">My List</a>
+                    <a class="nav-link text-white" href="#" style="margin-right: 20px;">Browse by Languages</a>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <!-- Simple Search Icon that redirects to main search -->
+                    <div class="search-trigger me-3" id="headerSearchIcon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="notifications-icon me-3" style="color: white; font-size: 18px; cursor: pointer;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="dropdown">
+                        <div class="profile-dropdown-container d-flex align-items-center" data-bs-toggle="dropdown" style="cursor: pointer;">
+                            <div class="profile-icon" id="currentProfileAvatar" style="width: 32px; height: 32px; background-color: #666; border-radius: 4px; overflow: hidden;">
+                                <img id="profileImage" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            </div>
+                            <div class="dropdown-arrow ms-1" style="color: white; font-size: 12px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 9L12 15L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="profiles.html">Switch Profiles</a></li>
+                            <li><a class="dropdown-item" href="#">Account</a></li>
+                            <li><a class="dropdown-item" href="#">Help Center</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="netflixLogout()">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <!-- Hero Section -->
+        <div class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://occ-0-2794-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABXYqjKlOlz6xlkwvtdV-YwdBm-GJnPkKoGJJzPaJGXXbT7gzPqQ8wbX4pIoSCu0jD3PL8c9wgkBDBkDpbBu9bkBkP9U.jpg'); background-size: cover; background-position: center; height: 80vh; display: flex; align-items: center; margin-bottom: 60px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 text-white mb-4" style="font-weight: 700;">Stranger Things</h1>
+                        <p class="lead text-white mb-4">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</p>
+                        <div class="hero-buttons">
+                            <button class="btn btn-light btn-lg me-3" style="padding: 12px 24px; border-radius: 4px;">
+                                ▶️ Play
+                            </button>
+                            <button class="btn btn-secondary btn-lg" style="padding: 12px 24px; border-radius: 4px; background-color: rgba(109, 109, 110, 0.7); border: none;">
+                                ℹ️ More Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Controls (Netflix Style) -->
+        <div class="container-fluid mb-4" style="max-width: 1400px;">
+            <div class="row">
+                <div class="col-12">
+                    <div class="netflix-search-controls d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                        <div class="search-container flex-grow-1" style="max-width: 400px;">
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                class="form-control netflix-search" 
+                                placeholder="Search titles, genres, or descriptions..."
+                                style="background: rgba(51, 51, 51, 0.7); border: 1px solid #555; color: white; border-radius: 2px; padding: 8px 40px 8px 14px; font-size: 14px;"
+                            >
+                        </div>
+                        <button 
+                            id="sortButton" 
+                            class="btn netflix-sort-btn"
+                            style="background: rgba(109, 109, 110, 0.7); border: none; color: white; border-radius: 2px; padding: 8px 16px; font-size: 14px; font-weight: 500;"
+                        >
+                            Sort A-Z
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Netflix Content Sections -->
+        <div class="netflix-content-container" style="max-width: 1400px; margin: 0 auto;">
+            
+            <!-- Continue Watching Section -->
+            <div class="netflix-row" id="continueWatchingSection">
+                <h3 class="row-title">Continue Watching for <span id="profileNameDisplay">User</span></h3>
+                <div class="netflix-slider-container" role="region" aria-label="Continue Watching">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('continueWatchingSlider', 'left')"
+                            aria-label="Scroll to previous items" tabindex="0">‹</button>
+                    <div class="netflix-slider" id="continueWatchingSlider" role="list" tabindex="0"
+                         aria-label="Continue watching movies and shows">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('continueWatchingSlider', 'right')"
+                            aria-label="Scroll to next items" tabindex="0">›</button>
+                </div>
+            </div>
+
+            <!-- Trending Now Section -->
+            <div class="netflix-row" id="trendingSection">
+                <h3 class="row-title">Trending Now</h3>
+                <div class="netflix-slider-container" role="region" aria-label="Trending Now">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('trendingSlider', 'left')"
+                            aria-label="Scroll to previous trending items" tabindex="0">‹</button>
+                    <div class="netflix-slider" id="trendingSlider" role="list" tabindex="0"
+                         aria-label="Trending movies and shows">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('trendingSlider', 'right')"
+                            aria-label="Scroll to next trending items" tabindex="0">›</button>
+                </div>
+            </div>
+
+            <!-- Popular Movies Section -->
+            <div class="netflix-row" id="moviesSection">
+                <h3 class="row-title">Popular Movies</h3>
+                <div class="netflix-slider-container">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('moviesSlider', 'left')">‹</button>
+                    <div class="netflix-slider" id="moviesSlider">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('moviesSlider', 'right')">›</button>
+                </div>
+            </div>
+
+            <!-- Series Section -->
+            <div class="netflix-row" id="seriesSection">
+                <h3 class="row-title">Popular Series</h3>
+                <div class="netflix-slider-container">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('seriesSlider', 'left')">‹</button>
+                    <div class="netflix-slider" id="seriesSlider">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('seriesSlider', 'right')">›</button>
+                </div>
+            </div>
+
+            <!-- Search Results Section (Hidden by default) -->
+            <div class="netflix-row" id="searchResultsSection" style="display: none;">
+                <h3 class="row-title">Search Results</h3>
+                <div class="netflix-slider-container">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('searchResultsSlider', 'left')">‹</button>
+                    <div class="netflix-slider" id="searchResultsSlider">
+                        <!-- Search results will be inserted here -->
+                    </div>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('searchResultsSlider', 'right')">›</button>
+                </div>
+            </div>
+
+        </div>
+                    
+            <!-- Mobile Menu for smaller screens -->
+            <div class="d-md-none mt-4">
+                <h4 class="text-white mb-3">Browse Categories</h4>
+                <div class="list-group list-group-flush">
+                    <a href="main.html" class="list-group-item list-group-item-dark active" style="background-color: #333; color: white; border-color: #333;">
+                        🏠 Home
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        📺 TV Shows
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        🎬 Movies
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        🔥 New & Popular
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        📝 My List
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-dark" style="background-color: #141414; color: white; border-color: #333;">
+                        🌍 Browse by Languages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/main.js"></script>
+    
+</body>
+</html>

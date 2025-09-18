@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Who's watching?</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="profile-container">
+        <div class="container text-center">
+            <h1 class="profile-title mb-5">Who's watching?</h1>
+            
+            <div class="profiles-list justify-content-center">
+                <!-- Paul Profile -->
+                <div class="profile-item">
+                    <a href="#" onclick="selectProfile('paul', 'Paul')" style="text-decoration: none; color: inherit;">
+                        <div class="profile-avatar">
+                            <img src="https://i.pravatar.cc/150?img=1" alt="Paul" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="profile-name">Paul</div>
+                    </a>
+                </div>
+                
+                <!-- Alon Profile -->
+                <div class="profile-item">
+                    <a href="#" onclick="selectProfile('alon', 'Alon')" style="text-decoration: none; color: inherit;">
+                        <div class="profile-avatar">
+                            <img src="https://i.pravatar.cc/150?img=8" alt="Alon" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="profile-name">Alon</div>
+                    </a>
+                </div>
+                
+                <!-- Ronni Profile -->
+                <div class="profile-item">
+                    <a href="#" onclick="selectProfile('ronni', 'Ronni')" style="text-decoration: none; color: inherit;">
+                        <div class="profile-avatar">
+                            <img src="https://i.pravatar.cc/150?img=9" alt="Ronni" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="profile-name">Ronni</div>
+                    </a>
+                </div>
+                
+                <!-- Anna Profile -->
+                <div class="profile-item">
+                    <a href="#" onclick="selectProfile('anna', 'Anna')" style="text-decoration: none; color: inherit;">
+                        <div class="profile-avatar">
+                            <img src="https://i.pravatar.cc/150?img=5" alt="Anna" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="profile-name">Anna</div>
+                    </a>
+                </div>
+                
+                <!-- Noa Profile -->
+                <div class="profile-item">
+                    <a href="#" onclick="selectProfile('noa', 'Noa')" style="text-decoration: none; color: inherit;">
+                        <div class="profile-avatar">
+                            <img src="https://i.pravatar.cc/150?img=10" alt="Noa" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="profile-name">Noa</div>
+                    </a>
+                </div>
+            </div>
+            
+            <button class="manage-profiles-btn mt-5">Manage Profiles</button>
+            <button class="manage-profiles-btn mt-3" onclick="netflixLogout()" style="background-color: transparent; border: 1px solid #e50914; color: #e50914;">Sign Out</button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
