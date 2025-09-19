@@ -3,7 +3,7 @@
 // Now with backend integration for likes, progress, and search
 
 class NetflixAPI {
-    static BACKEND_URL = 'http://localhost:5000/api';
+    static BACKEND_URL = window.AppConfig?.get('BACKEND_URL') || 'http://localhost:5000/api';
     /**
      * Fetch movie/TV show data from TMDB API
      * @param {number|string} id - TMDB ID
@@ -148,7 +148,9 @@ class NetflixAPI {
      */
     static async searchContentBackend(query, limit = 20) {
         try {
-            const response = await fetch(`${this.BACKEND_URL}/content/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+            const profileId = this.getCurrentProfileId();
+            const url = `${this.BACKEND_URL}/content/search?q=${encodeURIComponent(query)}&limit=${limit}${profileId ? `&profileId=${profileId}` : ''}`;
+            const response = await fetch(url);
             const data = await response.json();
 
             if (data.success) {

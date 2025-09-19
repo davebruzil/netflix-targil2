@@ -219,7 +219,7 @@ class MovieProfile {
         });
     }
 
-    toggleLike() {
+    async toggleLike() {
         if (!this.movieData) return;
 
         const likeBtn = document.getElementById('movieLikeBtn');
@@ -231,16 +231,56 @@ class MovieProfile {
             likeBtn.classList.remove('netflix-like-animation');
         }, 300);
 
-        if (this.likedItems.has(this.movieData.id)) {
-            this.likedItems.delete(this.movieData.id);
-            heartIcon.textContent = '♡';
-            likeBtn.classList.remove('liked');
-            likeBtn.classList.remove('btn-danger');
-        } else {
+        const wasLiked = this.likedItems.has(this.movieData.id);
+        const newLikedState = !wasLiked;
+
+        // Optimistic UI update
+        if (newLikedState) {
             this.likedItems.add(this.movieData.id);
             heartIcon.textContent = '♥';
             likeBtn.classList.add('liked');
             likeBtn.classList.add('btn-danger');
+        } else {
+            this.likedItems.delete(this.movieData.id);
+            heartIcon.textContent = '♡';
+            likeBtn.classList.remove('liked');
+            likeBtn.classList.remove('btn-danger');
+        }
+
+        // Update backend
+        try {
+            const result = await NetflixAPI.toggleLike(this.movieData.id, newLikedState);
+            if (result) {
+                // Backend success - keep UI changes
+                console.log('Like updated successfully:', result);
+            } else {
+                // Revert UI on backend failure
+                if (wasLiked) {
+                    this.likedItems.add(this.movieData.id);
+                    heartIcon.textContent = '♥';
+                    likeBtn.classList.add('liked');
+                    likeBtn.classList.add('btn-danger');
+                } else {
+                    this.likedItems.delete(this.movieData.id);
+                    heartIcon.textContent = '♡';
+                    likeBtn.classList.remove('liked');
+                    likeBtn.classList.remove('btn-danger');
+                }
+            }
+        } catch (error) {
+            console.warn('Like toggle failed, reverting:', error);
+            // Revert UI on error
+            if (wasLiked) {
+                this.likedItems.add(this.movieData.id);
+                heartIcon.textContent = '♥';
+                likeBtn.classList.add('liked');
+                likeBtn.classList.add('btn-danger');
+            } else {
+                this.likedItems.delete(this.movieData.id);
+                heartIcon.textContent = '♡';
+                likeBtn.classList.remove('liked');
+                likeBtn.classList.remove('btn-danger');
+            }
         }
 
         this.saveLikesToStorage();

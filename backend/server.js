@@ -21,8 +21,8 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files from parent directory (frontend)
-app.use(express.static(path.join(__dirname, '..')));
+// Serve static files from frontend directory
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // API Routes
 app.use('/api/content', contentRoutes);
@@ -50,7 +50,7 @@ app.get('*', (req, res) => {
 
     // Serve main.html for the main app
     if (req.path === '/' || req.path === '/main' || req.path === '/main.html') {
-        return res.sendFile(path.join(__dirname, '..', 'main.html'), (err) => {
+        return res.sendFile(path.join(__dirname, '..', 'frontend', 'main.html'), (err) => {
             if (err) {
                 console.error('Error serving main.html:', err);
                 res.status(404).send('File not found');
@@ -58,7 +58,7 @@ app.get('*', (req, res) => {
         });
     } else {
         // Try to serve the requested file with error handling
-        const filePath = path.join(__dirname, '..', req.path);
+        const filePath = path.join(__dirname, '..', 'frontend', req.path);
         res.sendFile(filePath, (err) => {
             if (err) {
                 console.warn(`File not found: ${req.path}`);

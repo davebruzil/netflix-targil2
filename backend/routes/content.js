@@ -34,6 +34,7 @@ async function writeContentData(data) {
 
 // GET /api/content - Fetch all content catalog
 router.get('/', async (req, res) => {
+    console.log('📥 GET /api/content - Fetching all content catalog');
     try {
         const contentData = await readContentData();
 
@@ -82,10 +83,11 @@ router.get('/sections', async (req, res) => {
     }
 });
 
-// GET /api/content/search - Search content
+// GET /api/content/search - Search content with history tracking
 router.get('/search', async (req, res) => {
+    console.log(`🔍 GET /api/content/search - Query: "${req.query.q}", ProfileId: ${req.query.profileId}, Limit: ${req.query.limit}`);
     try {
-        const { q: query, limit = 20 } = req.query;
+        const { q: query, limit = 20, profileId } = req.query;
 
         if (!query || query.trim().length === 0) {
             return res.json({
@@ -107,6 +109,41 @@ router.get('/search', async (req, res) => {
 
             return titleMatch || descriptionMatch || genreMatch || categoryMatch;
         }).slice(0, parseInt(limit));
+
+        // Track search history if profileId provided
+        if (profileId && results.length > 0) {
+            console.log(`📝 Tracking search history for profile: ${profileId}, Query: "${searchTerm}", Results: ${results.length}`);
+
+            if (!contentData.profiles[profileId]) {
+                contentData.profiles[profileId] = {
+                    likedContent: [],
+                    watchProgress: {},
+                    searchHistory: [],
+                    activityLog: []
+                };
+            }
+
+            // Add to search history (keep last 50 searches)
+            const profile = contentData.profiles[profileId];
+            profile.searchHistory.unshift({
+                query: searchTerm,
+                resultsCount: results.length,
+                timestamp: new Date().toISOString()
+            });
+            profile.searchHistory = profile.searchHistory.slice(0, 50);
+
+            // Add to activity log
+            profile.activityLog.unshift({
+                action: 'search',
+                query: searchTerm,
+                resultsCount: results.length,
+                timestamp: new Date().toISOString()
+            });
+            profile.activityLog = profile.activityLog.slice(0, 100);
+
+            await writeContentData(contentData);
+            console.log(`✅ Search history saved for profile: ${profileId}`);
+        }
 
         res.json({
             success: true,
@@ -139,9 +176,15 @@ router.get('/:id', async (req, res) => {
             });
         }
 
+        // Add like count from contentLikes
+        const itemWithLikes = {
+            ...item,
+            likes: contentData.contentLikes?.[id] || 0
+        };
+
         res.json({
             success: true,
-            data: item
+            data: itemWithLikes
         });
     } catch (error) {
         res.status(500).json({
@@ -154,6 +197,7 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/content/:id/like - Toggle like status for content
 router.post('/:id/like', async (req, res) => {
+    console.log(`❤️ POST /api/content/${req.params.id}/like - ProfileId: ${req.body.profileId}, Liked: ${req.body.liked}`);
     try {
         const { id } = req.params;
         const { profileId, liked } = req.body;
@@ -185,26 +229,56 @@ router.post('/:id/like', async (req, res) => {
         if (!contentData.profiles[profileId]) {
             contentData.profiles[profileId] = {
                 likedContent: [],
-                watchProgress: {}
+                watchProgress: {},
+                searchHistory: [],
+                activityLog: []
             };
         }
 
         const profile = contentData.profiles[profileId];
         const contentItem = contentData.content[contentIndex];
 
+        // Initialize contentLikes if it doesn't exist
+        if (!contentData.contentLikes) {
+            contentData.contentLikes = {};
+        }
+        if (!contentData.contentLikes[id]) {
+            contentData.contentLikes[id] = 0;
+        }
+
         // Toggle like status
         if (liked) {
             // Add to liked content if not already there
             if (!profile.likedContent.includes(id)) {
                 profile.likedContent.push(id);
-                contentItem.likes += 1;
+                contentData.contentLikes[id] += 1;
+
+                // Log activity
+                profile.activityLog.unshift({
+                    action: 'like',
+                    contentId: id,
+                    contentTitle: contentItem.title,
+                    timestamp: new Date().toISOString()
+                });
+                profile.activityLog = profile.activityLog.slice(0, 100);
+                console.log(`✅ Like activity logged for profile: ${profileId}, Content: ${contentItem.title}`);
             }
         } else {
             // Remove from liked content
             const likedIndex = profile.likedContent.indexOf(id);
             if (likedIndex > -1) {
                 profile.likedContent.splice(likedIndex, 1);
-                contentItem.likes = Math.max(0, contentItem.likes - 1);
+                contentData.contentLikes[id] = Math.max(0, contentData.contentLikes[id] - 1);
+
+                // Log activity
+                profile.activityLog.unshift({
+                    action: 'unlike',
+                    contentId: id,
+                    contentTitle: contentItem.title,
+                    timestamp: new Date().toISOString()
+                });
+                profile.activityLog = profile.activityLog.slice(0, 100);
+                console.log(`✅ Unlike activity logged for profile: ${profileId}, Content: ${contentItem.title}`);
             }
         }
 
@@ -216,7 +290,7 @@ router.post('/:id/like', async (req, res) => {
             data: {
                 contentId: id,
                 liked: profile.likedContent.includes(id),
-                totalLikes: contentItem.likes
+                totalLikes: contentData.contentLikes[id]
             }
         });
     } catch (error) {
@@ -292,12 +366,30 @@ router.post('/:id/progress', async (req, res) => {
         if (!contentData.profiles[profileId]) {
             contentData.profiles[profileId] = {
                 likedContent: [],
-                watchProgress: {}
+                watchProgress: {},
+                searchHistory: [],
+                activityLog: []
             };
         }
 
         // Update progress
-        contentData.profiles[profileId].watchProgress[id] = Math.max(0, Math.min(100, progress));
+        const newProgress = Math.max(0, Math.min(100, progress));
+        const oldProgress = contentData.profiles[profileId].watchProgress[id] || 0;
+        contentData.profiles[profileId].watchProgress[id] = newProgress;
+
+        // Log activity
+        const contentItem = contentData.content.find(item => item.id === id);
+        if (contentItem) {
+            contentData.profiles[profileId].activityLog.unshift({
+                action: 'watch_progress',
+                contentId: id,
+                contentTitle: contentItem.title,
+                progress: newProgress,
+                previousProgress: oldProgress,
+                timestamp: new Date().toISOString()
+            });
+            contentData.profiles[profileId].activityLog = contentData.profiles[profileId].activityLog.slice(0, 100);
+        }
 
         // Save updated data
         await writeContentData(contentData);
@@ -313,6 +405,66 @@ router.post('/:id/progress', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to update progress',
+            message: error.message
+        });
+    }
+});
+
+// GET /api/content/profile/:profileId/search-history - Get search history for profile
+router.get('/profile/:profileId/search-history', async (req, res) => {
+    try {
+        const { profileId } = req.params;
+        const { limit = 20 } = req.query;
+        const contentData = await readContentData();
+
+        const profile = contentData.profiles?.[profileId];
+        if (!profile) {
+            return res.json({
+                success: true,
+                data: []
+            });
+        }
+
+        const searchHistory = profile.searchHistory?.slice(0, parseInt(limit)) || [];
+
+        res.json({
+            success: true,
+            data: searchHistory
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch search history',
+            message: error.message
+        });
+    }
+});
+
+// GET /api/content/profile/:profileId/activity - Get activity log for profile
+router.get('/profile/:profileId/activity', async (req, res) => {
+    try {
+        const { profileId } = req.params;
+        const { limit = 50 } = req.query;
+        const contentData = await readContentData();
+
+        const profile = contentData.profiles?.[profileId];
+        if (!profile) {
+            return res.json({
+                success: true,
+                data: []
+            });
+        }
+
+        const activityLog = profile.activityLog?.slice(0, parseInt(limit)) || [];
+
+        res.json({
+            success: true,
+            data: activityLog
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch activity log',
             message: error.message
         });
     }

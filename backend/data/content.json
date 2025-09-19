@@ -3,39 +3,55 @@
     {
       "id": "movie_550",
       "title": "Fight Club",
-      "description": "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into something much, much more.",
+      "description": "A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.",
       "category": "Movie",
       "image": "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
-      "backdrop": "https://image.tmdb.org/t/p/w1280/52AfXWuXCHn3UjD17rBruA9f5qb.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/hZkgoQYus5vegHoetLkCJzb17zJ.jpg",
       "year": 1999,
-      "rating": "8.8",
+      "rating": "8.4",
       "genre": "Drama, Thriller",
       "runtime": "139 min",
-      "popularity": 85.5,
-      "likes": 2850,
-      "progress": 0,
-      "section": "continue"
+      "popularity": 21.4,
+      "tmdbId": 550,
+      "section": "continue",
+      "likes": 0
     },
     {
       "id": "movie_680",
       "title": "Pulp Fiction",
-      "description": "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
+      "description": "A burger-loving hit man, his philosophical partner, a drug-addled gangster's moll and a washed-up boxer converge in this sprawling crime caper.",
       "category": "Movie",
       "image": "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w1280/4cDFJr4HnXN5AdPw4AKrmLlMWdO.jpg",
       "year": 1994,
-      "rating": "8.9",
+      "rating": "8.5",
       "genre": "Crime, Drama",
       "runtime": "154 min",
-      "popularity": 92.3,
-      "likes": 3258,
-      "progress": 65,
-      "section": "continue"
+      "popularity": 29.8,
+      "tmdbId": 680,
+      "section": "continue",
+      "likes": 0
+    },
+    {
+      "id": "movie_155",
+      "title": "The Dark Knight",
+      "description": "Batman raises the stakes in his war on crime with the help of Lt. Jim Gordon and District Attorney Harvey Dent.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/dqK9Hag1054tghRQSqLSfrkvQnA.jpg",
+      "year": 2008,
+      "rating": "8.5",
+      "genre": "Action, Crime, Drama",
+      "runtime": "152 min",
+      "popularity": 120.3,
+      "tmdbId": 155,
+      "section": "continue",
+      "likes": 0
     },
     {
       "id": "tv_66732",
       "title": "Stranger Things",
-      "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
+      "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments and supernatural forces.",
       "category": "Series",
       "image": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w1280/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
@@ -43,15 +59,45 @@
       "rating": "8.7",
       "genre": "Drama, Fantasy, Horror",
       "runtime": "51 min",
-      "popularity": 98.7,
-      "likes": 4123,
-      "progress": 34,
+      "popularity": 350.2,
+      "tmdbId": 66732,
       "section": "continue"
+    },
+    {
+      "id": "tv_1399",
+      "title": "Game of Thrones",
+      "description": "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+      "year": 2011,
+      "rating": "8.4",
+      "genre": "Action & Adventure, Drama, Sci-Fi & Fantasy",
+      "runtime": "57 min",
+      "popularity": 369.6,
+      "tmdbId": 1399,
+      "section": "continue"
+    },
+    {
+      "id": "tv_1396",
+      "title": "Breaking Bad",
+      "description": "A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing meth.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/3xnWaLQjelJDDF7LT1WBo6f4BRe.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+      "year": 2008,
+      "rating": "8.9",
+      "genre": "Crime, Drama",
+      "runtime": "45 min",
+      "popularity": 208.7,
+      "tmdbId": 1396,
+      "section": "continue",
+      "likes": null
     },
     {
       "id": "movie_438631",
       "title": "Dune",
-      "description": "Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe.",
+      "description": "Paul Atreides must travel to the dangerous planet Arrakis to ensure the future of his family and people.",
       "category": "Movie",
       "image": "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w1280/iopYFuO3QipVuu7LuFKqnmFRgV8.jpg",
@@ -60,14 +106,45 @@
       "genre": "Adventure, Drama, Sci-Fi",
       "runtime": "155 min",
       "popularity": 89.4,
-      "likes": 2934,
-      "progress": 0,
+      "tmdbId": 438631,
       "section": "trending"
+    },
+    {
+      "id": "movie_634649",
+      "title": "Spider-Man: No Way Home",
+      "description": "Peter Parker seeks help from Doctor Strange when his identity is revealed, but the stakes become dangerous.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/14QbnygCuTO0vl7CAFmPf1fgZfV.jpg",
+      "year": 2021,
+      "rating": "8.2",
+      "genre": "Action, Adventure, Sci-Fi",
+      "runtime": "148 min",
+      "popularity": 93.5,
+      "tmdbId": 634649,
+      "section": "trending",
+      "likes": null
+    },
+    {
+      "id": "movie_505642",
+      "title": "Black Panther: Wakanda Forever",
+      "description": "The people of Wakanda fight to protect their home from intervening world powers.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/sv1xJUazXeYqALzczSZ3O6nkH75.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/yYrvN5WFeGYjJnRzhY0QXuo4Isw.jpg",
+      "year": 2022,
+      "rating": "7.3",
+      "genre": "Action, Adventure, Drama",
+      "runtime": "161 min",
+      "popularity": 75.8,
+      "tmdbId": 505642,
+      "section": "trending",
+      "likes": 0
     },
     {
       "id": "tv_119051",
       "title": "Wednesday",
-      "description": "Follow Wednesday Addams' years as a student at Nevermore Academy, where she attempts to master her emerging psychic ability.",
+      "description": "Follow Wednesday Addams' years as a student at Nevermore Academy.",
       "category": "Series",
       "image": "https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w1280/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg",
@@ -76,57 +153,8 @@
       "genre": "Comedy, Crime, Family",
       "runtime": "52 min",
       "popularity": 94.8,
-      "likes": 3847,
-      "progress": 0,
+      "tmdbId": 119051,
       "section": "trending"
-    },
-    {
-      "id": "movie_361743",
-      "title": "Top Gun: Maverick",
-      "description": "After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN's elite graduates on a mission.",
-      "category": "Movie",
-      "image": "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
-      "backdrop": "https://image.tmdb.org/t/p/w1280/odJ4hx6g6vBt4lBWKFD1tI8WS4x.jpg",
-      "year": 2022,
-      "rating": "8.3",
-      "genre": "Action, Drama",
-      "runtime": "130 min",
-      "popularity": 87.6,
-      "likes": 2765,
-      "progress": 0,
-      "section": "movies"
-    },
-    {
-      "id": "tv_71912",
-      "title": "The Witcher",
-      "description": "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
-      "category": "Series",
-      "image": "https://image.tmdb.org/t/p/w500/7vjaCdMw15FEbXyLQTVa04URsPm.jpg",
-      "backdrop": "https://image.tmdb.org/t/p/w1280/wmU3EbgSKDSxlbUjStYGX7SGXP.jpg",
-      "year": 2019,
-      "rating": "8.2",
-      "genre": "Action & Adventure, Drama, Sci-Fi & Fantasy",
-      "runtime": "60 min",
-      "popularity": 91.2,
-      "likes": 3421,
-      "progress": 0,
-      "section": "series"
-    },
-    {
-      "id": "movie_155",
-      "title": "The Dark Knight",
-      "description": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations.",
-      "category": "Movie",
-      "image": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-      "backdrop": "https://image.tmdb.org/t/p/w1280/dqK9Hag1054tghRQSqLSfrkvQnA.jpg",
-      "year": 2008,
-      "rating": "9.0",
-      "genre": "Action, Crime, Drama",
-      "runtime": "152 min",
-      "popularity": 96.8,
-      "likes": 4567,
-      "progress": 78,
-      "section": "continue"
     },
     {
       "id": "tv_85552",
@@ -140,51 +168,173 @@
       "genre": "Drama",
       "runtime": "60 min",
       "popularity": 88.9,
-      "likes": 3187,
-      "progress": 0,
+      "tmdbId": 85552,
       "section": "trending"
     },
     {
-      "id": "movie_634649",
-      "title": "Spider-Man: No Way Home",
-      "description": "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange, the stakes become even more dangerous.",
-      "category": "Movie",
-      "image": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
-      "backdrop": "https://image.tmdb.org/t/p/w1280/14QbnygCuTO0vl7CAFmPf1fgZfV.jpg",
-      "year": 2021,
-      "rating": "8.2",
-      "genre": "Action, Adventure, Sci-Fi",
-      "runtime": "148 min",
-      "popularity": 93.5,
-      "likes": 4893,
-      "progress": 0,
+      "id": "tv_82856",
+      "title": "The Boys",
+      "description": "A group of vigilantes set out to take down corrupt superheroes.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/mY7SeH4HFFxW1hiI6cWuwCRKptN.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/mGVrXeIjyecj6TKmwPVpHlscEmw.jpg",
+      "year": 2019,
+      "rating": "8.7",
+      "genre": "Action & Adventure, Comedy, Crime",
+      "runtime": "60 min",
+      "popularity": 345.2,
+      "tmdbId": 82856,
       "section": "trending"
+    },
+    {
+      "id": "movie_361743",
+      "title": "Top Gun: Maverick",
+      "description": "After thirty years, Maverick is still pushing the envelope as a top naval aviator.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/odJ4hx6g6vBt4lBWKFD1tI8WS4x.jpg",
+      "year": 2022,
+      "rating": "8.3",
+      "genre": "Action, Drama",
+      "runtime": "130 min",
+      "popularity": 87.6,
+      "tmdbId": 361743,
+      "section": "movies"
+    },
+    {
+      "id": "movie_791373",
+      "title": "Don't Look Up",
+      "description": "Two astronomers go on a media tour to warn humankind of a planet-killing comet.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/th4E1yqsE8DGpAseLiUrI60Hf8V.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/lNyLSOKMMeUPr1RsL4KcRuIXwHu.jpg",
+      "year": 2021,
+      "rating": "7.2",
+      "genre": "Comedy, Drama, Sci-Fi",
+      "runtime": "138 min",
+      "popularity": 65.4,
+      "tmdbId": 791373,
+      "section": "movies"
+    },
+    {
+      "id": "movie_460465",
+      "title": "Red Notice",
+      "description": "An Interpol agent tracks the world's most wanted art thief.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/lAXONuqg41NwUMuzMiFvicDET9Y.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/dK12GIdhGP6NPGFssK2Fh265jyr.jpg",
+      "year": 2021,
+      "rating": "6.8",
+      "genre": "Action, Comedy, Crime",
+      "runtime": "118 min",
+      "popularity": 78.2,
+      "tmdbId": 460465,
+      "section": "movies"
+    },
+    {
+      "id": "movie_581389",
+      "title": "Space Jam: A New Legacy",
+      "description": "LeBron James teams up with Bugs Bunny and the Looney Tunes for a basketball game.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/5bFK5d3mVTAvBCXi5NPWH0tYjKl.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/8s4h9friP6Ci3adRGahHARVd76E.jpg",
+      "year": 2021,
+      "rating": "7.1",
+      "genre": "Animation, Comedy, Family",
+      "runtime": "115 min",
+      "popularity": 45.3,
+      "tmdbId": 581389,
+      "section": "movies"
+    },
+    {
+      "id": "tv_71912",
+      "title": "The Witcher",
+      "description": "Geralt of Rivia, a monster hunter, struggles to find his place in a world where people often prove more wicked than beasts.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/7vjaCdMw15FEbXyLQTVa04URsPm.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/wmU3EbgSKDSxlbUjStYGX7SGXP.jpg",
+      "year": 2019,
+      "rating": "8.2",
+      "genre": "Action & Adventure, Drama, Sci-Fi & Fantasy",
+      "runtime": "60 min",
+      "popularity": 91.2,
+      "tmdbId": 71912,
+      "section": "series"
+    },
+    {
+      "id": "tv_69050",
+      "title": "Ozark",
+      "description": "A financial advisor drags his family to the Missouri Ozarks for money laundering.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/m73d5J9W3JEavvIje5cl33W2DWS.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/bF6d1LS4b4tjgJJlbRghr9Z8Gby.jpg",
+      "year": 2017,
+      "rating": "8.4",
+      "genre": "Crime, Drama",
+      "runtime": "60 min",
+      "popularity": 156.8,
+      "tmdbId": 69050,
+      "section": "series"
+    },
+    {
+      "id": "tv_87108",
+      "title": "Squid Game",
+      "description": "Hundreds of cash-strapped players accept a strange invitation to compete in children's games.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/qw3J9cNeLioOLoR68WX7z79aCdK.jpg",
+      "year": 2021,
+      "rating": "7.8",
+      "genre": "Action & Adventure, Drama, Mystery",
+      "runtime": "54 min",
+      "popularity": 267.4,
+      "tmdbId": 87108,
+      "section": "series"
+    },
+    {
+      "id": "tv_103768",
+      "title": "House of the Dragon",
+      "description": "The Targaryen civil war, set 200 years before the events of Game of Thrones.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/7QMsOTMUswlwxJP0rTTZfmz2tX2.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/etj8E2o0Bud0HkONVQPjyCkIvep.jpg",
+      "year": 2022,
+      "rating": "8.4",
+      "genre": "Action & Adventure, Drama, Sci-Fi & Fantasy",
+      "runtime": "60 min",
+      "popularity": 987.3,
+      "tmdbId": 103768,
+      "section": "series"
     }
   ],
   "sections": {
     "continue": [
       "movie_550",
       "movie_680",
+      "movie_155",
       "tv_66732",
-      "movie_155"
+      "tv_1399",
+      "tv_1396"
     ],
     "trending": [
       "movie_438631",
+      "movie_634649",
+      "movie_505642",
       "tv_119051",
       "tv_85552",
-      "movie_634649"
+      "tv_82856"
     ],
     "movies": [
       "movie_361743",
-      "movie_155",
-      "movie_680",
-      "movie_550"
+      "movie_791373",
+      "movie_460465",
+      "movie_581389"
     ],
     "series": [
       "tv_71912",
-      "tv_66732",
-      "tv_119051",
-      "tv_85552"
+      "tv_69050",
+      "tv_87108",
+      "tv_103768"
     ]
   },
   "profiles": {
@@ -194,25 +344,33 @@
       ],
       "watchProgress": {
         "movie_550": 45
-      }
+      },
+      "searchHistory": [],
+      "activityLog": []
     },
     "frontend_test": {
       "likedContent": [
         "movie_680"
       ],
-      "watchProgress": {}
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
     },
     "integration_test": {
       "likedContent": [],
       "watchProgress": {
         "movie_155": 25
-      }
+      },
+      "searchHistory": [],
+      "activityLog": []
     },
     "test_user": {
       "likedContent": [
         "movie_550"
       ],
-      "watchProgress": {}
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
     },
     "ronni": {
       "likedContent": [
@@ -220,12 +378,81 @@
         "movie_680",
         "movie_634649"
       ],
-      "watchProgress": {}
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
+    },
+    "alon": {
+      "likedContent": [
+        "tv_1396"
+      ],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
+    },
+    "anna": {
+      "likedContent": [
+        "movie_634649",
+        "movie_550",
+        "movie_155"
+      ],
+      "watchProgress": {},
+      "searchHistory": [
+        {
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T14:54:40.241Z"
+        }
+      ],
+      "activityLog": [
+        {
+          "action": "search",
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T14:54:40.241Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-19T14:54:33.497Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_550",
+          "contentTitle": "Fight Club",
+          "timestamp": "2025-09-19T14:54:26.582Z"
+        }
+      ]
     }
   },
+  "contentLikes": {
+    "movie_550": 2851,
+    "movie_680": 3258,
+    "movie_155": 4568,
+    "tv_66732": 4123,
+    "tv_1399": 3892,
+    "tv_1396": 4567,
+    "movie_438631": 2934,
+    "movie_634649": 4893,
+    "movie_505642": 2234,
+    "tv_119051": 3847,
+    "tv_85552": 3187,
+    "tv_82856": 4012,
+    "movie_361743": 2765,
+    "movie_791373": 1987,
+    "movie_460465": 1654,
+    "movie_581389": 1234,
+    "tv_71912": 3421,
+    "tv_69050": 3654,
+    "tv_87108": 4321,
+    "tv_103768": 3987
+  },
   "metadata": {
-    "lastUpdated": "2025-09-18T18:00:00.000Z",
-    "version": "1.0.0",
-    "totalContent": 10
+    "lastUpdated": "2025-09-19T14:20:00.000Z",
+    "version": "3.0.0",
+    "description": "Hybrid TMDB + User data system",
+    "totalContent": 20,
+    "totalProfiles": 5
   }
 }
