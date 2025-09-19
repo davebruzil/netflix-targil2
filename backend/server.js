@@ -6,8 +6,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-// Import routes
-const contentRoutes = require('./routes/content');
+// Import MVC routes
+const contentRoutes = require('./routes/ContentRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
