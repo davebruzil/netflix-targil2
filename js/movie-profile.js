@@ -297,7 +297,8 @@ class MovieProfile {
 
 // Logout function
 function netflixLogout() {
-    localStorage.removeItem('netflix:isLoggedIn');
+    localStorage.removeItem('netflix:isAuthenticated');
+    localStorage.removeItem('netflix:email');
     localStorage.removeItem('netflix:profileId');
     localStorage.removeItem('netflix:profileName');
     window.location.href = 'index.html';

@@ -1,0 +1,231 @@
+{
+  "content": [
+    {
+      "id": "movie_550",
+      "title": "Fight Club",
+      "description": "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into something much, much more.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/52AfXWuXCHn3UjD17rBruA9f5qb.jpg",
+      "year": 1999,
+      "rating": "8.8",
+      "genre": "Drama, Thriller",
+      "runtime": "139 min",
+      "popularity": 85.5,
+      "likes": 2850,
+      "progress": 0,
+      "section": "continue"
+    },
+    {
+      "id": "movie_680",
+      "title": "Pulp Fiction",
+      "description": "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/4cDFJr4HnXN5AdPw4AKrmLlMWdO.jpg",
+      "year": 1994,
+      "rating": "8.9",
+      "genre": "Crime, Drama",
+      "runtime": "154 min",
+      "popularity": 92.3,
+      "likes": 3258,
+      "progress": 65,
+      "section": "continue"
+    },
+    {
+      "id": "tv_66732",
+      "title": "Stranger Things",
+      "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+      "year": 2016,
+      "rating": "8.7",
+      "genre": "Drama, Fantasy, Horror",
+      "runtime": "51 min",
+      "popularity": 98.7,
+      "likes": 4123,
+      "progress": 34,
+      "section": "continue"
+    },
+    {
+      "id": "movie_438631",
+      "title": "Dune",
+      "description": "Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/iopYFuO3QipVuu7LuFKqnmFRgV8.jpg",
+      "year": 2021,
+      "rating": "8.0",
+      "genre": "Adventure, Drama, Sci-Fi",
+      "runtime": "155 min",
+      "popularity": 89.4,
+      "likes": 2934,
+      "progress": 0,
+      "section": "trending"
+    },
+    {
+      "id": "tv_119051",
+      "title": "Wednesday",
+      "description": "Follow Wednesday Addams' years as a student at Nevermore Academy, where she attempts to master her emerging psychic ability.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg",
+      "year": 2022,
+      "rating": "8.6",
+      "genre": "Comedy, Crime, Family",
+      "runtime": "52 min",
+      "popularity": 94.8,
+      "likes": 3847,
+      "progress": 0,
+      "section": "trending"
+    },
+    {
+      "id": "movie_361743",
+      "title": "Top Gun: Maverick",
+      "description": "After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN's elite graduates on a mission.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/odJ4hx6g6vBt4lBWKFD1tI8WS4x.jpg",
+      "year": 2022,
+      "rating": "8.3",
+      "genre": "Action, Drama",
+      "runtime": "130 min",
+      "popularity": 87.6,
+      "likes": 2765,
+      "progress": 0,
+      "section": "movies"
+    },
+    {
+      "id": "tv_71912",
+      "title": "The Witcher",
+      "description": "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/7vjaCdMw15FEbXyLQTVa04URsPm.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/wmU3EbgSKDSxlbUjStYGX7SGXP.jpg",
+      "year": 2019,
+      "rating": "8.2",
+      "genre": "Action & Adventure, Drama, Sci-Fi & Fantasy",
+      "runtime": "60 min",
+      "popularity": 91.2,
+      "likes": 3421,
+      "progress": 0,
+      "section": "series"
+    },
+    {
+      "id": "movie_155",
+      "title": "The Dark Knight",
+      "description": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/dqK9Hag1054tghRQSqLSfrkvQnA.jpg",
+      "year": 2008,
+      "rating": "9.0",
+      "genre": "Action, Crime, Drama",
+      "runtime": "152 min",
+      "popularity": 96.8,
+      "likes": 4567,
+      "progress": 78,
+      "section": "continue"
+    },
+    {
+      "id": "tv_85552",
+      "title": "Euphoria",
+      "description": "A group of high school students navigate love and friendships in a world of drugs, sex, trauma and hope.",
+      "category": "Series",
+      "image": "https://image.tmdb.org/t/p/w500/3Q0hd3heuWwDWpwcDkhQOA6TYWI.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/oKt4J3TFjWirVwBqoHyIvv5IIqe.jpg",
+      "year": 2019,
+      "rating": "8.4",
+      "genre": "Drama",
+      "runtime": "60 min",
+      "popularity": 88.9,
+      "likes": 3187,
+      "progress": 0,
+      "section": "trending"
+    },
+    {
+      "id": "movie_634649",
+      "title": "Spider-Man: No Way Home",
+      "description": "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange, the stakes become even more dangerous.",
+      "category": "Movie",
+      "image": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/14QbnygCuTO0vl7CAFmPf1fgZfV.jpg",
+      "year": 2021,
+      "rating": "8.2",
+      "genre": "Action, Adventure, Sci-Fi",
+      "runtime": "148 min",
+      "popularity": 93.5,
+      "likes": 4893,
+      "progress": 0,
+      "section": "trending"
+    }
+  ],
+  "sections": {
+    "continue": [
+      "movie_550",
+      "movie_680",
+      "tv_66732",
+      "movie_155"
+    ],
+    "trending": [
+      "movie_438631",
+      "tv_119051",
+      "tv_85552",
+      "movie_634649"
+    ],
+    "movies": [
+      "movie_361743",
+      "movie_155",
+      "movie_680",
+      "movie_550"
+    ],
+    "series": [
+      "tv_71912",
+      "tv_66732",
+      "tv_119051",
+      "tv_85552"
+    ]
+  },
+  "profiles": {
+    "user123": {
+      "likedContent": [
+        "movie_550"
+      ],
+      "watchProgress": {
+        "movie_550": 45
+      }
+    },
+    "frontend_test": {
+      "likedContent": [
+        "movie_680"
+      ],
+      "watchProgress": {}
+    },
+    "integration_test": {
+      "likedContent": [],
+      "watchProgress": {
+        "movie_155": 25
+      }
+    },
+    "test_user": {
+      "likedContent": [
+        "movie_550"
+      ],
+      "watchProgress": {}
+    },
+    "ronni": {
+      "likedContent": [
+        "movie_550",
+        "movie_680",
+        "movie_634649"
+      ],
+      "watchProgress": {}
+    }
+  },
+  "metadata": {
+    "lastUpdated": "2025-09-18T18:00:00.000Z",
+    "version": "1.0.0",
+    "totalContent": 10
+  }
+}
