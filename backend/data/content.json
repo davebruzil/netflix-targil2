@@ -376,11 +376,205 @@
       "likedContent": [
         "movie_550",
         "movie_680",
-        "movie_634649"
+        "movie_634649",
+        "movie_155",
+        "tv_119051"
       ],
       "watchProgress": {},
-      "searchHistory": [],
-      "activityLog": []
+      "searchHistory": [
+        {
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-20T17:32:04.009Z"
+        },
+        {
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-20T17:32:03.979Z"
+        },
+        {
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.947Z"
+        },
+        {
+          "query": "batm",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.921Z"
+        },
+        {
+          "query": "batma",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.885Z"
+        },
+        {
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.377Z"
+        },
+        {
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.840Z"
+        },
+        {
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.745Z"
+        },
+        {
+          "query": "batma",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.608Z"
+        },
+        {
+          "query": "batm",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.533Z"
+        },
+        {
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.284Z"
+        },
+        {
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:35.470Z"
+        },
+        {
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-20T17:31:35.215Z"
+        },
+        {
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-20T17:31:35.145Z"
+        }
+      ],
+      "activityLog": [
+        {
+          "action": "like",
+          "contentId": "tv_119051",
+          "contentTitle": "Wednesday",
+          "timestamp": "2025-09-20T17:35:46.633Z"
+        },
+        {
+          "action": "search",
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-20T17:32:04.009Z"
+        },
+        {
+          "action": "search",
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-20T17:32:03.979Z"
+        },
+        {
+          "action": "search",
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.947Z"
+        },
+        {
+          "action": "search",
+          "query": "batm",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.921Z"
+        },
+        {
+          "action": "search",
+          "query": "batma",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.885Z"
+        },
+        {
+          "action": "search",
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:32:03.377Z"
+        },
+        {
+          "action": "search",
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.840Z"
+        },
+        {
+          "action": "search",
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.745Z"
+        },
+        {
+          "action": "search",
+          "query": "batma",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.608Z"
+        },
+        {
+          "action": "search",
+          "query": "batm",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.533Z"
+        },
+        {
+          "action": "search",
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:36.284Z"
+        },
+        {
+          "action": "search",
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-20T17:31:35.470Z"
+        },
+        {
+          "action": "search",
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-20T17:31:35.215Z"
+        },
+        {
+          "action": "search",
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-20T17:31:35.145Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-20T17:31:32.120Z"
+        },
+        {
+          "action": "unlike",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-20T17:31:31.761Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-20T17:31:31.332Z"
+        },
+        {
+          "action": "unlike",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-20T17:31:30.564Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-20T17:31:11.407Z"
+        }
+      ]
     },
     "alon": {
       "likedContent": [
@@ -394,7 +588,8 @@
       "likedContent": [
         "movie_634649",
         "movie_550",
-        "movie_155"
+        "movie_155",
+        "movie_791373"
       ],
       "watchProgress": {},
       "searchHistory": [
@@ -405,6 +600,12 @@
         }
       ],
       "activityLog": [
+        {
+          "action": "like",
+          "contentId": "movie_791373",
+          "contentTitle": "Don't Look Up",
+          "timestamp": "2025-09-20T17:52:24.992Z"
+        },
         {
           "action": "search",
           "query": "batman",
@@ -536,18 +737,18 @@
   "contentLikes": {
     "movie_550": 2852,
     "movie_680": 3259,
-    "movie_155": 4569,
+    "movie_155": 4570,
     "tv_66732": 4123,
     "tv_1399": 3892,
     "tv_1396": 4567,
     "movie_438631": 2934,
     "movie_634649": 4893,
     "movie_505642": 2234,
-    "tv_119051": 3847,
+    "tv_119051": 3848,
     "tv_85552": 3187,
     "tv_82856": 4012,
     "movie_361743": 2765,
-    "movie_791373": 1987,
+    "movie_791373": 1988,
     "movie_460465": 1654,
     "movie_581389": 1234,
     "tv_71912": 3421,
