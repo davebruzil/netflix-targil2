@@ -8,6 +8,8 @@ const path = require('path');
 
 // Import MVC routes
 const contentRoutes = require('./routes/ContentRoutes');
+const authRoutes = require('./routes/AuthRoutes');
+const profileRoutes = require('./routes/ProfileRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +28,8 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // API Routes
 app.use('/api/content', contentRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/profiles', profileRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
