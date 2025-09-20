@@ -5,44 +5,159 @@
 - **API Base URL**: http://localhost:5000/api
 - **Existing API**: http://localhost:5000/api/content (already working)
 
-## Developer Tasks
+## MVC Architecture Pattern
 
-### Developer 1: Registration & Authentication
-Create authentication system at `/api/auth`
+Our backend follows the **MVC (Model-View-Controller)** pattern:
 
-**Files to create:**
-- `backend/models/User.js`
-- `backend/controllers/AuthController.js`
-- `backend/routes/AuthRoutes.js`
-- `backend/data/users.json`
+### 📁 **Model** (Data Layer)
+- **Purpose**: Handle data operations (reading/writing files, data validation)
+- **Location**: `backend/models/`
+- **Responsibility**: Direct file system operations, data structure definitions
+- **Example**: `User.js` reads/writes to `users.json`, validates user data
 
-**Update:** Add auth routes to `server.js`
+### 🎮 **Controller** (Business Logic Layer)
+- **Purpose**: Process requests, implement business logic, handle errors
+- **Location**: `backend/controllers/`
+- **Responsibility**: HTTP request/response handling, calling models, error handling
+- **Example**: `AuthController.js` handles login logic, calls User model, returns JSON responses
 
-### Developer 2: Profile Management
-Create profile system at `/api/profiles`
+### 🛣️ **Routes** (URL Routing Layer)
+- **Purpose**: Define API endpoints and delegate to controllers
+- **Location**: `backend/routes/`
+- **Responsibility**: URL mapping, middleware, route delegation
+- **Example**: `AuthRoutes.js` defines `/register`, `/login` endpoints, calls AuthController methods
 
-**Files to create:**
-- `backend/models/Profile.js`
-- `backend/controllers/ProfileController.js`
-- `backend/routes/ProfileRoutes.js`
+## Team Assignments
 
-**Update:** Add profile routes to `server.js`
+### 👨‍💻 **Alon - Authentication System** (`/api/auth`)
+**Your mission**: Implement user registration, login, and authentication
 
-## Important Rules
-1. Follow the existing `Content.js` pattern exactly
-2. Always use try-catch in controllers
-3. Return JSON responses: `{ success: true, data: ... }`
-4. Models handle file operations only
-5. Controllers handle HTTP logic
-6. Routes delegate to controllers
+**Model files** (already created for you):
+- ✅ `backend/models/User.js` - Handle user data operations
+- ✅ `backend/data/users.json` - User storage file
 
-## Testing
-Test with curl:
+**You need to implement**:
+- `backend/controllers/AuthController.js` - Authentication logic
+- `backend/routes/AuthRoutes.js` - Auth API endpoints
+
+**Required endpoints**:
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user info
+
+### 👨‍💻 **Yaron - Profile Management** (`/api/profiles`)
+**Your mission**: Implement user profile management and preferences
+
+**Model files** (already created for you):
+- ✅ `backend/models/Profile.js` - Handle profile data operations
+
+**You need to implement**:
+- `backend/controllers/ProfileController.js` - Profile management logic
+- `backend/routes/ProfileRoutes.js` - Profile API endpoints
+
+**Required endpoints**:
+- `GET /api/profiles` - Get all user profiles
+- `POST /api/profiles` - Create new profile
+- `GET /api/profiles/:id` - Get specific profile
+- `PUT /api/profiles/:id` - Update profile
+- `DELETE /api/profiles/:id` - Delete profile
+
+## 📋 Implementation Guidelines
+
+### 🔧 **For Controllers** (`AuthController.js`, `ProfileController.js`)
+```javascript
+// Structure your controllers like this:
+class AuthController {
+    static async register(req, res) {
+        try {
+            // 1. Extract data from req.body
+            const { email, password, firstName, lastName } = req.body;
+
+            // 2. Validate input data
+            if (!email || !password) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Email and password required'
+                });
+            }
+
+            // 3. Call Model methods
+            const user = await User.create({ email, password, firstName, lastName });
+
+            // 4. Return standardized response
+            res.status(201).json({
+                success: true,
+                data: { user }
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: error.message
+            });
+        }
+    }
+}
 ```
-curl -X POST http://localhost:5000/api/auth/register -d '{"email":"test@test.com","password":"123","firstName":"John","lastName":"Doe"}' -H "Content-Type: application/json"
+
+### 🛣️ **For Routes** (`AuthRoutes.js`, `ProfileRoutes.js`)
+```javascript
+// Structure your routes like this:
+const express = require('express');
+const AuthController = require('../controllers/AuthController');
+const router = express.Router();
+
+// Define endpoints and delegate to controller methods
+router.post('/register', AuthController.register);
+router.post('/login', AuthController.login);
+router.get('/logout', AuthController.logout);
+router.get('/me', AuthController.me);
+
+module.exports = router;
 ```
 
-## Do NOT Touch
-- NetflixAPI (frontend)
-- Content.js, ContentController.js, ContentRoutes.js
+### 📁 **Model Files Already Created**
+The model files are already implemented and ready to use:
+- `backend/models/User.js` - Contains methods like `User.create()`, `User.findByEmail()`, etc.
+- `backend/models/Profile.js` - Contains methods like `Profile.create()`, `Profile.findById()`, etc.
+- `backend/data/users.json` - Storage file for user data
+
+## ✅ Testing Your Implementation
+
+### Test Authentication (Alon):
+```bash
+# Register new user
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alon@test.com","password":"123","firstName":"Alon","lastName":"Dev"}'
+
+# Login user
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alon@test.com","password":"123"}'
+```
+
+### Test Profiles (Yaron):
+```bash
+# Create profile
+curl -X POST http://localhost:5000/api/profiles \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Yaron Profile","avatar":"avatar1.png","preferences":{"language":"en"}}'
+
+# Get all profiles
+curl -X GET http://localhost:5000/api/profiles
+```
+
+## 🚨 Important Rules
+1. **Always use try-catch blocks** in controller methods
+2. **Return standardized JSON**: `{ success: true/false, data: ..., error: ... }`
+3. **Models handle file operations only** - don't put HTTP logic in models
+4. **Controllers handle HTTP logic** - request/response, status codes, validation
+5. **Routes just delegate** - keep them simple, just call controller methods
+6. **Follow the existing pattern** - look at `ContentController.js` as reference
+
+## ❌ Do NOT Touch
+- `NetflixAPI` (frontend code)
+- `Content.js`, `ContentController.js`, `ContentRoutes.js` (existing working code)
+- `server.js` (main server file)
 - Any existing functionality
