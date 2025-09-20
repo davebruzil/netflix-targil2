@@ -424,12 +424,119 @@
           "timestamp": "2025-09-19T14:54:26.582Z"
         }
       ]
+    },
+    "noa": {
+      "likedContent": [
+        "movie_550",
+        "movie_680",
+        "movie_155"
+      ],
+      "watchProgress": {},
+      "searchHistory": [
+        {
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.671Z"
+        },
+        {
+          "query": "batma",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.533Z"
+        },
+        {
+          "query": "batm",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.466Z"
+        },
+        {
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.232Z"
+        },
+        {
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:57.627Z"
+        },
+        {
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-19T23:17:57.522Z"
+        },
+        {
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-19T23:17:57.396Z"
+        }
+      ],
+      "activityLog": [
+        {
+          "action": "search",
+          "query": "batman",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.671Z"
+        },
+        {
+          "action": "search",
+          "query": "batma",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.533Z"
+        },
+        {
+          "action": "search",
+          "query": "batm",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.466Z"
+        },
+        {
+          "action": "search",
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:58.232Z"
+        },
+        {
+          "action": "search",
+          "query": "bat",
+          "resultsCount": 1,
+          "timestamp": "2025-09-19T23:17:57.627Z"
+        },
+        {
+          "action": "search",
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-19T23:17:57.522Z"
+        },
+        {
+          "action": "search",
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-19T23:17:57.396Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_155",
+          "contentTitle": "The Dark Knight",
+          "timestamp": "2025-09-19T23:17:56.058Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_680",
+          "contentTitle": "Pulp Fiction",
+          "timestamp": "2025-09-19T23:17:54.749Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_550",
+          "contentTitle": "Fight Club",
+          "timestamp": "2025-09-19T23:03:02.349Z"
+        }
+      ]
     }
   },
   "contentLikes": {
-    "movie_550": 2851,
-    "movie_680": 3258,
-    "movie_155": 4568,
+    "movie_550": 2852,
+    "movie_680": 3259,
+    "movie_155": 4569,
     "tv_66732": 4123,
     "tv_1399": 3892,
     "tv_1396": 4567,
