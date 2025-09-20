@@ -1,4 +1,6 @@
-# Backend MVC Development Guide - COPY PASTE TO AI
+# Netflix Clone - Backend MVC Development Guide
+
+> **Copy-paste instructions for AI development**
 
 ## 🚀 SERVER INFO:
 - **Backend Server**: http://localhost:5000
