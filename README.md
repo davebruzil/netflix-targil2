@@ -63,6 +63,19 @@ Our backend follows the **MVC (Model-View-Controller)** pattern:
 - `PUT /api/profiles/:id` - Update profile
 - `DELETE /api/profiles/:id` - Delete profile
 
+**🔌 Frontend Integration (ALREADY EXISTS)**:
+The frontend already uses these profile features:
+- `profiles.html` - Shows profile selection page with hardcoded profiles
+- `NetflixAPI.getCurrentProfileId()` - Gets current profile from localStorage
+- Profile data stored as: `netflix:profileId` and `netflix:profileName` in localStorage
+- Frontend expects profiles like: `paul`, `alon`, `ronni`, `anna`, `noa`
+
+**📱 Current Frontend Profile Flow**:
+1. User selects profile on `profiles.html` → calls `selectProfile(id, name)`
+2. Profile ID/name saved to localStorage
+3. Main app uses `localStorage.getItem('netflix:profileId')` everywhere
+4. Your API should work with these existing profile IDs
+
 ## 📋 Implementation Guidelines
 
 ### 🔧 **For Controllers** (`AuthController.js`, `ProfileController.js`)
@@ -139,13 +152,34 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ### Test Profiles (Yaron):
 ```bash
-# Create profile
+# Get all profiles (should return paul, alon, ronni, anna, noa)
+curl -X GET http://localhost:5000/api/profiles
+
+# Get specific profile
+curl -X GET http://localhost:5000/api/profiles/paul
+
+# Create new profile
 curl -X POST http://localhost:5000/api/profiles \
   -H "Content-Type: application/json" \
-  -d '{"name":"Yaron Profile","avatar":"avatar1.png","preferences":{"language":"en"}}'
+  -d '{"id":"yaron","name":"Yaron","avatar":"https://i.pravatar.cc/150?img=12","preferences":{"language":"en"}}'
 
-# Get all profiles
-curl -X GET http://localhost:5000/api/profiles
+# Update profile
+curl -X PUT http://localhost:5000/api/profiles/paul \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Paul Updated","preferences":{"language":"he"}}'
+```
+
+**🔥 Important for Yaron**: Your profile API should return data compatible with the existing frontend:
+```javascript
+// Frontend expects this profile structure:
+{
+  "id": "paul",
+  "name": "Paul",
+  "avatar": "https://i.pravatar.cc/150?img=1",
+  "preferences": {
+    "language": "en"
+  }
+}
 ```
 
 ## 🚨 Important Rules
