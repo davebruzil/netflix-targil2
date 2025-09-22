@@ -55,6 +55,22 @@
       "firstName": "lol",
       "lastName": "lol",
       "createdAt": "2025-09-21T21:38:27.912Z"
+    },
+    {
+      "id": "user_1758535463487_ha5pf7tpq",
+      "email": "sophie@lala.com",
+      "password": "123456",
+      "firstName": "puffy",
+      "lastName": "girly",
+      "createdAt": "2025-09-22T10:04:23.488Z"
+    },
+    {
+      "id": "user_1758541405195_917pvefo3",
+      "email": "ll@l.com",
+      "password": "123456",
+      "firstName": "l",
+      "lastName": "l",
+      "createdAt": "2025-09-22T11:43:25.196Z"
     }
   ]
 }
