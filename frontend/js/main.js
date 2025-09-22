@@ -28,11 +28,8 @@ class NetflixFeed {
         this.loadProfile();
         this.setupEventListeners();
 
-        // Load content from API
-        await this.loadAllContent();
-
-        // Load featured hero movie
-        this.loadFeaturedHero();
+        // Load content with progressive loading
+        await this.loadContentProgressively();
     }
 
     checkAuth() {
@@ -47,6 +44,34 @@ class NetflixFeed {
         const profileId = localStorage.getItem('netflix:profileId');
         const profileName = localStorage.getItem('netflix:profileName') || 'User';
         NetflixUI.loadProfile(profileId, profileName);
+    }
+
+    async loadContentProgressively() {
+        this.isLoading = true;
+        NetflixUI.showLoadingState(this.sections);
+
+        try {
+            // Step 1: Load all content (with caching and parallel loading)
+            await NetflixAPI.loadAllContent(this.sections, this.allContent);
+            CONTENT_DATA = [...this.allContent];
+
+            // Step 2: Load hero section immediately for better UX
+            this.loadFeaturedHero();
+
+            // Step 3: Load liked items from backend (non-blocking)
+            this.loadLikedItemsFromBackend();
+
+            // Step 4: Render all sections
+            this.renderAllSections();
+
+            console.log('✅ Progressive loading completed');
+        } catch (error) {
+            console.error('❌ Error loading content:', error);
+            NetflixUI.showErrorState();
+        } finally {
+            this.isLoading = false;
+            NetflixUI.hideLoadingState();
+        }
     }
 
     async loadAllContent() {

@@ -74,17 +74,21 @@ class NetflixUI {
     }
 
     /**
-     * Show loading state for sections
+     * Show loading state for sections with progress
      * @param {Object} sections - Sections object
+     * @param {number} progress - Loading progress (0-100)
      */
-    static showLoadingState(sections) {
+    static showLoadingState(sections, progress = 0) {
         Object.keys(sections).forEach(section => {
             const slider = document.getElementById(`${section}Slider`) || document.getElementById(`${section}WatchingSlider`);
             if (slider) {
                 slider.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; padding: 40px; color: #999;">
-                        <div style="border: 3px solid #333; border-top: 3px solid var(--netflix-red); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-right: 15px;"></div>
-                        Loading ${section} content...
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: #999;">
+                        <div style="border: 3px solid #333; border-top: 3px solid var(--netflix-red); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+                        <div style="margin-bottom: 10px;">Loading ${section} content...</div>
+                        <div style="width: 200px; height: 4px; background: #333; border-radius: 2px; overflow: hidden;">
+                            <div style="width: ${progress}%; height: 100%; background: var(--netflix-red); transition: width 0.3s ease;"></div>
+                        </div>
                     </div>
                 `;
             }

@@ -1,3 +1,60 @@
 {
-  "users": []
+  "users": [
+    {
+      "id": "user_1758481109553_3kve64j4l",
+      "email": "test@example.com",
+      "password": "password123",
+      "firstName": "Test",
+      "lastName": "User",
+      "createdAt": "2025-09-21T18:58:29.553Z"
+    },
+    {
+      "id": "user_1758486309238_tq3t2wdb5",
+      "email": "newuser@example.com",
+      "password": "password123",
+      "firstName": "New",
+      "lastName": "User",
+      "createdAt": "2025-09-21T20:25:09.241Z"
+    },
+    {
+      "id": "user_1758488362186_ni1xwvti9",
+      "email": "professor@example.com",
+      "password": "password123",
+      "firstName": "Professor",
+      "lastName": "Smith",
+      "createdAt": "2025-09-21T20:59:22.186Z"
+    },
+    {
+      "id": "user_1758489842961_c7x2621k6",
+      "email": "testuser@example.com",
+      "password": "password123",
+      "firstName": "Test",
+      "lastName": "User",
+      "createdAt": "2025-09-21T21:24:02.963Z"
+    },
+    {
+      "id": "user_1758489883528_3inbb1587",
+      "email": "lol@example.com",
+      "password": "123456",
+      "firstName": "lol",
+      "lastName": "ol",
+      "createdAt": "2025-09-21T21:24:43.528Z"
+    },
+    {
+      "id": "user_1758490661641_rxl8lu84o",
+      "email": "alon.horovitz98@gmail.com",
+      "password": "123456",
+      "firstName": "Alon",
+      "lastName": "Horovitz",
+      "createdAt": "2025-09-21T21:37:41.641Z"
+    },
+    {
+      "id": "user_1758490707912_9xco9rnbt",
+      "email": "lol@lol.com",
+      "password": "lol123",
+      "firstName": "lol",
+      "lastName": "lol",
+      "createdAt": "2025-09-21T21:38:27.912Z"
+    }
+  ]
 }

@@ -26,7 +26,9 @@ class NetflixAPI {
                 title: data.title || data.name,
                 description: data.overview || 'No description available.',
                 category: type === 'movie' ? 'Movie' : 'Series',
-                image: data.poster_path ? `${API_CONFIG.IMAGE_BASE_URL}${data.poster_path}` : 'https://via.placeholder.com/500x750/333/fff?text=No+Image',
+                // Use smaller images for faster loading
+                image: data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/300x450/333/fff?text=No+Image',
+                imageLarge: data.poster_path ? `${API_CONFIG.IMAGE_BASE_URL}${data.poster_path}` : null,
                 backdrop: data.backdrop_path ? `${API_CONFIG.BACKDROP_BASE_URL}${data.backdrop_path}` : null,
                 year: data.release_date ? new Date(data.release_date).getFullYear() :
                       data.first_air_date ? new Date(data.first_air_date).getFullYear() : null,
@@ -46,57 +48,101 @@ class NetflixAPI {
     }
 
     /**
-     * Load all content for different sections
+     * Load all content for different sections with optimizations
      * @param {Object} sections - Sections object to populate
      * @param {Array} allContent - Array to store all content
      * @returns {Promise<void>}
      */
     static async loadAllContent(sections, allContent) {
         try {
-            // Load content for each section
-            for (const [section, queries] of Object.entries(CONTENT_QUERIES)) {
-                const sectionContent = [];
+            console.log('🚀 Loading content with optimizations...');
+            
+            // Check for cached content first
+            const cachedContent = this.getCachedContent();
+            if (cachedContent && this.isCacheValid(cachedContent)) {
+                console.log('📦 Using cached content');
+                this.populateSectionsFromCache(sections, allContent, cachedContent);
+                return;
+            }
 
+            // Load content in parallel for better performance
+            const loadPromises = [];
+            
+            for (const [section, queries] of Object.entries(CONTENT_QUERIES)) {
+                // Create promises for all content in this section
+                const sectionPromises = [];
+                
                 // Handle movies
                 if (queries.movies) {
-                    for (const movieId of queries.movies) {
-                        const movieData = await this.fetchTMDBData(movieId, 'movie');
-                        if (movieData) {
-                            movieData.section = section;
-                            // Add random progress for continue watching section
-                            if (section === 'continue') {
-                                movieData.progress = Math.floor(Math.random() * 90) + 10;
-                            }
-                            sectionContent.push(movieData);
-                            allContent.push(movieData);
-                        }
-                    }
+                    queries.movies.forEach(movieId => {
+                        sectionPromises.push(
+                            this.fetchTMDBData(movieId, 'movie').then(movieData => {
+                                if (movieData) {
+                                    movieData.section = section;
+                                    if (section === 'continue') {
+                                        movieData.progress = Math.floor(Math.random() * 90) + 10;
+                                    }
+                                    return { type: 'movie', data: movieData, section };
+                                }
+                                return null;
+                            })
+                        );
+                    });
                 }
 
                 // Handle TV shows
                 if (queries.tv) {
-                    for (const tvId of queries.tv) {
-                        const tvData = await this.fetchTMDBData(tvId, 'tv');
-                        if (tvData) {
-                            tvData.section = section;
-                            // Add random progress for continue watching section
-                            if (section === 'continue') {
-                                tvData.progress = Math.floor(Math.random() * 90) + 10;
-                            }
-                            sectionContent.push(tvData);
-                            allContent.push(tvData);
-                        }
-                    }
+                    queries.tv.forEach(tvId => {
+                        sectionPromises.push(
+                            this.fetchTMDBData(tvId, 'tv').then(tvData => {
+                                if (tvData) {
+                                    tvData.section = section;
+                                    if (section === 'continue') {
+                                        tvData.progress = Math.floor(Math.random() * 90) + 10;
+                                    }
+                                    return { type: 'tv', data: tvData, section };
+                                }
+                                return null;
+                            })
+                        );
+                    });
                 }
-
-                sections[section] = sectionContent;
+                
+                loadPromises.push(...sectionPromises);
             }
+
+            // Wait for all content to load in parallel
+            console.log(`⏳ Loading ${loadPromises.length} items in parallel...`);
+            const results = await Promise.all(loadPromises);
+            
+            // Process results and organize by section
+            const sectionContent = {};
+            results.forEach(result => {
+                if (result && result.data) {
+                    const section = result.section;
+                    if (!sectionContent[section]) {
+                        sectionContent[section] = [];
+                    }
+                    sectionContent[section].push(result.data);
+                    allContent.push(result.data);
+                }
+            });
+
+            // Populate sections
+            Object.keys(CONTENT_QUERIES).forEach(section => {
+                sections[section] = sectionContent[section] || [];
+            });
+
+            // Cache the content for future use
+            this.cacheContent(allContent);
 
             // Update global content data
             window.CONTENT_DATA = [...allContent];
+            
+            console.log('✅ Content loaded successfully');
 
         } catch (error) {
-            console.error('Error loading content:', error);
+            console.error('❌ Error loading content:', error);
             throw error;
         }
     }
@@ -131,6 +177,133 @@ class NetflixAPI {
     }
 
     // ===== BACKEND INTEGRATION METHODS =====
+
+    // ===== AUTHENTICATION METHODS =====
+
+    /**
+     * Register a new user
+     * @param {Object} userData - User registration data
+     * @param {string} userData.email - User email
+     * @param {string} userData.password - User password
+     * @param {string} userData.firstName - User first name
+     * @param {string} userData.lastName - User last name
+     * @returns {Promise<Object|null>} Registration result
+     */
+    static async register(userData) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Store user data in localStorage
+                localStorage.setItem('netflix:isAuthenticated', 'true');
+                localStorage.setItem('netflix:user', JSON.stringify(data.data.user));
+                localStorage.setItem('netflix:email', data.data.user.email);
+                
+                console.log('✅ User registered successfully:', data.data.user);
+                return data.data;
+            } else {
+                console.error('❌ Registration failed:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ Registration error:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Login user
+     * @param {Object} credentials - Login credentials
+     * @param {string} credentials.email - User email
+     * @param {string} credentials.password - User password
+     * @returns {Promise<Object|null>} Login result
+     */
+    static async login(credentials) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(credentials)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Store user data in localStorage
+                localStorage.setItem('netflix:isAuthenticated', 'true');
+                localStorage.setItem('netflix:user', JSON.stringify(data.data.user));
+                localStorage.setItem('netflix:email', data.data.user.email);
+                
+                console.log('✅ User logged in successfully:', data.data.user);
+                return data.data;
+            } else {
+                console.error('❌ Login failed:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ Login error:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Logout user
+     * @returns {Promise<boolean>} Logout success
+     */
+    static async logout() {
+        try {
+            // Clear all authentication data from localStorage
+            localStorage.removeItem('netflix:isAuthenticated');
+            localStorage.removeItem('netflix:user');
+            localStorage.removeItem('netflix:email');
+            localStorage.removeItem('netflix:profileId');
+            localStorage.removeItem('netflix:profileName');
+            localStorage.removeItem('netflix:likedItems');
+            
+            console.log('✅ User logged out successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Logout error:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Get current authenticated user
+     * @returns {Object|null} Current user data
+     */
+    static getCurrentUser() {
+        try {
+            const isAuthenticated = localStorage.getItem('netflix:isAuthenticated');
+            if (!isAuthenticated) {
+                return null;
+            }
+
+            const userData = localStorage.getItem('netflix:user');
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('❌ Error getting current user:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Check if user is authenticated
+     * @returns {boolean} Authentication status
+     */
+    static isAuthenticated() {
+        return localStorage.getItem('netflix:isAuthenticated') === 'true';
+    }
 
     /**
      * Get current profile ID from localStorage
@@ -270,6 +443,88 @@ class NetflixAPI {
             console.error('Error syncing content:', error);
             return false;
         }
+    }
+
+    // ===== CACHING METHODS =====
+
+    /**
+     * Get cached content from localStorage
+     * @returns {Object|null} Cached content data
+     */
+    static getCachedContent() {
+        try {
+            const cached = localStorage.getItem('netflix:cachedContent');
+            return cached ? JSON.parse(cached) : null;
+        } catch (error) {
+            console.warn('Error reading cached content:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Check if cached content is still valid (less than 1 hour old)
+     * @param {Object} cachedContent - Cached content data
+     * @returns {boolean} Whether cache is valid
+     */
+    static isCacheValid(cachedContent) {
+        if (!cachedContent || !cachedContent.timestamp) return false;
+        
+        const cacheAge = Date.now() - cachedContent.timestamp;
+        const maxAge = 60 * 60 * 1000; // 1 hour in milliseconds
+        
+        return cacheAge < maxAge;
+    }
+
+    /**
+     * Cache content to localStorage
+     * @param {Array} content - Content array to cache
+     */
+    static cacheContent(content) {
+        try {
+            const cacheData = {
+                content: content,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('netflix:cachedContent', JSON.stringify(cacheData));
+            console.log('📦 Content cached successfully');
+        } catch (error) {
+            console.warn('Error caching content:', error);
+        }
+    }
+
+    /**
+     * Populate sections from cached content
+     * @param {Object} sections - Sections object to populate
+     * @param {Array} allContent - Array to store all content
+     * @param {Object} cachedContent - Cached content data
+     */
+    static populateSectionsFromCache(sections, allContent, cachedContent) {
+        const content = cachedContent.content || [];
+        
+        // Clear existing content
+        allContent.length = 0;
+        Object.keys(sections).forEach(section => {
+            sections[section] = [];
+        });
+        
+        // Populate sections from cache
+        content.forEach(item => {
+            if (item.section && sections[item.section]) {
+                sections[item.section].push(item);
+            }
+            allContent.push(item);
+        });
+        
+        // Update global content data
+        window.CONTENT_DATA = [...allContent];
+    }
+
+    /**
+     * Clear content cache
+     */
+    static clearContentCache() {
+        localStorage.removeItem('netflix:cachedContent');
+        console.log('🗑️ Content cache cleared');
     }
 }
 
