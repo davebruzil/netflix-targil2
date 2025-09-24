@@ -271,6 +271,137 @@ class NetflixAPI {
             return false;
         }
     }
+
+    // ============================================
+    // PROFILE MANAGEMENT API FUNCTIONS
+    // ============================================
+
+    /**
+     * Get all profiles from backend API
+     * @returns {Promise<Array>} Array of profile objects
+     */
+    static async getAllProfiles() {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/profiles`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data.profiles || [];
+            } else {
+                console.error('Failed to fetch profiles:', data.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Error fetching profiles:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get specific profile by ID
+     * @param {string} profileId - Profile ID
+     * @returns {Promise<Object|null>} Profile object or null
+     */
+    static async getProfile(profileId) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/profiles/${profileId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data.profile;
+            } else {
+                console.error('Failed to fetch profile:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Create new profile
+     * @param {Object} profileData - Profile data {id, name, avatar, preferences}
+     * @returns {Promise<Object|null>} Created profile object or null
+     */
+    static async createProfile(profileData) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/profiles`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(profileData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data.profile;
+            } else {
+                console.error('Failed to create profile:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error creating profile:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Update existing profile
+     * @param {string} profileId - Profile ID
+     * @param {Object} updates - Updates to apply
+     * @returns {Promise<Object|null>} Updated profile object or null
+     */
+    static async updateProfile(profileId, updates) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/profiles/${profileId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updates)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data.profile;
+            } else {
+                console.error('Failed to update profile:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Delete profile
+     * @param {string} profileId - Profile ID
+     * @returns {Promise<boolean>} Success status
+     */
+    static async deleteProfile(profileId) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/profiles/${profileId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                return true;
+            } else {
+                console.error('Failed to delete profile:', data.error);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error deleting profile:', error);
+            return false;
+        }
+    }
 }
 
 // Export for global use
