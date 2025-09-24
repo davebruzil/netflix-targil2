@@ -776,15 +776,43 @@
     "paul": {
       "likedContent": [
         "movie_550",
-        "movie_680"
+        "movie_680",
+        "tv_1396"
       ],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
+    },
+    "yaron": {
+      "likedContent": [],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
+    },
+    "dafd": {
+      "likedContent": [
+        "movie_550"
+      ],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": [
+        {
+          "action": "like",
+          "contentId": "movie_550",
+          "contentTitle": "Fight Club",
+          "timestamp": "2025-09-24T03:45:43.269Z"
+        }
+      ]
+    },
+    "testworkflow": {
+      "likedContent": [],
       "watchProgress": {},
       "searchHistory": [],
       "activityLog": []
     }
   },
   "contentLikes": {
-    "movie_550": 2852,
+    "movie_550": 2853,
     "movie_680": 3259,
     "movie_155": 4570,
     "tv_66732": 4123,
