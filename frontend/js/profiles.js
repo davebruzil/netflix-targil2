@@ -10,6 +10,14 @@
      */
     async function initProfiles() {
         console.log('Initializing profiles page...');
+        
+        // Check if user is authenticated
+        if (!NetflixAPI.isAuthenticated()) {
+            console.log('User not authenticated, redirecting to login...');
+            window.location.href = '/index.html';
+            return;
+        }
+        
         showLoadingState();
         
         try {
@@ -305,11 +313,17 @@
         
         try {
             const profileData = {
-                id: profileId,
                 name: name,
                 avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}`,
-                preferences: { language: 'en' }
+                isChild: false
             };
+            
+            // Check current user
+            const currentUser = NetflixAPI.getCurrentUser();
+            if (!currentUser) {
+                alert('No user found. Please log in again.');
+                return;
+            }
             
             // Show loading state
             const createBtn = document.getElementById('create-profile-btn');
@@ -320,7 +334,6 @@
             const newProfile = await NetflixAPI.createProfile(profileData);
             
             if (newProfile) {
-                console.log('Profile created successfully:', newProfile);
                 
                 // Show success feedback
                 createBtn.textContent = '✓ Created!';
@@ -413,6 +426,28 @@
             initProfiles();
         }
     });
+
+    /**
+     * Select profile and redirect to main app
+     */
+    window.selectProfile = function(profileId, profileName) {
+        // Store selected profile in localStorage
+        localStorage.setItem('netflix:selectedProfile', JSON.stringify({
+            id: profileId,
+            name: profileName
+        }));
+        
+        // Redirect to main app
+        window.location.href = '/main.html';
+    };
+
+    /**
+     * Logout function
+     */
+    window.netflixLogout = function() {
+        NetflixAPI.logout();
+        window.location.href = '/index.html';
+    };
 
     // Export functions for global use
     window.ProfileManager = {

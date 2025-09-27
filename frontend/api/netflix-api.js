@@ -23,19 +23,19 @@ class NetflixAPI {
     static formatContentData(data, type) {
         const posterPath = data.poster_path;
         const releaseDate = data.release_date || data.first_air_date;
-        
-        return {
-            id: `${type}_${data.id}`,
-            title: data.title || data.name,
-            description: data.overview || 'No description available.',
-            category: type === 'movie' ? 'Movie' : 'Series',
+
+            return {
+                id: `${type}_${data.id}`,
+                title: data.title || data.name,
+                description: data.overview || 'No description available.',
+                category: type === 'movie' ? 'Movie' : 'Series',
             image: posterPath ? `https://image.tmdb.org/t/p/w300${posterPath}` : 'https://via.placeholder.com/300x450/333/fff?text=No+Image',
-            backdrop: data.backdrop_path ? `${API_CONFIG.BACKDROP_BASE_URL}${data.backdrop_path}` : null,
+                backdrop: data.backdrop_path ? `${API_CONFIG.BACKDROP_BASE_URL}${data.backdrop_path}` : null,
             year: releaseDate ? new Date(releaseDate).getFullYear() : null,
-            rating: data.vote_average ? data.vote_average.toFixed(1) : null,
-            genre: data.genres ? data.genres.map(g => g.name).slice(0, 3).join(', ') : null,
+                rating: data.vote_average ? data.vote_average.toFixed(1) : null,
+                genre: data.genres ? data.genres.map(g => g.name).slice(0, 3).join(', ') : null,
             runtime: this.getRuntime(data, type),
-            popularity: data.popularity || 0,
+                popularity: data.popularity || 0,
             likes: Math.floor(Math.random() * 3000) + 500,
             progress: 0
         };
@@ -339,9 +339,16 @@ class NetflixAPI {
      */
     static async getAllProfiles() {
         try {
-            const response = await fetch(`${this.BACKEND_URL}/profiles`);
+            // Get current user ID from localStorage
+            const currentUser = this.getCurrentUser();
+            if (!currentUser || !currentUser.id) {
+                console.error('No current user found');
+                return [];
+            }
+
+            const response = await fetch(`${this.BACKEND_URL}/profiles/user/${currentUser.id}`);
             const data = await response.json();
-            
+
             if (data.success) {
                 return data.data.profiles || [];
             } else {
@@ -363,7 +370,7 @@ class NetflixAPI {
         try {
             const response = await fetch(`${this.BACKEND_URL}/profiles/${profileId}`);
             const data = await response.json();
-            
+
             if (data.success) {
                 return data.data.profile;
             } else {
@@ -383,12 +390,27 @@ class NetflixAPI {
      */
     static async createProfile(profileData) {
         try {
+            // Get current user ID from localStorage
+            const currentUser = this.getCurrentUser();
+            if (!currentUser || !currentUser.id) {
+                console.error('No current user found');
+                return null;
+            }
+
+            // Transform profile data to match backend expectations
+            const backendProfileData = {
+                userId: currentUser.id,
+                name: profileData.name,
+                avatar: profileData.avatar,
+                isChild: profileData.isChild || false
+            };
+
             const response = await fetch(`${this.BACKEND_URL}/profiles`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(profileData)
+                body: JSON.stringify(backendProfileData)
             });
             
             const data = await response.json();
@@ -422,7 +444,7 @@ class NetflixAPI {
             });
             
             const data = await response.json();
-            
+
             if (data.success) {
                 return data.data.profile;
             } else {
@@ -449,7 +471,7 @@ class NetflixAPI {
             const data = await response.json();
             
             if (data.success) {
-                return true;
+            return true;
             } else {
                 console.error('Failed to delete profile:', data.error);
                 return false;

@@ -15,7 +15,7 @@ class Config {
             TMDB_BASE_URL: 'https://api.themoviedb.org/3',
             IMAGE_BASE_URL: 'https://image.tmdb.org/t/p/w500',
             BACKDROP_BASE_URL: 'https://image.tmdb.org/t/p/w1280',
-            BACKEND_URL: 'http://localhost:5001/api',
+            BACKEND_URL: 'http://localhost:5000/api',
             NODE_ENV: 'development'
         };
 
