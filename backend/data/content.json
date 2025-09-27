@@ -364,14 +364,6 @@
       "searchHistory": [],
       "activityLog": []
     },
-    "test_user": {
-      "likedContent": [
-        "movie_550"
-      ],
-      "watchProgress": {},
-      "searchHistory": [],
-      "activityLog": []
-    },
     "ronni": {
       "likedContent": [
         "movie_550",
@@ -589,10 +581,22 @@
         "movie_634649",
         "movie_550",
         "movie_155",
-        "movie_791373"
+        "movie_791373",
+        "tv_69050",
+        "tv_71912"
       ],
       "watchProgress": {},
       "searchHistory": [
+        {
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-21T09:01:46.288Z"
+        },
+        {
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-21T09:01:45.070Z"
+        },
         {
           "query": "batman",
           "resultsCount": 1,
@@ -600,6 +604,42 @@
         }
       ],
       "activityLog": [
+        {
+          "action": "search",
+          "query": "ba",
+          "resultsCount": 3,
+          "timestamp": "2025-09-21T09:01:46.288Z"
+        },
+        {
+          "action": "search",
+          "query": "b",
+          "resultsCount": 12,
+          "timestamp": "2025-09-21T09:01:45.070Z"
+        },
+        {
+          "action": "unlike",
+          "contentId": "movie_438631",
+          "contentTitle": "Dune",
+          "timestamp": "2025-09-21T08:55:09.475Z"
+        },
+        {
+          "action": "like",
+          "contentId": "movie_438631",
+          "contentTitle": "Dune",
+          "timestamp": "2025-09-21T08:55:09.205Z"
+        },
+        {
+          "action": "like",
+          "contentId": "tv_71912",
+          "contentTitle": "The Witcher",
+          "timestamp": "2025-09-21T08:55:07.668Z"
+        },
+        {
+          "action": "like",
+          "contentId": "tv_69050",
+          "contentTitle": "Ozark",
+          "timestamp": "2025-09-21T08:55:06.303Z"
+        },
         {
           "action": "like",
           "contentId": "movie_791373",
@@ -732,10 +772,47 @@
           "timestamp": "2025-09-19T23:03:02.349Z"
         }
       ]
+    },
+    "paul": {
+      "likedContent": [
+        "movie_550",
+        "movie_680",
+        "tv_1396"
+      ],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
+    },
+    "yaron": {
+      "likedContent": [],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
+    },
+    "dafd": {
+      "likedContent": [
+        "movie_550"
+      ],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": [
+        {
+          "action": "like",
+          "contentId": "movie_550",
+          "contentTitle": "Fight Club",
+          "timestamp": "2025-09-24T03:45:43.269Z"
+        }
+      ]
+    },
+    "testworkflow": {
+      "likedContent": [],
+      "watchProgress": {},
+      "searchHistory": [],
+      "activityLog": []
     }
   },
   "contentLikes": {
-    "movie_550": 2852,
+    "movie_550": 2853,
     "movie_680": 3259,
     "movie_155": 4570,
     "tv_66732": 4123,
@@ -751,8 +828,8 @@
     "movie_791373": 1988,
     "movie_460465": 1654,
     "movie_581389": 1234,
-    "tv_71912": 3421,
-    "tv_69050": 3654,
+    "tv_71912": 3422,
+    "tv_69050": 3655,
     "tv_87108": 4321,
     "tv_103768": 3987
   },
