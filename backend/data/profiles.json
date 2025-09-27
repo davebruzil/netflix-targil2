@@ -1,0 +1,92 @@
+{
+  "profiles": [
+    {
+      "id": "profile_1758481109553_3kve64j4l_1",
+      "userId": "user_1758481109553_3kve64j4l",
+      "name": "Test User",
+      "avatar": "https://via.placeholder.com/150/FF6B6B/FFFFFF?text=T",
+      "isChild": false,
+      "createdAt": "2025-09-21T18:58:29.553Z"
+    },
+    {
+      "id": "profile_1758486309238_tq3t2wdb5_1",
+      "userId": "user_1758486309238_tq3t2wdb5",
+      "name": "New User",
+      "avatar": "https://via.placeholder.com/150/4ECDC4/FFFFFF?text=N",
+      "isChild": false,
+      "createdAt": "2025-09-21T20:25:09.241Z"
+    },
+    {
+      "id": "profile_1758488362186_ni1xwvti9_1",
+      "userId": "user_1758488362186_ni1xwvti9",
+      "name": "Professor Smith",
+      "avatar": "https://via.placeholder.com/150/45B7D1/FFFFFF?text=P",
+      "isChild": false,
+      "createdAt": "2025-09-21T20:59:22.186Z"
+    },
+    {
+      "id": "profile_1758488362186_ni1xwvti9_2",
+      "userId": "user_1758488362186_ni1xwvti9",
+      "name": "Kids Profile",
+      "avatar": "https://via.placeholder.com/150/96CEB4/FFFFFF?text=K",
+      "isChild": true,
+      "createdAt": "2025-09-21T20:59:22.186Z"
+    },
+    {
+      "id": "profile_1758489842961_c7x2621k6_1",
+      "userId": "user_1758489842961_c7x2621k6",
+      "name": "Test User",
+      "avatar": "https://via.placeholder.com/150/FFEAA7/FFFFFF?text=T",
+      "isChild": false,
+      "createdAt": "2025-09-21T21:24:02.963Z"
+    },
+    {
+      "id": "profile_1758489883528_3inbb1587_1",
+      "userId": "user_1758489883528_3inbb1587",
+      "name": "lol",
+      "avatar": "https://via.placeholder.com/150/DDA0DD/FFFFFF?text=L",
+      "isChild": false,
+      "createdAt": "2025-09-21T21:24:43.528Z"
+    },
+    {
+      "id": "profile_1758490661641_rxl8lu84o_1",
+      "userId": "user_1758490661641_rxl8lu84o",
+      "name": "Alon",
+      "avatar": "https://via.placeholder.com/150/98D8C8/FFFFFF?text=A",
+      "isChild": false,
+      "createdAt": "2025-09-21T21:37:41.641Z"
+    },
+    {
+      "id": "profile_1758490661641_rxl8lu84o_2",
+      "userId": "user_1758490661641_rxl8lu84o",
+      "name": "Alon's Kids",
+      "avatar": "https://via.placeholder.com/150/F7DC6F/FFFFFF?text=K",
+      "isChild": true,
+      "createdAt": "2025-09-21T21:37:41.641Z"
+    },
+    {
+      "id": "profile_1758490707912_9xco9rnbt_1",
+      "userId": "user_1758490707912_9xco9rnbt",
+      "name": "lol",
+      "avatar": "https://via.placeholder.com/150/F8B500/FFFFFF?text=L",
+      "isChild": false,
+      "createdAt": "2025-09-21T21:38:27.912Z"
+    },
+    {
+      "id": "profile_1758535463487_ha5pf7tpq_1",
+      "userId": "user_1758535463487_ha5pf7tpq",
+      "name": "puffy",
+      "avatar": "https://via.placeholder.com/150/FF9FF3/FFFFFF?text=P",
+      "isChild": false,
+      "createdAt": "2025-09-22T10:04:23.488Z"
+    },
+    {
+      "id": "profile_1758541405195_917pvefo3_1",
+      "userId": "user_1758541405195_917pvefo3",
+      "name": "l",
+      "avatar": "https://via.placeholder.com/150/74B9FF/FFFFFF?text=L",
+      "isChild": false,
+      "createdAt": "2025-09-22T11:43:25.196Z"
+    }
+  ]
+}
