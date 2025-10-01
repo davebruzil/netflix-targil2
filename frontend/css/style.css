@@ -15,11 +15,16 @@
     box-sizing: border-box;
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--netflix-black);
     color: var(--netflix-white);
     line-height: 1.6;
+    width: 100%;
 }
 
 /* Login Page Styles */
