@@ -86,7 +86,7 @@
         const profileDiv = document.createElement('div');
         profileDiv.className = 'profile-item';
         profileDiv.innerHTML = `
-            <a href="#" onclick="selectProfile('${profile.id}', '${profile.name}')" style="text-decoration: none; color: inherit;">
+            <a href="#" onclick="selectProfile('${profile.id}', '${profile.name}', '${profile.avatar}')" style="text-decoration: none; color: inherit;">
                 <div class="profile-avatar">
                     <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
                 </div>
@@ -430,13 +430,19 @@
     /**
      * Select profile and redirect to main app
      */
-    window.selectProfile = function(profileId, profileName) {
+    window.selectProfile = function(profileId, profileName, profileAvatar) {
         // Store selected profile in localStorage
         localStorage.setItem('netflix:selectedProfile', JSON.stringify({
             id: profileId,
-            name: profileName
+            name: profileName,
+            avatar: profileAvatar
         }));
-        
+
+        // Also store in individual keys for backward compatibility
+        localStorage.setItem('netflix:profileId', profileId);
+        localStorage.setItem('netflix:profileName', profileName);
+        localStorage.setItem('netflix:profileAvatar', profileAvatar);
+
         // Redirect to main app
         window.location.href = '/main.html';
     };

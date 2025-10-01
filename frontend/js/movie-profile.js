@@ -25,20 +25,16 @@ class MovieProfile {
     }
 
     loadProfile() {
-        const profileAvatars = {
-            'paul': 'https://i.pravatar.cc/150?img=1',
-            'alon': 'https://i.pravatar.cc/150?img=8',
-            'ronni': 'https://i.pravatar.cc/150?img=9',
-            'anna': 'https://i.pravatar.cc/150?img=5',
-            'noa': 'https://i.pravatar.cc/150?img=10'
-        };
-
-        const profileId = localStorage.getItem('netflix:profileId');
         const profileImage = document.getElementById('profileImage');
+        const profileAvatar = localStorage.getItem('netflix:profileAvatar');
 
-        if (profileId && profileAvatars[profileId] && profileImage) {
-            profileImage.src = profileAvatars[profileId];
+        if (profileAvatar && profileImage) {
+            profileImage.src = profileAvatar;
             profileImage.style.display = 'block';
+            profileImage.onerror = function() {
+                // Fallback to a random avatar if the image fails to load
+                this.src = `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}`;
+            };
         }
     }
 

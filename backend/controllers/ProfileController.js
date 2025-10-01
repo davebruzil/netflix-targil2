@@ -8,7 +8,9 @@ class ProfileController {
     async createProfile(req, res) {
         try {
             const { userId, name, avatar, isChild } = req.body;
-            
+
+            console.log('📝 POST /api/profiles - Creating new profile:', { userId, name, avatar, isChild });
+
             if (!userId) {
                 return res.status(400).json({
                     success: false,
@@ -33,14 +35,16 @@ class ProfileController {
             };
 
             const newProfile = await this.profileModel.createProfile(profileData);
-            
+
+            console.log('✅ Profile created successfully:', newProfile.id);
+
             res.status(201).json({
                 success: true,
                 message: 'Profile created successfully',
                 data: { profile: newProfile }
             });
         } catch (error) {
-            console.error('Error creating profile:', error);
+            console.error('❌ Error creating profile:', error);
             res.status(500).json({
                 success: false,
                 error: 'Failed to create profile',
