@@ -5,6 +5,49 @@ class ProfileController {
         this.profileModel = new Profile();
     }
 
+    async getAllProfiles(req, res) {
+        try {
+            const result = await this.profileModel.getAllProfiles();
+            res.json({
+                success: true,
+                data: result
+            });
+        } catch (error) {
+            console.error('❌ Error getting all profiles:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get profiles',
+                message: error.message
+            });
+        }
+    }
+
+    async getProfileById(req, res) {
+        try {
+            const { id } = req.params;
+            const profile = await this.profileModel.getProfileById(id);
+
+            if (!profile) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Profile not found'
+                });
+            }
+
+            res.json({
+                success: true,
+                data: { profile }
+            });
+        } catch (error) {
+            console.error('❌ Error getting profile by ID:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get profile',
+                message: error.message
+            });
+        }
+    }
+
     async createProfile(req, res) {
         try {
             const { userId, name, avatar, isChild } = req.body;

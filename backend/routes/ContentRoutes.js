@@ -1,9 +1,13 @@
 // Content Routes - Routing Layer (MVC)
 const express = require('express');
 const ContentController = require('../controllers/ContentController');
+const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 const contentController = new ContentController();
+
+// Apply auth middleware to all content routes
+router.use(requireAuth);
 
 // GET /api/content - Fetch all content catalog
 router.get('/', (req, res) => contentController.getAllContent(req, res));

@@ -1,62 +1,41 @@
-const fs = require('fs').promises;
-const path = require('path');
+// User Model - MongoDB Implementation with Mongoose
+const UserSchema = require('../schemas/UserSchema');
 
 class User {
     constructor() {
-        this.dataFile = path.join(__dirname, '..', 'data', 'users.json');
+        this.model = UserSchema;
     }
 
     async getAllUsers() {
         try {
-            const data = await fs.readFile(this.dataFile, 'utf8');
-            return JSON.parse(data);
+            const users = await this.model.find().select('-password');
+            return { users };
         } catch (error) {
             console.error('Error reading users data:', error);
-            // Return empty structure if file doesn't exist or is corrupted
             return { users: [] };
-        }
-    }
-
-    async saveUsers(users) {
-        try {
-            await fs.writeFile(this.dataFile, JSON.stringify(users, null, 2));
-            return true;
-        } catch (error) {
-            console.error('Error saving users data:', error);
-            throw new Error('Failed to save users data');
         }
     }
 
     async createUser(userData) {
         try {
-            // 1. Get existing users
-            const usersData = await this.getAllUsers();
-            
-            // 2. Check if user already exists
-            const existingUser = usersData.users.find(user => user.email === userData.email);
+            // Check if user already exists
+            const existingUser = await this.model.findOne({ email: userData.email });
             if (existingUser) {
                 throw new Error('User with this email already exists');
             }
-            
-            // 3. Create new user object
-            const newUser = {
-                id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+
+            // Create new user (password hashing handled by schema pre-save hook)
+            const newUser = new this.model({
                 email: userData.email,
-                password: userData.password, // In production, hash this password
+                password: userData.password,
                 firstName: userData.firstName,
-                lastName: userData.lastName,
-                createdAt: new Date().toISOString()
-            };
-            
-            // 4. Add to users array
-            usersData.users.push(newUser);
-            
-            // 5. Save to file
-            await this.saveUsers(usersData);
-            
-            // 6. Return user without password for security
-            const { password, ...userWithoutPassword } = newUser;
-            return userWithoutPassword;
+                lastName: userData.lastName
+            });
+
+            await newUser.save();
+
+            // Return user without password (handled by schema toJSON method)
+            return newUser.toJSON();
         } catch (error) {
             console.error('Error creating user:', error);
             throw error;
@@ -65,11 +44,20 @@ class User {
 
     async getUserByEmail(email) {
         try {
-            const usersData = await this.getAllUsers();
-            const user = usersData.users.find(user => user.email === email);
+            const user = await this.model.findOne({ email });
             return user || null;
         } catch (error) {
             console.error('Error finding user by email:', error);
+            throw error;
+        }
+    }
+
+    async getUserById(userId) {
+        try {
+            const user = await this.model.findById(userId).select('-password');
+            return user || null;
+        } catch (error) {
+            console.error('Error finding user by ID:', error);
             throw error;
         }
     }
@@ -80,7 +68,8 @@ class User {
             if (!user) {
                 return false;
             }
-            return user.password === password;
+            // Use schema method to compare password
+            return await user.comparePassword(password);
         } catch (error) {
             console.error('Error validating password:', error);
             return false;

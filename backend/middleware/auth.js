@@ -9,11 +9,17 @@
  * Calls next() if authenticated
  */
 function requireAuth(req, res, next) {
-    // TODO: Check if req.session exists and has userId
+    // Check if session exists and has userId
+    if (!req.session || !req.session.userId) {
+        return res.status(401).json({
+            success: false,
+            error: 'Authentication required',
+            message: 'Please log in to access this resource'
+        });
+    }
 
-    // TODO: If not authenticated, return 401 error
-
-    // TODO: If authenticated, call next()
+    // User is authenticated, proceed to next middleware/route handler
+    next();
 }
 
 /**
@@ -21,11 +27,26 @@ function requireAuth(req, res, next) {
  * Checks req.session for admin role
  */
 function requireAdmin(req, res, next) {
-    // TODO: Check if user is admin
+    // First check if authenticated
+    if (!req.session || !req.session.userId) {
+        return res.status(401).json({
+            success: false,
+            error: 'Authentication required',
+            message: 'Please log in to access this resource'
+        });
+    }
 
-    // TODO: Return 403 if not admin
+    // Check if user has admin role
+    if (!req.session.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            error: 'Forbidden',
+            message: 'You do not have permission to access this resource'
+        });
+    }
 
-    // TODO: Call next() if admin
+    // User is admin, proceed
+    next();
 }
 
 module.exports = {

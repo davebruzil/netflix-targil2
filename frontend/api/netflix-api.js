@@ -128,18 +128,19 @@ class NetflixAPI {
                 body: JSON.stringify(userData)
             });
             const data = await response.json();
-            
+
             if (data.success) {
                 this.saveUserData(data.data.user);
                 console.log('✅ User registered successfully');
                 return data.data;
             } else {
-                console.error('❌ Registration failed:', data.error);
-                return null;
+                console.error('❌ Registration failed:', data.message || data.error);
+                // Throw error with the actual backend message
+                throw new Error(data.message || data.error || 'Registration failed');
             }
         } catch (error) {
             console.error('❌ Registration error:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -392,14 +393,16 @@ class NetflixAPI {
         try {
             // Get current user ID from localStorage
             const currentUser = this.getCurrentUser();
-            if (!currentUser || !currentUser.id) {
+            // MongoDB uses _id, not id
+            const userId = currentUser?._id || currentUser?.id;
+            if (!currentUser || !userId) {
                 console.error('No current user found');
                 return null;
             }
 
             // Transform profile data to match backend expectations
             const backendProfileData = {
-                userId: currentUser.id,
+                userId: userId,
                 name: profileData.name,
                 avatar: profileData.avatar,
                 isChild: profileData.isChild || false
