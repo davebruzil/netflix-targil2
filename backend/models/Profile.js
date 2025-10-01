@@ -1,54 +1,42 @@
-const fs = require('fs').promises;
-const path = require('path');
+// Profile Model - MongoDB Implementation with Mongoose
+const ProfileSchema = require('../schemas/ProfileSchema');
 
 class Profile {
     constructor() {
-        this.dataFile = path.join(__dirname, '..', 'data', 'profiles.json');
+        this.model = ProfileSchema;
     }
 
     async getAllProfiles() {
         try {
-            const data = await fs.readFile(this.dataFile, 'utf8');
-            return JSON.parse(data);
+            const profiles = await this.model.find().populate('userId', '-password');
+            return { profiles };
         } catch (error) {
             console.error('Error reading profiles data:', error);
-            // Return empty structure if file doesn't exist or is corrupted
             return { profiles: [] };
-        }
-    }
-
-    async saveProfiles(profiles) {
-        try {
-            await fs.writeFile(this.dataFile, JSON.stringify(profiles, null, 2));
-            return true;
-        } catch (error) {
-            console.error('Error saving profiles data:', error);
-            throw new Error('Failed to save profiles data');
         }
     }
 
     async createProfile(profileData) {
         try {
-            // 1. Get existing profiles
-            const profilesData = await this.getAllProfiles();
-            
-            // 2. Create new profile object
-            const newProfile = {
-                id: `profile_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            // Check profile count for user (max 5 profiles)
+            const userProfileCount = await this.model.countDocuments({ userId: profileData.userId });
+            if (userProfileCount >= 5) {
+                throw new Error('Maximum 5 profiles per user');
+            }
+
+            // Generate avatar if not provided
+            const avatar = profileData.avatar ||
+                `https://via.placeholder.com/150/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=${profileData.name.charAt(0).toUpperCase()}`;
+
+            // Create new profile
+            const newProfile = new this.model({
                 userId: profileData.userId,
                 name: profileData.name,
-                avatar: profileData.avatar || `https://via.placeholder.com/150/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=${profileData.name.charAt(0).toUpperCase()}`,
-                isChild: profileData.isChild || false,
-                createdAt: new Date().toISOString()
-            };
-            
-            // 3. Add to profiles array
-            profilesData.profiles.push(newProfile);
-            
-            // 4. Save to file
-            await this.saveProfiles(profilesData);
-            
-            // 5. Return profile
+                avatar: avatar,
+                isChild: profileData.isChild || false
+            });
+
+            await newProfile.save();
             return newProfile;
         } catch (error) {
             console.error('Error creating profile:', error);
@@ -58,9 +46,8 @@ class Profile {
 
     async getProfilesByUserId(userId) {
         try {
-            const profilesData = await this.getAllProfiles();
-            const userProfiles = profilesData.profiles.filter(profile => profile.userId === userId);
-            return userProfiles;
+            const profiles = await this.model.find({ userId });
+            return profiles;
         } catch (error) {
             console.error('Error finding profiles by user ID:', error);
             throw error;
@@ -69,8 +56,7 @@ class Profile {
 
     async getProfileById(profileId) {
         try {
-            const profilesData = await this.getAllProfiles();
-            const profile = profilesData.profiles.find(profile => profile.id === profileId);
+            const profile = await this.model.findById(profileId);
             return profile || null;
         } catch (error) {
             console.error('Error finding profile by ID:', error);
@@ -80,20 +66,17 @@ class Profile {
 
     async updateProfile(profileId, profileData) {
         try {
-            const profilesData = await this.getAllProfiles();
-            const profileIndex = profilesData.profiles.findIndex(profile => profile.id === profileId);
-            
-            if (profileIndex === -1) {
+            const profile = await this.model.findById(profileId);
+            if (!profile) {
                 throw new Error('Profile not found');
             }
 
-            // Update profile fields
-            const profile = profilesData.profiles[profileIndex];
+            // Update fields
             if (profileData.name) profile.name = profileData.name;
             if (profileData.avatar) profile.avatar = profileData.avatar;
             if (profileData.isChild !== undefined) profile.isChild = profileData.isChild;
 
-            await this.saveProfiles(profilesData);
+            await profile.save();
             return profile;
         } catch (error) {
             console.error('Error updating profile:', error);
@@ -103,23 +86,18 @@ class Profile {
 
     async deleteProfile(profileId) {
         try {
-            const profilesData = await this.getAllProfiles();
-            const profileIndex = profilesData.profiles.findIndex(profile => profile.id === profileId);
-            
-            if (profileIndex === -1) {
+            const profile = await this.model.findById(profileId);
+            if (!profile) {
                 throw new Error('Profile not found');
             }
 
             // Check if this is the last profile for the user
-            const profile = profilesData.profiles[profileIndex];
-            const userProfiles = profilesData.profiles.filter(p => p.userId === profile.userId);
-            
+            const userProfiles = await this.model.find({ userId: profile.userId });
             if (userProfiles.length <= 1) {
                 throw new Error('Cannot delete the last profile for a user');
             }
 
-            profilesData.profiles.splice(profileIndex, 1);
-            await this.saveProfiles(profilesData);
+            await this.model.findByIdAndDelete(profileId);
             return true;
         } catch (error) {
             console.error('Error deleting profile:', error);

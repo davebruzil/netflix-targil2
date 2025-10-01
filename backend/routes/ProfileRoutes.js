@@ -1,8 +1,12 @@
 const express = require('express');
 const ProfileController = require('../controllers/ProfileController');
+const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 const profileController = new ProfileController();
+
+// Apply auth middleware to all profile routes
+router.use(requireAuth);
 
 // GET /api/profiles - Get all profiles
 router.get('/', (req, res) => profileController.getAllProfiles(req, res));

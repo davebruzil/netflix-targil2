@@ -1,187 +1,189 @@
-// Content Model - Data Access Layer
-const fs = require('fs').promises;
-const path = require('path');
+// Content Model - MongoDB Implementation with Mongoose
+const ContentSchema = require('../schemas/ContentSchema');
+const ProfileInteractionSchema = require('../schemas/ProfileInteractionSchema');
 
 class Content {
     constructor() {
-        this.dataFile = path.join(__dirname, '..', 'data', 'content.json');
+        this.model = ContentSchema;
+        this.interactionModel = ProfileInteractionSchema;
     }
 
-    // Read all content data from file
+    // Get all content data
     async getAllData() {
         try {
-            const data = await fs.readFile(this.dataFile, 'utf8');
-            return JSON.parse(data);
+            const content = await this.model.find();
+            const profiles = await this.interactionModel.find();
+            return { content, profiles };
         } catch (error) {
             console.error('Error reading content data:', error);
             throw new Error('Failed to load content data');
         }
     }
 
-    // Write content data to file
-    async saveData(data) {
-        try {
-            await fs.writeFile(this.dataFile, JSON.stringify(data, null, 2));
-            return true;
-        } catch (error) {
-            console.error('Error writing content data:', error);
-            throw new Error('Failed to save content data');
-        }
-    }
-
     // Get all content items
     async getAllContent() {
-        const data = await this.getAllData();
-        return data.content;
+        try {
+            const content = await this.model.find();
+            return content;
+        } catch (error) {
+            console.error('Error getting all content:', error);
+            throw error;
+        }
     }
 
     // Get content organized by sections
     async getContentBySections() {
-        const data = await this.getAllData();
-        const { sections, content } = data;
-
-        const organizedContent = {};
-        for (const [sectionName, contentIds] of Object.entries(sections)) {
-            organizedContent[sectionName] = contentIds.map(id =>
-                content.find(item => item.id === id)
-            ).filter(Boolean);
+        try {
+            const sections = {
+                continue: await this.model.find({ section: 'continue' }),
+                trending: await this.model.find({ section: 'trending' }),
+                movies: await this.model.find({ section: 'movies' }),
+                series: await this.model.find({ section: 'series' })
+            };
+            return sections;
+        } catch (error) {
+            console.error('Error getting content by sections:', error);
+            throw error;
         }
-
-        return organizedContent;
     }
 
     // Get single content item by ID
     async getContentById(id) {
-        const data = await this.getAllData();
-        const item = data.content.find(content => content.id === id);
-
-        if (!item) {
+        try {
+            const item = await this.model.findById(id);
+            return item;
+        } catch (error) {
+            console.error('Error getting content by ID:', error);
             return null;
         }
-
-        // Add like count
-        const itemWithLikes = {
-            ...item,
-            likes: data.contentLikes?.[id] || 0
-        };
-
-        return itemWithLikes;
     }
 
     // Search content by query
     async searchContent(query, limit = 20) {
-        const data = await this.getAllData();
-        const searchTerm = query.toLowerCase().trim();
+        try {
+            const searchTerm = query.toLowerCase().trim();
 
-        const results = data.content.filter(item => {
-            const titleMatch = item.title.toLowerCase().includes(searchTerm);
-            const descriptionMatch = item.description.toLowerCase().includes(searchTerm);
-            const genreMatch = item.genre.toLowerCase().includes(searchTerm);
-            const categoryMatch = item.category.toLowerCase().includes(searchTerm);
+            const results = await this.model.find({
+                $or: [
+                    { title: { $regex: searchTerm, $options: 'i' } },
+                    { description: { $regex: searchTerm, $options: 'i' } },
+                    { genre: { $regex: searchTerm, $options: 'i' } },
+                    { category: { $regex: searchTerm, $options: 'i' } }
+                ]
+            }).limit(parseInt(limit));
 
-            return titleMatch || descriptionMatch || genreMatch || categoryMatch;
-        }).slice(0, parseInt(limit));
-
-        return results;
+            return results;
+        } catch (error) {
+            console.error('Error searching content:', error);
+            return [];
+        }
     }
 
     // Toggle like status for content
     async toggleLike(contentId, profileId, liked) {
-        const data = await this.getAllData();
+        try {
+            // Find or create profile interaction
+            let interaction = await this.interactionModel.findOne({ profileId });
+            if (!interaction) {
+                interaction = new this.interactionModel({
+                    profileId,
+                    likedContent: [],
+                    watchProgress: new Map(),
+                    searchHistory: [],
+                    activityLog: []
+                });
+            }
 
-        // Find content
-        const contentIndex = data.content.findIndex(item => item.id === contentId);
-        if (contentIndex === -1) {
-            throw new Error('Content not found');
-        }
+            // Find content
+            const content = await this.model.findById(contentId);
+            if (!content) {
+                throw new Error('Content not found');
+            }
 
-        // Initialize data structures
-        if (!data.profiles) data.profiles = {};
-        if (!data.profiles[profileId]) {
-            data.profiles[profileId] = {
-                likedContent: [],
-                watchProgress: {},
-                searchHistory: [],
-                activityLog: []
+            // Update like status
+            if (liked) {
+                if (!interaction.likedContent.includes(contentId)) {
+                    interaction.likedContent.push(contentId);
+                    content.likes += 1;
+                }
+            } else {
+                const index = interaction.likedContent.indexOf(contentId);
+                if (index > -1) {
+                    interaction.likedContent.splice(index, 1);
+                    content.likes = Math.max(0, content.likes - 1);
+                }
+            }
+
+            // Save both
+            await interaction.save();
+            await content.save();
+
+            return {
+                contentId,
+                liked: interaction.likedContent.includes(contentId),
+                totalLikes: content.likes
             };
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            throw error;
         }
-        if (!data.contentLikes) data.contentLikes = {};
-        if (!data.contentLikes[contentId]) data.contentLikes[contentId] = 0;
-
-        const profile = data.profiles[profileId];
-        const contentItem = data.content[contentIndex];
-
-        // Update like status
-        if (liked) {
-            if (!profile.likedContent.includes(contentId)) {
-                profile.likedContent.push(contentId);
-                data.contentLikes[contentId] += 1;
-            }
-        } else {
-            const likedIndex = profile.likedContent.indexOf(contentId);
-            if (likedIndex > -1) {
-                profile.likedContent.splice(likedIndex, 1);
-                data.contentLikes[contentId] = Math.max(0, data.contentLikes[contentId] - 1);
-            }
-        }
-
-        // Save data
-        await this.saveData(data);
-
-        return {
-            contentId,
-            liked: profile.likedContent.includes(contentId),
-            totalLikes: data.contentLikes[contentId]
-        };
     }
 
     // Get liked content for profile
     async getLikedContent(profileId) {
-        const data = await this.getAllData();
-        const profile = data.profiles?.[profileId];
-
-        if (!profile) {
+        try {
+            const interaction = await this.interactionModel.findOne({ profileId }).populate('likedContent');
+            if (!interaction) {
+                return [];
+            }
+            return interaction.likedContent;
+        } catch (error) {
+            console.error('Error getting liked content:', error);
             return [];
         }
-
-        const likedContent = profile.likedContent.map(id =>
-            data.content.find(item => item.id === id)
-        ).filter(Boolean);
-
-        return likedContent;
     }
 
     // Update watch progress
     async updateProgress(contentId, profileId, progress) {
-        const data = await this.getAllData();
+        try {
+            // Validate content exists
+            const content = await this.model.findById(contentId);
+            if (!content) {
+                throw new Error('Content not found');
+            }
 
-        // Validate content exists
-        const contentExists = data.content.some(item => item.id === contentId);
-        if (!contentExists) {
-            throw new Error('Content not found');
-        }
+            // Find or create profile interaction
+            let interaction = await this.interactionModel.findOne({ profileId });
+            if (!interaction) {
+                interaction = new this.interactionModel({
+                    profileId,
+                    likedContent: [],
+                    watchProgress: new Map(),
+                    searchHistory: [],
+                    activityLog: []
+                });
+            }
 
-        // Initialize profile data
-        if (!data.profiles) data.profiles = {};
-        if (!data.profiles[profileId]) {
-            data.profiles[profileId] = {
-                likedContent: [],
-                watchProgress: {},
-                searchHistory: [],
-                activityLog: []
+            // Update progress
+            const newProgress = Math.max(0, Math.min(100, progress));
+            interaction.watchProgress.set(contentId.toString(), newProgress);
+
+            await interaction.save();
+
+            return {
+                contentId,
+                progress: newProgress
             };
+        } catch (error) {
+            console.error('Error updating progress:', error);
+            throw error;
         }
+    }
 
-        // Update progress
-        const newProgress = Math.max(0, Math.min(100, progress));
-        data.profiles[profileId].watchProgress[contentId] = newProgress;
-
-        await this.saveData(data);
-
-        return {
-            contentId,
-            progress: newProgress
-        };
+    // Save data (for compatibility - not needed in MongoDB version)
+    async saveData(data) {
+        console.warn('saveData() is deprecated with MongoDB implementation');
+        return true;
     }
 }
 

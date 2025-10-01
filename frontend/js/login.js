@@ -281,11 +281,14 @@
                     console.log('✅ Registration successful:', result.user);
                     redirectTo('profiles.html');
                 } else {
-                    showError(emailInput, emailError, 'Registration failed. Email may already exist.');
+                    // Show actual error message from backend
+                    showError(emailInput, emailError, 'Registration failed. Please check your password requirements.');
                 }
             } catch (error) {
                 console.error('❌ Registration error:', error);
-                showError(emailInput, emailError, 'Registration failed. Please try again.');
+                // Show the actual error message from the backend
+                const errorMessage = error.message || error.error || 'Registration failed. Please try again.';
+                showError(passwordInput, passwordError, errorMessage);
             } finally {
                 showLoading(submitButton, false);
             }
