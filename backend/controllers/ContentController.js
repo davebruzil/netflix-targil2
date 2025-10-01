@@ -273,6 +273,99 @@ class ContentController {
             console.error('Failed to log activity:', error);
         }
     }
+
+    // =============================================================================
+    // DEV #3 (ALON) - RECOMMENDATION & ADVANCED SEARCH METHODS (TO BE IMPLEMENTED)
+    // =============================================================================
+
+    /**
+     * Get trending content
+     * TODO: Implement logic to fetch trending content based on popularity
+     * Algorithm: Use RecommendationEngine.getPopularContent()
+     *
+     * @route GET /api/content/trending
+     */
+    async getTrending(req, res) {
+        // TODO: Get limit from query params (default: 10)
+
+        // TODO: Import and use RecommendationEngine.getPopularContent(limit)
+
+        // TODO: Return trending content array
+
+        // TODO: Handle errors with 500 status
+    }
+
+    /**
+     * Get personalized recommendations for a profile
+     * TODO: Implement personalized recommendation logic
+     * Algorithm: Use RecommendationEngine.getRecommendations()
+     *
+     * @route GET /api/content/recommendations/:profileId
+     */
+    async getRecommendations(req, res) {
+        // TODO: Get profileId from req.params
+
+        // TODO: Get limit from query params (default: 10)
+
+        // TODO: Validate profileId exists
+
+        // TODO: Import and use RecommendationEngine.getRecommendations(profileId, limit)
+
+        // TODO: Return recommendations array
+
+        // TODO: Handle errors with 500 status
+    }
+
+    /**
+     * Get related/similar content for a specific item
+     * "More Like This" functionality
+     * TODO: Implement similar content logic
+     * Algorithm: Use RecommendationEngine.getRelatedContent()
+     *
+     * @route GET /api/content/:id/related
+     */
+    async getRelatedContent(req, res) {
+        // TODO: Get contentId from req.params
+
+        // TODO: Get limit from query params (default: 6)
+
+        // TODO: Import and use RecommendationEngine.getRelatedContent(contentId, limit)
+
+        // TODO: Return related content array
+
+        // TODO: Handle errors with 500 status
+    }
+
+    /**
+     * Advanced search with filters
+     * TODO: Enhance existing searchContent() with advanced filters
+     * Filters: genre, type (movie/series), year range, rating
+     *
+     * @route GET /api/content/search (enhanced with filter params)
+     */
+    async advancedSearch(req, res) {
+        // TODO: Get search query from req.query.q
+
+        // TODO: Get filter params: genre, type, yearFrom, yearTo, minRating
+
+        // TODO: Get limit from query params (default: 20)
+
+        // TODO: Call contentModel.searchContent() to get base results
+
+        // TODO: Apply genre filter if provided
+
+        // TODO: Apply type filter (movie/series) if provided
+
+        // TODO: Apply year range filter if provided
+
+        // TODO: Apply rating filter if provided
+
+        // TODO: Return filtered results
+
+        // TODO: Track search with filters in history
+
+        // TODO: Handle errors with 500 status
+    }
 }
 
 module.exports = ContentController;

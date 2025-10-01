@@ -702,12 +702,11 @@ static showError(containerId, message) {
 ```
 
 **Files to work on:**
-- `backend/services/RecommendationEngine.js` (create new)
-- `backend/controllers/ContentController.js` (search, trending, recommendations)
-- `backend/models/Content.js` (search history)
-- `frontend/js/main.js` (recommendations integration)
-- `frontend/js/netflix-ui.js` (loading/error states)
-- `frontend/js/search.js` (create new - advanced search UI)
+- `backend/services/RecommendationEngine.js` (**ALREADY CREATED** - implement the TODO functions)
+- `backend/controllers/ContentController.js` (**ALREADY CREATED** - implement the TODO methods at the bottom: `getTrending()`, `getRecommendations()`, `getRelatedContent()`, `advancedSearch()`)
+- `backend/models/Content.js` (add search history methods)
+- `frontend/js/main.js` (add recommendations section integration)
+- `frontend/js/netflix-ui.js` (enhance loading/error states)
 
 ---
 

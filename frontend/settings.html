@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Profile Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- TODO: Add navigation header (copy from main.html) -->
+
+    <main class="settings-main" style="padding: 60px 20px;">
+        <div class="container" style="max-width: 1000px;">
+            <h1 class="text-white mb-4">Manage Profiles</h1>
+
+            <!-- Profile Count Display -->
+            <p class="profile-count text-white mb-4">
+                <span id="profileCount">0</span>/5 profiles used
+            </p>
+
+            <!-- Create Profile Section -->
+            <div class="create-profile-section mb-5">
+                <h3 class="text-white mb-3">Create New Profile</h3>
+                <form id="createProfileForm" class="profile-form">
+                    <!-- TODO: Add profile name input -->
+                    <!-- TODO: Add avatar selection dropdown with image previews -->
+                    <!-- TODO: Add "Kids Profile" checkbox -->
+                    <!-- TODO: Add submit button -->
+                </form>
+            </div>
+
+            <!-- Existing Profiles List -->
+            <div class="profiles-list-section">
+                <h3 class="text-white mb-3">Your Profiles</h3>
+                <div id="profilesList" class="row">
+                    <!-- TODO: Profiles will be rendered here dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script src="api/api-config.js"></script>
+    <script src="api/netflix-api.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>
