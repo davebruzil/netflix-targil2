@@ -61,9 +61,16 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 // Instance method to return user object without password
+// Transforms _id to id for frontend compatibility
 userSchema.methods.toJSON = function() {
     const user = this.toObject();
+
+    // Transform MongoDB _id to id
+    user.id = user._id.toString();
+    delete user._id;
+    delete user.__v;
     delete user.password;
+
     return user;
 };
 

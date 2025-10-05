@@ -275,6 +275,85 @@ class ContentController {
     }
 
     // =============================================================================
+    // DEV #2 (YARON) - MY LIST FEATURE
+    // =============================================================================
+
+    /**
+     * Toggle My List status for content
+     * @route POST /api/content/:id/mylist
+     */
+    async toggleMyList(req, res) {
+        console.log(`📋 POST /api/content/${req.params.id}/mylist - ProfileId: ${req.body.profileId}, AddToList: ${req.body.addToList}`);
+        try {
+            const { id } = req.params;
+            const { profileId, addToList } = req.body;
+
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
+
+            const result = await this.contentModel.toggleMyList(id, profileId, addToList);
+
+            // Log activity
+            await this.logActivity(profileId, addToList ? 'add_to_mylist' : 'remove_from_mylist', id);
+
+            res.json({
+                success: true,
+                data: result,
+                message: addToList ? 'Added to My List' : 'Removed from My List'
+            });
+        } catch (error) {
+            if (error.message === 'Content not found') {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Content not found'
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                error: 'Failed to update My List',
+                message: error.message
+            });
+        }
+    }
+
+    /**
+     * Get My List for a profile
+     * @route GET /api/content/profile/:profileId/mylist
+     */
+    async getMyList(req, res) {
+        console.log(`📋 GET /api/content/profile/${req.params.profileId}/mylist`);
+        try {
+            const { profileId } = req.params;
+
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
+
+            const myList = await this.contentModel.getMyList(profileId);
+
+            res.json({
+                success: true,
+                data: myList,
+                count: myList.length
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Failed to fetch My List',
+                message: error.message
+            });
+        }
+    }
+
+    // =============================================================================
     // DEV #3 (ALON) - RECOMMENDATION & ADVANCED SEARCH METHODS (TO BE IMPLEMENTED)
     // =============================================================================
 

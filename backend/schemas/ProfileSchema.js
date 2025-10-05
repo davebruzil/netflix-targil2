@@ -38,6 +38,19 @@ profileSchema.statics.countByUser = async function(userId) {
     return await this.countDocuments({ userId });
 };
 
+// Instance method to return profile object with id instead of _id
+// Transforms _id to id for frontend compatibility
+profileSchema.methods.toJSON = function() {
+    const profile = this.toObject();
+
+    // Transform MongoDB _id to id
+    profile.id = profile._id.toString();
+    delete profile._id;
+    delete profile.__v;
+
+    return profile;
+};
+
 const Profile = mongoose.model('Profile', profileSchema);
 
 module.exports = Profile;

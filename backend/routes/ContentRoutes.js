@@ -30,4 +30,10 @@ router.get('/profile/:profileId/likes', (req, res) => contentController.getLiked
 // POST /api/content/:id/progress - Update watch progress
 router.post('/:id/progress', (req, res) => contentController.updateProgress(req, res));
 
+// POST /api/content/:id/mylist - Toggle My List status
+router.post('/:id/mylist', (req, res) => contentController.toggleMyList(req, res));
+
+// GET /api/content/profile/:profileId/mylist - Get My List for profile
+router.get('/profile/:profileId/mylist', (req, res) => contentController.getMyList(req, res));
+
 module.exports = router;

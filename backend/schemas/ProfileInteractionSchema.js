@@ -11,6 +11,10 @@ const profileInteractionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Content'
     }],
+    myList: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Content'
+    }],
     watchProgress: {
         type: Map,
         of: Number, // contentId -> progress percentage (0-100)

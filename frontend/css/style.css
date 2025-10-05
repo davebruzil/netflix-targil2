@@ -933,6 +933,49 @@ body {
     color: white;
 }
 
+/* My List Button (Dev #2 - Yaron) */
+.netflix-mylist-btn {
+    position: absolute;
+    top: 8px;
+    right: 45px;
+    background: rgba(109, 109, 110, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    transform: scale(0.9);
+    z-index: 5;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+}
+
+.netflix-card:hover .netflix-mylist-btn {
+    opacity: 1;
+    transform: scale(1);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: white;
+}
+
+.netflix-mylist-btn:hover {
+    background: rgba(51, 153, 255, 0.9);
+    border-color: rgba(51, 153, 255, 1);
+    transform: scale(1.1);
+    color: white;
+}
+
+.netflix-mylist-btn.in-list {
+    opacity: 1;
+    background: rgba(51, 153, 255, 0.9);
+    border-color: rgba(51, 153, 255, 1);
+    color: white;
+}
+
 /* Search and Controls Netflix Style */
 .netflix-search-controls {
     padding: 0 100px;

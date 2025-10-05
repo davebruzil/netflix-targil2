@@ -6,16 +6,217 @@
     <title>Netflix - Profile Settings</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .settings-main {
+            background-color: #141414;
+            min-height: 100vh;
+            padding: 80px 20px 40px;
+        }
+
+        .profile-count {
+            font-size: 18px;
+            font-weight: 500;
+            color: #e5e5e5;
+        }
+
+        .profile-form {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .profile-form label {
+            color: #e5e5e5;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .profile-form input,
+        .profile-form select {
+            background: #333;
+            border: 1px solid #555;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .profile-form input:focus,
+        .profile-form select:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            margin-top: 10px;
+            object-fit: cover;
+        }
+
+        .profile-card {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-card:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        .profile-card-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .profile-card-info {
+            flex: 1;
+        }
+
+        .profile-card-name {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-card-badge {
+            display: inline-block;
+            background: #e50914;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .profile-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background: #555;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #666;
+        }
+
+        .btn-delete {
+            background: #e50914;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #f40612;
+        }
+
+        .btn-create {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-create:hover {
+            background: #f40612;
+        }
+
+        .btn-create:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .avatar-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            object-fit: cover;
+        }
+
+        .avatar-option:hover {
+            border-color: #e50914;
+            transform: scale(1.1);
+        }
+
+        .avatar-option.selected {
+            border-color: #e50914;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+        }
+    </style>
 </head>
 <body>
-    <!-- TODO: Add navigation header (copy from main.html) -->
+    <!-- Navigation Header (copied from main.html) -->
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a href="main.html" class="navbar-brand me-4">
+                    <img src="images/better.png" alt="NETFLIX" class="logo-nav">
+                </a>
 
-    <main class="settings-main" style="padding: 60px 20px;">
+                <div class="navbar-nav d-none d-lg-flex me-auto">
+                    <a class="nav-link text-white" href="main.html" style="margin-right: 20px;">Home</a>
+                    <a class="nav-link text-white" href="profiles.html" style="margin-right: 20px;">Profiles</a>
+                    <a class="nav-link text-white active" href="settings.html" style="margin-right: 20px;">Settings</a>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <button onclick="netflixLogout()" class="btn btn-outline-light btn-sm">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="settings-main">
         <div class="container" style="max-width: 1000px;">
             <h1 class="text-white mb-4">Manage Profiles</h1>
 
             <!-- Profile Count Display -->
-            <p class="profile-count text-white mb-4">
+            <p class="profile-count mb-4">
                 <span id="profileCount">0</span>/5 profiles used
             </p>
 
@@ -23,18 +224,46 @@
             <div class="create-profile-section mb-5">
                 <h3 class="text-white mb-3">Create New Profile</h3>
                 <form id="createProfileForm" class="profile-form">
-                    <!-- TODO: Add profile name input -->
-                    <!-- TODO: Add avatar selection dropdown with image previews -->
-                    <!-- TODO: Add "Kids Profile" checkbox -->
-                    <!-- TODO: Add submit button -->
+                    <div class="mb-3">
+                        <label for="profileName">Profile Name</label>
+                        <input
+                            type="text"
+                            id="profileName"
+                            name="profileName"
+                            required
+                            maxlength="15"
+                            placeholder="Enter profile name (2-15 characters)"
+                        >
+                        <small id="nameValidation" style="color: #999;"></small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Select Avatar</label>
+                        <div class="avatar-options" id="avatarOptions">
+                            <!-- Avatar options will be generated here -->
+                        </div>
+                        <input type="hidden" id="selectedAvatar" name="avatar">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>
+                            <input type="checkbox" id="isKidProfile" name="isChild" style="width: auto; margin-right: 8px;">
+                            This is a kids profile
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-create" id="createBtn">Create Profile</button>
                 </form>
             </div>
 
             <!-- Existing Profiles List -->
             <div class="profiles-list-section">
                 <h3 class="text-white mb-3">Your Profiles</h3>
-                <div id="profilesList" class="row">
-                    <!-- TODO: Profiles will be rendered here dynamically -->
+                <div id="profilesList">
+                    <!-- Profiles will be rendered here dynamically -->
+                    <div class="empty-state">
+                        <p>Loading profiles...</p>
+                    </div>
                 </div>
             </div>
         </div>
