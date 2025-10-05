@@ -8,8 +8,9 @@ class NetflixUI {
      * @param {Set} likedItems - Set of liked item IDs
      * @returns {string} HTML string for the card
      */
-    static createNetflixCard(item, likedItems) {
+    static createNetflixCard(item, likedItems, myListItems) {
         const isLiked = likedItems.has(item.id);
+        const inMyList = myListItems ? myListItems.has(item.id) : false;
         const likeCount = item.likes + (isLiked ? 1 : 0);
         const progress = item.progress || 0;
         const rating = item.rating && item.rating !== 'N/A' ? item.rating : '';
@@ -27,6 +28,12 @@ class NetflixUI {
                         <button class="netflix-like-btn ${isLiked ? 'liked' : ''}" onclick="netflixFeed.toggleLike('${item.id}', event)">
                             <span style="font-size: 16px;">
                                 ${isLiked ? '♥' : '♡'}
+                            </span>
+                        </button>
+
+                        <button class="netflix-mylist-btn ${inMyList ? 'in-list' : ''}" onclick="netflixFeed.toggleMyList('${item.id}', event)" title="${inMyList ? 'Remove from My List' : 'Add to My List'}">
+                            <span style="font-size: 18px;">
+                                ${inMyList ? '✓' : '+'}
                             </span>
                         </button>
 
@@ -56,8 +63,9 @@ class NetflixUI {
      * @param {string} sliderId - ID of the slider element
      * @param {Array} sectionContent - Content array for the section
      * @param {Set} likedItems - Set of liked item IDs
+     * @param {Set} myListItems - Set of My List item IDs (Dev #2 - Yaron)
      */
-    static renderSection(sliderId, sectionContent, likedItems) {
+    static renderSection(sliderId, sectionContent, likedItems, myListItems = new Set()) {
         const slider = document.getElementById(sliderId);
         if (!slider) return;
 
@@ -70,7 +78,7 @@ class NetflixUI {
             return;
         }
 
-        slider.innerHTML = sectionContent.map(item => this.createNetflixCard(item, likedItems)).join('');
+        slider.innerHTML = sectionContent.map(item => this.createNetflixCard(item, likedItems, myListItems)).join('');
     }
 
     /**
@@ -138,7 +146,7 @@ class NetflixUI {
      * @param {boolean} isAlphaSorted - Whether content is alphabetically sorted
      * @param {Set} likedItems - Set of liked item IDs
      */
-    static renderSearchResults(allContent, searchTerm, isAlphaSorted, likedItems) {
+    static renderSearchResults(allContent, searchTerm, isAlphaSorted, likedItems, myListItems = new Set()) {
         let filtered = allContent.filter(item => {
             const titleMatch = item.title.toLowerCase().includes(searchTerm);
             const genreMatch = item.genre && item.genre.toLowerCase().includes(searchTerm);
@@ -164,7 +172,7 @@ class NetflixUI {
             return;
         }
 
-        searchSlider.innerHTML = filtered.map(item => this.createNetflixCard(item, likedItems)).join('');
+        searchSlider.innerHTML = filtered.map(item => this.createNetflixCard(item, likedItems, myListItems)).join('');
     }
 
     /**

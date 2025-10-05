@@ -185,6 +185,87 @@ class Content {
         console.warn('saveData() is deprecated with MongoDB implementation');
         return true;
     }
+
+    // =====================================================================
+    // MY LIST FUNCTIONALITY (Dev #2 - Yaron)
+    // =====================================================================
+
+    /**
+     * Toggle My List status for content
+     * @param {string} contentId - Content ID
+     * @param {string} profileId - Profile ID
+     * @param {boolean} addToList - true to add, false to remove
+     * @returns {object} Result with myList status
+     */
+    async toggleMyList(contentId, profileId, addToList) {
+        try {
+            // Find or create profile interaction
+            let interaction = await this.interactionModel.findOne({ profileId });
+            if (!interaction) {
+                interaction = new this.interactionModel({
+                    profileId,
+                    likedContent: [],
+                    myList: [],
+                    watchProgress: new Map(),
+                    searchHistory: [],
+                    activityLog: []
+                });
+            }
+
+            // Find content to verify it exists
+            const content = await this.model.findById(contentId);
+            if (!content) {
+                throw new Error('Content not found');
+            }
+
+            // Update My List status
+            if (addToList) {
+                if (!interaction.myList.includes(contentId)) {
+                    interaction.myList.push(contentId);
+                }
+            } else {
+                const index = interaction.myList.indexOf(contentId);
+                if (index > -1) {
+                    interaction.myList.splice(index, 1);
+                }
+            }
+
+            await interaction.save();
+
+            return {
+                contentId,
+                inMyList: interaction.myList.includes(contentId),
+                myListCount: interaction.myList.length
+            };
+        } catch (error) {
+            console.error('Error toggling My List:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get all content in profile's My List
+     * @param {string} profileId - Profile ID
+     * @returns {array} Array of content items
+     */
+    async getMyList(profileId) {
+        try {
+            const interaction = await this.interactionModel.findOne({ profileId });
+            if (!interaction || !interaction.myList.length) {
+                return [];
+            }
+
+            // Populate My List with full content details
+            const myListContent = await this.model.find({
+                _id: { $in: interaction.myList }
+            });
+
+            return myListContent;
+        } catch (error) {
+            console.error('Error getting My List:', error);
+            return [];
+        }
+    }
 }
 
 module.exports = Content;

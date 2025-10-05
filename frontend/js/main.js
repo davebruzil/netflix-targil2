@@ -9,6 +9,8 @@ class NetflixFeed {
     constructor() {
         this.allContent = [];
         this.likedItems = this.getLikedFromStorage();
+        this.myListItems = new Set(); // Dev #2 - Yaron: My List tracking
+        this.myListContent = []; // Dev #2 - Yaron: My List content array
         this.searchTerm = '';
         this.isAlphaSorted = false;
         this.sections = {
@@ -58,8 +60,11 @@ class NetflixFeed {
             // Step 2: Load hero section immediately for better UX
             this.loadFeaturedHero();
 
-            // Step 3: Load liked items from backend (non-blocking)
-            this.loadLikedItemsFromBackend();
+            // Step 3: Load liked items and My List from backend (parallel)
+            await Promise.all([
+                this.loadLikedItemsFromBackend(),
+                this.loadMyList() // Dev #2 - Yaron: Load My List
+            ]);
 
             // Step 4: Render all sections
             this.renderAllSections();
@@ -106,6 +111,112 @@ class NetflixFeed {
         } catch (error) {
             console.warn('Failed to load likes from backend, using localStorage:', error);
             // Keep existing localStorage data if backend fails
+        }
+    }
+
+    // ===== MY LIST FUNCTIONALITY (Dev #2 - Yaron) =====
+
+    /**
+     * Load My List from backend
+     */
+    async loadMyList() {
+        try {
+            console.log('📋 Loading My List...');
+            this.myListContent = await NetflixAPI.getMyList();
+            this.myListItems = new Set(this.myListContent.map(item => item.id));
+
+            // Render My List section
+            this.renderMyListSection();
+
+            console.log(`✅ My List loaded: ${this.myListContent.length} items`);
+        } catch (error) {
+            console.warn('Failed to load My List:', error);
+            this.myListContent = [];
+            this.myListItems = new Set();
+        }
+    }
+
+    /**
+     * Render My List section
+     */
+    renderMyListSection() {
+        const myListSection = document.getElementById('myListSection');
+        if (!myListSection) return;
+
+        if (this.myListContent.length > 0) {
+            myListSection.style.display = 'block';
+            NetflixUI.renderSection('myListSlider', this.myListContent, this.likedItems, this.myListItems);
+        } else {
+            myListSection.style.display = 'none';
+        }
+    }
+
+    /**
+     * Toggle My List for an item
+     */
+    async toggleMyList(itemId, event) {
+        event.stopPropagation();
+
+        const myListButton = event.currentTarget;
+        const checkIcon = myListButton.querySelector('span');
+
+        // Add animation class
+        myListButton.classList.add('netflix-like-animation');
+        setTimeout(() => {
+            myListButton.classList.remove('netflix-like-animation');
+        }, 300);
+
+        const wasInList = this.myListItems.has(itemId);
+        const newState = !wasInList;
+
+        // Optimistic UI update
+        if (newState) {
+            this.myListItems.add(itemId);
+            checkIcon.textContent = '✓';
+            myListButton.classList.add('in-list');
+            myListButton.title = 'Remove from My List';
+        } else {
+            this.myListItems.delete(itemId);
+            checkIcon.textContent = '+';
+            myListButton.classList.remove('in-list');
+            myListButton.title = 'Add to My List';
+        }
+
+        // Update backend
+        try {
+            const result = await NetflixAPI.toggleMyList(itemId, newState);
+            if (result) {
+                // Reload My List from backend to get latest state
+                await this.loadMyList();
+
+                // Update all cards to reflect new state
+                this.renderAllSections();
+
+                console.log(`✅ ${newState ? 'Added to' : 'Removed from'} My List: ${itemId}`);
+            } else {
+                // Revert UI on backend failure
+                if (wasInList) {
+                    this.myListItems.add(itemId);
+                    checkIcon.textContent = '✓';
+                    myListButton.classList.add('in-list');
+                } else {
+                    this.myListItems.delete(itemId);
+                    checkIcon.textContent = '+';
+                    myListButton.classList.remove('in-list');
+                }
+            }
+        } catch (error) {
+            console.warn('My List toggle failed, reverting:', error);
+            // Revert UI on error
+            if (wasInList) {
+                this.myListItems.add(itemId);
+                checkIcon.textContent = '✓';
+                myListButton.classList.add('in-list');
+            } else {
+                this.myListItems.delete(itemId);
+                checkIcon.textContent = '+';
+                myListButton.classList.remove('in-list');
+            }
         }
     }
 
@@ -224,14 +335,14 @@ class NetflixFeed {
                 const backendResults = await NetflixAPI.searchContentBackend(this.searchTerm, 20);
                 if (backendResults.length > 0) {
                     // Use backend search results
-                    NetflixUI.renderSearchResults(backendResults, this.searchTerm, this.isAlphaSorted, this.likedItems);
+                    NetflixUI.renderSearchResults(backendResults, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
                 } else {
                     // Fallback to local TMDB search
-                    NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems);
+                    NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
                 }
             } catch (error) {
                 console.warn('Backend search failed, using local search:', error);
-                NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems);
+                NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
             }
         } else {
             this.renderAllSections();
@@ -244,20 +355,23 @@ class NetflixFeed {
 
         // Re-render current view
         if (this.searchTerm) {
-            NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems);
+            NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
         } else {
             this.renderAllSections();
         }
     }
 
     renderAllSections() {
+        // Render My List section (Dev #2 - Yaron)
+        this.renderMyListSection();
+
         // Apply sorting if enabled
         Object.keys(this.sections).forEach(section => {
             let content = this.sections[section];
             if (this.isAlphaSorted) {
                 content = NetflixAPI.sortContent(content, this.isAlphaSorted);
             }
-            NetflixUI.renderSection(`${section}Slider`, content, this.likedItems);
+            NetflixUI.renderSection(`${section}Slider`, content, this.likedItems, this.myListItems);
         });
 
         // Handle continue watching section with different ID
@@ -266,7 +380,7 @@ class NetflixFeed {
             if (this.isAlphaSorted) {
                 content = NetflixAPI.sortContent(content, this.isAlphaSorted);
             }
-            NetflixUI.renderSection('continueWatchingSlider', content, this.likedItems);
+            NetflixUI.renderSection('continueWatchingSlider', content, this.likedItems, this.myListItems);
         }
     }
 

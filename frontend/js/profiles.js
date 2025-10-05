@@ -85,14 +85,30 @@
     function createProfileElement(profile) {
         const profileDiv = document.createElement('div');
         profileDiv.className = 'profile-item';
-        profileDiv.innerHTML = `
-            <a href="#" onclick="selectProfile('${profile.id}', '${profile.name}', '${profile.avatar}')" style="text-decoration: none; color: inherit;">
-                <div class="profile-avatar">
-                    <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
+
+        if (isManageMode) {
+            // In manage mode, show delete button
+            profileDiv.innerHTML = `
+                <div style="position: relative;">
+                    <div class="profile-avatar">
+                        <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
+                        <button onclick="window.deleteProfile('${profile.id}', '${profile.name}')" style="position: absolute; top: -10px; right: -10px; background: #e50914; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">×</button>
+                    </div>
+                    <div class="profile-name">${profile.name}</div>
                 </div>
-                <div class="profile-name">${profile.name}</div>
-            </a>
-        `;
+            `;
+        } else {
+            // Normal select mode
+            profileDiv.innerHTML = `
+                <a href="#" onclick="selectProfile('${profile.id}', '${profile.name}', '${profile.avatar}')" style="text-decoration: none; color: inherit;">
+                    <div class="profile-avatar">
+                        <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
+                    </div>
+                    <div class="profile-name">${profile.name}</div>
+                </a>
+            `;
+        }
+
         return profileDiv;
     }
 
@@ -174,12 +190,7 @@
      * Setup event listeners
      */
     function setupEventListeners() {
-        // Handle "Manage Profiles" button
-        const manageBtn = document.querySelector('.manage-profiles-btn');
-        if (manageBtn && !manageBtn.hasAttribute('data-listener-added')) {
-            manageBtn.addEventListener('click', showManageProfilesModal);
-            manageBtn.setAttribute('data-listener-added', 'true');
-        }
+        // Manage Profiles button is now handled via onclick in HTML
     }
 
     /**
@@ -368,9 +379,50 @@
     /**
      * Show manage profiles modal (placeholder)
      */
-    function showManageProfilesModal() {
-        alert('Profile management features coming soon! You can add new profiles using the + button.');
-    }
+    let isManageMode = false;
+
+    /**
+     * Toggle between select and manage mode
+     */
+    window.toggleManageMode = function() {
+        isManageMode = !isManageMode;
+        const btn = document.getElementById('manageProfilesBtn');
+
+        if (isManageMode) {
+            btn.textContent = 'Done';
+            btn.style.backgroundColor = '#e50914';
+            btn.style.color = 'white';
+        } else {
+            btn.textContent = 'Manage Profiles';
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+        }
+
+        renderProfiles();
+    };
+
+    /**
+     * Delete profile with confirmation
+     */
+    window.deleteProfile = async function(profileId, profileName) {
+        if (!confirm(`Are you sure you want to delete the profile "${profileName}"?`)) {
+            return;
+        }
+
+        try {
+            const success = await NetflixAPI.deleteProfile(profileId);
+            if (success) {
+                showSuccessToast(`Profile "${profileName}" deleted successfully`);
+                await loadProfilesFromAPI();
+                renderProfiles();
+            } else {
+                alert('Failed to delete profile. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting profile:', error);
+            alert('Error deleting profile. Please try again.');
+        }
+    };
 
     /**
      * Show success toast notification

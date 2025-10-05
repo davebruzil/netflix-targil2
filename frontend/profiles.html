@@ -17,8 +17,8 @@
                 <!-- Profiles will be loaded dynamically from API -->
             </div>
             
-            <button class="manage-profiles-btn mt-4" onclick="showAddProfileModal()" style="background-color: #e50914; color: white; border: none;">+ Add New Profile</button>
-            <button class="manage-profiles-btn mt-3">Manage Profiles</button>
+            <button class="manage-profiles-btn mt-4" onclick="window.handleAddProfile(event)" style="background-color: #e50914; color: white; border: none;">+ Add New Profile</button>
+            <button class="manage-profiles-btn mt-3" id="manageProfilesBtn" onclick="window.toggleManageMode()">Manage Profiles</button>
             <button class="manage-profiles-btn mt-3" onclick="netflixLogout()" style="background-color: transparent; border: 1px solid #e50914; color: #e50914;">Sign Out</button>
         </div>
     </div>

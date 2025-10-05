@@ -4,6 +4,18 @@
 class NetflixAPI {
     static BACKEND_URL = window.AppConfig?.get('BACKEND_URL') || 'http://localhost:5000/api';
 
+    // Helper method to fetch with credentials (for session cookies)
+    static async fetchWithCredentials(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            credentials: 'include', // Always include cookies for session management
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
     // ===== TMDB API =====
 
     static async fetchTMDBData(id, type = 'movie') {
@@ -122,9 +134,8 @@ class NetflixAPI {
 
     static async register(userData) {
         try {
-            const response = await fetch(`${this.BACKEND_URL}/auth/register`, {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/auth/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
             });
             const data = await response.json();
@@ -146,9 +157,8 @@ class NetflixAPI {
 
     static async login(credentials) {
         try {
-            const response = await fetch(`${this.BACKEND_URL}/auth/login`, {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(credentials)
             });
             const data = await response.json();
@@ -183,7 +193,14 @@ class NetflixAPI {
             const isAuthenticated = localStorage.getItem('netflix:isAuthenticated');
             if (!isAuthenticated) return null;
             const userData = localStorage.getItem('netflix:user');
-            return userData ? JSON.parse(userData) : null;
+            if (!userData) return null;
+
+            const user = JSON.parse(userData);
+            // Handle backward compatibility: transform _id to id if needed
+            if (user && !user.id && user._id) {
+                user.id = user._id.toString();
+            }
+            return user;
         } catch (error) {
             console.error('❌ Error getting current user:', error);
             return null;
@@ -316,9 +333,16 @@ class NetflixAPI {
     }
 
     static saveUserData(user) {
+        // Ensure user has an id field (handle both id and _id)
+        if (user && !user.id && user._id) {
+            user.id = user._id.toString();
+        }
+
         localStorage.setItem('netflix:isAuthenticated', 'true');
         localStorage.setItem('netflix:user', JSON.stringify(user));
         localStorage.setItem('netflix:email', user.email);
+
+        console.log('✅ User data saved to localStorage:', { id: user.id, email: user.email });
     }
 
     static clearUserData() {
@@ -347,7 +371,7 @@ class NetflixAPI {
                 return [];
             }
 
-            const response = await fetch(`${this.BACKEND_URL}/profiles/user/${currentUser.id}`);
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/profiles/user/${currentUser.id}`);
             const data = await response.json();
 
             if (data.success) {
@@ -408,14 +432,11 @@ class NetflixAPI {
                 isChild: profileData.isChild || false
             };
 
-            const response = await fetch(`${this.BACKEND_URL}/profiles`, {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/profiles`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify(backendProfileData)
             });
-            
+
             const data = await response.json();
             
             if (data.success) {
@@ -467,14 +488,15 @@ class NetflixAPI {
      */
     static async deleteProfile(profileId) {
         try {
-            const response = await fetch(`${this.BACKEND_URL}/profiles/${profileId}`, {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/profiles/${profileId}`, {
                 method: 'DELETE'
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
-            return true;
+                console.log('✅ Profile deleted successfully');
+                return true;
             } else {
                 console.error('Failed to delete profile:', data.error);
                 return false;
@@ -482,6 +504,71 @@ class NetflixAPI {
         } catch (error) {
             console.error('Error deleting profile:', error);
             return false;
+        }
+    }
+
+    // ===== MY LIST FEATURE (Dev #2 - Yaron) =====
+
+    /**
+     * Toggle My List status for content
+     * @param {string} contentId - Content ID
+     * @param {boolean} addToList - true to add, false to remove
+     * @returns {Promise<object|null>} Result with myList status
+     */
+    static async toggleMyList(contentId, addToList) {
+        try {
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (!profileId) {
+                console.error('No profile ID found');
+                return null;
+            }
+
+            const response = await fetch(`${this.BACKEND_URL}/content/${contentId}/mylist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profileId, addToList })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                console.log('✅ My List updated:', data.data);
+                return data.data;
+            } else {
+                console.error('Failed to update My List:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error updating My List:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get My List for current profile
+     * @returns {Promise<Array>} Array of content in My List
+     */
+    static async getMyList() {
+        try {
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (!profileId) {
+                console.error('No profile ID found');
+                return [];
+            }
+
+            const response = await fetch(`${this.BACKEND_URL}/content/profile/${profileId}/mylist`);
+            const data = await response.json();
+
+            if (data.success) {
+                console.log('✅ My List loaded:', data.count, 'items');
+                return data.data;
+            } else {
+                console.error('Failed to fetch My List:', data.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Error fetching My List:', error);
+            return [];
         }
     }
 }
