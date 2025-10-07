@@ -9,8 +9,6 @@ class NetflixFeed {
     constructor() {
         this.allContent = [];
         this.likedItems = this.getLikedFromStorage();
-        this.myListItems = new Set(); // Dev #2 - Yaron: My List tracking
-        this.myListContent = []; // Dev #2 - Yaron: My List content array
         this.searchTerm = '';
         this.isAlphaSorted = false;
         this.sections = {
@@ -19,6 +17,8 @@ class NetflixFeed {
             movies: [],
             series: []
         };
+        this.dynamicSections = {}; // Dev #3 - Alon: Dynamic content sections
+        this.genreSections = {}; // Dev #3 - Alon: Genre-based sections
         this.isLoading = false;
 
         this.init();
@@ -60,10 +60,12 @@ class NetflixFeed {
             // Step 2: Load hero section immediately for better UX
             this.loadFeaturedHero();
 
-            // Step 3: Load liked items and My List from backend (parallel)
+            // Step 3: Load liked items, recommendations, and dynamic sections from backend (parallel)
             await Promise.all([
                 this.loadLikedItemsFromBackend(),
-                this.loadMyList() // Dev #2 - Yaron: Load My List
+                this.loadRecommendations(), // Dev #3 - Alon: Load personalized recommendations
+                this.loadTrendingContent(), // Dev #3 - Alon: Load trending content
+                this.loadDynamicSections() // Dev #3 - Alon: Load dynamic content sections
             ]);
 
             // Step 4: Render all sections
@@ -114,109 +116,128 @@ class NetflixFeed {
         }
     }
 
-    // ===== MY LIST FUNCTIONALITY (Dev #2 - Yaron) =====
+    // ===== RECOMMENDATION FUNCTIONALITY (Dev #3 - Alon) =====
 
     /**
-     * Load My List from backend
+     * Load personalized recommendations for the current profile
      */
-    async loadMyList() {
+    async loadRecommendations() {
         try {
-            console.log('📋 Loading My List...');
-            this.myListContent = await NetflixAPI.getMyList();
-            this.myListItems = new Set(this.myListContent.map(item => item.id));
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (!profileId) {
+                console.log('No profile ID found, skipping recommendations');
+                return;
+            }
 
-            // Render My List section
-            this.renderMyListSection();
-
-            console.log(`✅ My List loaded: ${this.myListContent.length} items`);
+            console.log('🎯 Loading personalized recommendations...');
+            const recommendations = await NetflixAPI.getRecommendations(profileId, 10);
+            
+            if (recommendations.length > 0) {
+                // Add recommendations to sections
+                this.sections.recommendations = recommendations;
+                console.log(`✅ Loaded ${recommendations.length} personalized recommendations`);
+            } else {
+                console.log('No recommendations available yet');
+            }
         } catch (error) {
-            console.warn('Failed to load My List:', error);
-            this.myListContent = [];
-            this.myListItems = new Set();
+            console.warn('Failed to load recommendations:', error);
+            this.sections.recommendations = [];
         }
     }
 
     /**
-     * Render My List section
+     * Load trending content
      */
-    renderMyListSection() {
-        const myListSection = document.getElementById('myListSection');
-        if (!myListSection) return;
-
-        if (this.myListContent.length > 0) {
-            myListSection.style.display = 'block';
-            NetflixUI.renderSection('myListSlider', this.myListContent, this.likedItems, this.myListItems);
-        } else {
-            myListSection.style.display = 'none';
+    async loadTrendingContent() {
+        try {
+            console.log('🔥 Loading trending content...');
+            const trendingContent = await NetflixAPI.getTrendingContent(10);
+            
+            if (trendingContent.length > 0) {
+                // Update trending section with backend data
+                this.sections.trending = trendingContent;
+                console.log(`✅ Loaded ${trendingContent.length} trending items`);
+            } else {
+                console.log('No trending content available');
+            }
+        } catch (error) {
+            console.warn('Failed to load trending content:', error);
         }
     }
 
     /**
-     * Toggle My List for an item
+     * Load dynamic content sections (Dev #3 - Alon)
      */
-    async toggleMyList(itemId, event) {
-        event.stopPropagation();
-
-        const myListButton = event.currentTarget;
-        const checkIcon = myListButton.querySelector('span');
-
-        // Add animation class
-        myListButton.classList.add('netflix-like-animation');
-        setTimeout(() => {
-            myListButton.classList.remove('netflix-like-animation');
-        }, 300);
-
-        const wasInList = this.myListItems.has(itemId);
-        const newState = !wasInList;
-
-        // Optimistic UI update
-        if (newState) {
-            this.myListItems.add(itemId);
-            checkIcon.textContent = '✓';
-            myListButton.classList.add('in-list');
-            myListButton.title = 'Remove from My List';
-        } else {
-            this.myListItems.delete(itemId);
-            checkIcon.textContent = '+';
-            myListButton.classList.remove('in-list');
-            myListButton.title = 'Add to My List';
-        }
-
-        // Update backend
+    async loadDynamicSections() {
         try {
-            const result = await NetflixAPI.toggleMyList(itemId, newState);
-            if (result) {
-                // Reload My List from backend to get latest state
-                await this.loadMyList();
+            console.log('🎬 Loading dynamic content sections...');
+            
+            // Load core dynamic sections
+            const sectionTypes = ['trending', 'newReleases', 'topRated', 'continueWatching'];
+            const dynamicSections = await NetflixAPI.loadDynamicSections(sectionTypes);
+            
+            // Store dynamic sections
+            this.dynamicSections = dynamicSections;
+            
+            // Load genre-based sections
+            await this.loadGenreSections();
+            
+            console.log('✅ Dynamic sections loaded successfully');
+        } catch (error) {
+            console.warn('Failed to load dynamic sections:', error);
+            this.dynamicSections = {};
+        }
+    }
 
-                // Update all cards to reflect new state
-                this.renderAllSections();
-
-                console.log(`✅ ${newState ? 'Added to' : 'Removed from'} My List: ${itemId}`);
-            } else {
-                // Revert UI on backend failure
-                if (wasInList) {
-                    this.myListItems.add(itemId);
-                    checkIcon.textContent = '✓';
-                    myListButton.classList.add('in-list');
-                } else {
-                    this.myListItems.delete(itemId);
-                    checkIcon.textContent = '+';
-                    myListButton.classList.remove('in-list');
-                }
+    /**
+     * Load genre-based sections (Dev #3 - Alon)
+     */
+    async loadGenreSections() {
+        try {
+            console.log('🎭 Loading genre-based sections...');
+            
+            // Get available genres
+            const genres = await NetflixAPI.getAvailableGenres();
+            
+            if (genres.length > 0) {
+                // Load top 4 genres for homepage
+                const topGenres = genres.slice(0, 4);
+                
+                const genrePromises = topGenres.map(async (genre) => {
+                    const genreData = await NetflixAPI.getGenreSection(genre, 8);
+                    return { genre, data: genreData };
+                });
+                
+                const genreSections = await Promise.all(genrePromises);
+                
+                // Store genre sections
+                this.genreSections = {};
+                genreSections.forEach(({ genre, data }) => {
+                    if (data.content.length > 0) {
+                        this.genreSections[genre.toLowerCase()] = data;
+                    }
+                });
+                
+                console.log(`✅ Loaded ${Object.keys(this.genreSections).length} genre sections`);
             }
         } catch (error) {
-            console.warn('My List toggle failed, reverting:', error);
-            // Revert UI on error
-            if (wasInList) {
-                this.myListItems.add(itemId);
-                checkIcon.textContent = '✓';
-                myListButton.classList.add('in-list');
-            } else {
-                this.myListItems.delete(itemId);
-                checkIcon.textContent = '+';
-                myListButton.classList.remove('in-list');
-            }
+            console.warn('Failed to load genre sections:', error);
+            this.genreSections = {};
+        }
+    }
+
+    /**
+     * Render recommendations section (Dev #3 - Alon)
+     */
+    renderRecommendationsSection() {
+        const recommendationsSection = document.getElementById('recommendationsSection');
+        if (!recommendationsSection) return;
+
+        if (this.sections.recommendations && this.sections.recommendations.length > 0) {
+            recommendationsSection.style.display = 'block';
+            NetflixUI.renderSection('recommendationsSlider', this.sections.recommendations, this.likedItems);
+        } else {
+            recommendationsSection.style.display = 'none';
         }
     }
 
@@ -335,14 +356,14 @@ class NetflixFeed {
                 const backendResults = await NetflixAPI.searchContentBackend(this.searchTerm, 20);
                 if (backendResults.length > 0) {
                     // Use backend search results
-                    NetflixUI.renderSearchResults(backendResults, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
+                    NetflixUI.renderSearchResults(backendResults, this.searchTerm, this.isAlphaSorted, this.likedItems);
                 } else {
                     // Fallback to local TMDB search
-                    NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
+                    NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems);
                 }
             } catch (error) {
                 console.warn('Backend search failed, using local search:', error);
-                NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
+                NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems);
             }
         } else {
             this.renderAllSections();
@@ -355,23 +376,29 @@ class NetflixFeed {
 
         // Re-render current view
         if (this.searchTerm) {
-            NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems, this.myListItems);
+            NetflixUI.renderSearchResults(this.allContent, this.searchTerm, this.isAlphaSorted, this.likedItems);
         } else {
             this.renderAllSections();
         }
     }
 
     renderAllSections() {
-        // Render My List section (Dev #2 - Yaron)
-        this.renderMyListSection();
+        // Render recommendations section (Dev #3 - Alon)
+        this.renderRecommendationsSection();
+
+        // Render dynamic sections (Dev #3 - Alon)
+        this.renderDynamicSections();
 
         // Apply sorting if enabled
         Object.keys(this.sections).forEach(section => {
+            // Skip recommendations as it's handled separately
+            if (section === 'recommendations') return;
+            
             let content = this.sections[section];
             if (this.isAlphaSorted) {
                 content = NetflixAPI.sortContent(content, this.isAlphaSorted);
             }
-            NetflixUI.renderSection(`${section}Slider`, content, this.likedItems, this.myListItems);
+            NetflixUI.renderSection(`${section}Slider`, content, this.likedItems);
         });
 
         // Handle continue watching section with different ID
@@ -380,8 +407,70 @@ class NetflixFeed {
             if (this.isAlphaSorted) {
                 content = NetflixAPI.sortContent(content, this.isAlphaSorted);
             }
-            NetflixUI.renderSection('continueWatchingSlider', content, this.likedItems, this.myListItems);
+            NetflixUI.renderSection('continueWatchingSlider', content, this.likedItems);
         }
+    }
+
+    /**
+     * Render dynamic content sections (Dev #3 - Alon)
+     */
+    renderDynamicSections() {
+        // Render core dynamic sections
+        if (this.dynamicSections) {
+            Object.keys(this.dynamicSections).forEach(sectionType => {
+                const sectionData = this.dynamicSections[sectionType];
+                if (sectionData && sectionData.content && sectionData.content.length > 0) {
+                    this.renderDynamicSection(sectionType, sectionData);
+                }
+            });
+        }
+
+        // Render genre-based sections
+        if (this.genreSections) {
+            Object.keys(this.genreSections).forEach(genre => {
+                const genreData = this.genreSections[genre];
+                if (genreData && genreData.content && genreData.content.length > 0) {
+                    this.renderDynamicSection(`genre-${genre}`, genreData);
+                }
+            });
+        }
+    }
+
+    /**
+     * Render a single dynamic section (Dev #3 - Alon)
+     */
+    renderDynamicSection(sectionId, sectionData) {
+        // Create section container if it doesn't exist
+        let sectionContainer = document.getElementById(`${sectionId}Section`);
+        if (!sectionContainer) {
+            sectionContainer = this.createDynamicSectionContainer(sectionId, sectionData.section);
+        }
+
+        // Render the content
+        const sliderId = `${sectionId}Slider`;
+        NetflixUI.renderSection(sliderId, sectionData.content, this.likedItems);
+        
+        // Show the section
+        sectionContainer.style.display = 'block';
+    }
+
+    /**
+     * Create dynamic section container (Dev #3 - Alon)
+     */
+    createDynamicSectionContainer(sectionId, sectionTitle) {
+        const mainContainer = document.querySelector('.main-content');
+        
+        const sectionHTML = `
+            <div class="netflix-section" id="${sectionId}Section">
+                <h2 class="section-title">${sectionTitle}</h2>
+                <div class="netflix-slider" id="${sectionId}Slider">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        `;
+        
+        mainContainer.insertAdjacentHTML('beforeend', sectionHTML);
+        return document.getElementById(`${sectionId}Section`);
     }
 
     async toggleLike(itemId, event) {
