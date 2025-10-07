@@ -36,4 +36,42 @@ router.post('/:id/mylist', (req, res) => contentController.toggleMyList(req, res
 // GET /api/content/profile/:profileId/mylist - Get My List for profile
 router.get('/profile/:profileId/mylist', (req, res) => contentController.getMyList(req, res));
 
+// GET /api/content/profile/:profileId/search-history - Get search history for profile
+router.get('/profile/:profileId/search-history', (req, res) => contentController.getSearchHistory(req, res));
+
+// =============================================================================
+// DEV #3 (ALON) - RECOMMENDATION & ADVANCED SEARCH ROUTES
+// =============================================================================
+
+// GET /api/content/trending - Get trending/popular content
+router.get('/trending', (req, res) => contentController.getTrending(req, res));
+
+// GET /api/content/recommendations/:profileId - Get personalized recommendations
+router.get('/recommendations/:profileId', (req, res) => contentController.getRecommendations(req, res));
+
+// GET /api/content/:id/related - Get related/similar content
+router.get('/:id/related', (req, res) => contentController.getRelatedContent(req, res));
+
+// =============================================================================
+// DYNAMIC CONTENT SECTIONS ROUTES
+// =============================================================================
+
+// GET /api/content/sections/trending - Get trending content
+router.get('/sections/trending', (req, res) => contentController.getTrendingContent(req, res));
+
+// GET /api/content/sections/new-releases - Get new releases
+router.get('/sections/new-releases', (req, res) => contentController.getNewReleases(req, res));
+
+// GET /api/content/sections/top-rated - Get top rated content
+router.get('/sections/top-rated', (req, res) => contentController.getTopRated(req, res));
+
+// GET /api/content/sections/genre/:genre - Get content by genre
+router.get('/sections/genre/:genre', (req, res) => contentController.getContentByGenre(req, res));
+
+// GET /api/content/sections/continue-watching/:profileId - Get continue watching
+router.get('/sections/continue-watching/:profileId', (req, res) => contentController.getContinueWatching(req, res));
+
+// GET /api/content/sections/genres - Get all available genres
+router.get('/sections/genres', (req, res) => contentController.getAvailableGenres(req, res));
+
 module.exports = router;

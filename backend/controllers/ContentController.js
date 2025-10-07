@@ -211,37 +211,40 @@ class ContentController {
         try {
             console.log(`📝 Tracking search history for profile: ${profileId}, Query: "${query}", Results: ${resultsCount}`);
 
-            const data = await this.contentModel.getAllData();
-
-            if (!data.profiles[profileId]) {
-                data.profiles[profileId] = {
+            // Find or create profile interaction
+            let interaction = await this.contentModel.interactionModel.findOne({ profileId });
+            if (!interaction) {
+                interaction = new this.contentModel.interactionModel({
+                    profileId,
                     likedContent: [],
-                    watchProgress: {},
+                    watchProgress: new Map(),
                     searchHistory: [],
                     activityLog: []
-                };
+                });
             }
 
-            const profile = data.profiles[profileId];
-
             // Add to search history
-            profile.searchHistory.unshift({
+            interaction.searchHistory.unshift({
                 query: query,
                 resultsCount: resultsCount,
-                timestamp: new Date().toISOString()
+                timestamp: new Date()
             });
-            profile.searchHistory = profile.searchHistory.slice(0, 50);
+
+            // Keep only last 50 searches
+            interaction.searchHistory = interaction.searchHistory.slice(0, 50);
 
             // Add to activity log
-            profile.activityLog.unshift({
+            interaction.activityLog.unshift({
                 action: 'search',
                 query: query,
                 resultsCount: resultsCount,
-                timestamp: new Date().toISOString()
+                timestamp: new Date()
             });
-            profile.activityLog = profile.activityLog.slice(0, 100);
 
-            await this.contentModel.saveData(data);
+            // Keep only last 100 activities
+            interaction.activityLog = interaction.activityLog.slice(0, 100);
+
+            await interaction.save();
             console.log(`✅ Search history saved for profile: ${profileId}`);
         } catch (error) {
             console.error('Failed to track search history:', error);
@@ -251,26 +254,84 @@ class ContentController {
     // Helper method to log activity
     async logActivity(profileId, action, contentId, extra = {}) {
         try {
-            const data = await this.contentModel.getAllData();
+            // Find or create profile interaction
+            let interaction = await this.contentModel.interactionModel.findOne({ profileId });
+            if (!interaction) {
+                interaction = new this.contentModel.interactionModel({
+                    profileId,
+                    likedContent: [],
+                    watchProgress: new Map(),
+                    searchHistory: [],
+                    activityLog: []
+                });
+            }
 
-            if (!data.profiles[profileId]) return;
-
-            const contentItem = data.content.find(item => item.id === contentId);
+            // Find content item for title
+            const contentItem = await this.contentModel.model.findById(contentId);
             if (!contentItem) return;
 
-            data.profiles[profileId].activityLog.unshift({
+            // Add to activity log
+            interaction.activityLog.unshift({
                 action,
                 contentId,
                 contentTitle: contentItem.title,
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 ...extra
             });
-            data.profiles[profileId].activityLog = data.profiles[profileId].activityLog.slice(0, 100);
 
-            await this.contentModel.saveData(data);
+            // Keep only last 100 activities
+            interaction.activityLog = interaction.activityLog.slice(0, 100);
+
+            await interaction.save();
             console.log(`✅ ${action} activity logged for profile: ${profileId}, Content: ${contentItem.title}`);
         } catch (error) {
             console.error('Failed to log activity:', error);
+        }
+    }
+
+    /**
+     * Get search history for a profile
+     * @route GET /api/content/profile/:profileId/search-history
+     */
+    async getSearchHistory(req, res) {
+        try {
+            const { profileId } = req.params;
+            const { limit = 20 } = req.query;
+
+            console.log(`📝 GET /api/content/profile/${profileId}/search-history - Limit: ${limit}`);
+
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
+
+            const interaction = await this.contentModel.interactionModel.findOne({ profileId });
+            if (!interaction) {
+                return res.json({
+                    success: true,
+                    data: [],
+                    message: 'No search history found'
+                });
+            }
+
+            const searchHistory = interaction.searchHistory.slice(0, parseInt(limit));
+
+            res.json({
+                success: true,
+                data: searchHistory,
+                count: searchHistory.length,
+                profileId: profileId
+            });
+
+        } catch (error) {
+            console.error('Error getting search history:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get search history',
+                message: error.message
+            });
         }
     }
 
@@ -359,60 +420,117 @@ class ContentController {
 
     /**
      * Get trending content
-     * TODO: Implement logic to fetch trending content based on popularity
      * Algorithm: Use RecommendationEngine.getPopularContent()
      *
      * @route GET /api/content/trending
      */
     async getTrending(req, res) {
-        // TODO: Get limit from query params (default: 10)
+        try {
+            const { limit = 10 } = req.query;
 
-        // TODO: Import and use RecommendationEngine.getPopularContent(limit)
+            console.log(`🔥 GET /api/content/trending - Limit: ${limit}`);
 
-        // TODO: Return trending content array
+            // Import and use RecommendationEngine
+            const RecommendationEngine = require('../services/RecommendationEngine');
+            const trendingContent = await RecommendationEngine.getPopularContent(parseInt(limit));
 
-        // TODO: Handle errors with 500 status
+            res.json({
+                success: true,
+                data: trendingContent,
+                count: trendingContent.length
+            });
+
+        } catch (error) {
+            console.error('Error getting trending content:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get trending content',
+                message: error.message
+            });
+        }
     }
 
     /**
      * Get personalized recommendations for a profile
-     * TODO: Implement personalized recommendation logic
      * Algorithm: Use RecommendationEngine.getRecommendations()
      *
      * @route GET /api/content/recommendations/:profileId
      */
     async getRecommendations(req, res) {
-        // TODO: Get profileId from req.params
+        try {
+            const { profileId } = req.params;
+            const { limit = 10 } = req.query;
 
-        // TODO: Get limit from query params (default: 10)
+            console.log(`🎯 GET /api/content/recommendations/${profileId} - Limit: ${limit}`);
 
-        // TODO: Validate profileId exists
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
 
-        // TODO: Import and use RecommendationEngine.getRecommendations(profileId, limit)
+            // Import and use RecommendationEngine
+            const RecommendationEngine = require('../services/RecommendationEngine');
+            const recommendations = await RecommendationEngine.getRecommendations(profileId, parseInt(limit));
 
-        // TODO: Return recommendations array
+            res.json({
+                success: true,
+                data: recommendations,
+                count: recommendations.length,
+                profileId: profileId
+            });
 
-        // TODO: Handle errors with 500 status
+        } catch (error) {
+            console.error('Error getting recommendations:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get recommendations',
+                message: error.message
+            });
+        }
     }
 
     /**
      * Get related/similar content for a specific item
      * "More Like This" functionality
-     * TODO: Implement similar content logic
      * Algorithm: Use RecommendationEngine.getRelatedContent()
      *
      * @route GET /api/content/:id/related
      */
     async getRelatedContent(req, res) {
-        // TODO: Get contentId from req.params
+        try {
+            const { id } = req.params;
+            const { limit = 6 } = req.query;
 
-        // TODO: Get limit from query params (default: 6)
+            console.log(`🔗 GET /api/content/${id}/related - Limit: ${limit}`);
 
-        // TODO: Import and use RecommendationEngine.getRelatedContent(contentId, limit)
+            if (!id) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Content ID is required'
+                });
+            }
 
-        // TODO: Return related content array
+            // Import and use RecommendationEngine
+            const RecommendationEngine = require('../services/RecommendationEngine');
+            const relatedContent = await RecommendationEngine.getRelatedContent(id, parseInt(limit));
 
-        // TODO: Handle errors with 500 status
+            res.json({
+                success: true,
+                data: relatedContent,
+                count: relatedContent.length,
+                sourceContentId: id
+            });
+
+        } catch (error) {
+            console.error('Error getting related content:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get related content',
+                message: error.message
+            });
+        }
     }
 
     /**
@@ -444,6 +562,159 @@ class ContentController {
         // TODO: Track search with filters in history
 
         // TODO: Handle errors with 500 status
+    }
+
+    // Helper method to reduce code duplication
+    static async handleSectionRequest(req, res, queryFn, sectionName) {
+        try {
+            const { limit = 10 } = req.query;
+            const content = await queryFn(parseInt(limit));
+            
+            res.json({
+                success: true,
+                data: {
+                    content,
+                    section: sectionName,
+                    total: content.length
+                }
+            });
+        } catch (error) {
+            console.error(`Error getting ${sectionName.toLowerCase()}:`, error);
+            res.status(500).json({
+                success: false,
+                error: `Failed to fetch ${sectionName.toLowerCase()}`,
+                message: error.message
+            });
+        }
+    }
+
+    static async getTrendingContent(req, res) {
+        await this.handleSectionRequest(req, res, 
+            (limit) => RecommendationEngine.getPopularContent(limit), 
+            'Trending Now'
+        );
+    }
+
+    static async getNewReleases(req, res) {
+        await this.handleSectionRequest(req, res,
+            (limit) => ContentSchema.find().sort({ createdAt: -1 }).limit(limit),
+            'New Releases'
+        );
+    }
+
+    static async getTopRated(req, res) {
+        await this.handleSectionRequest(req, res,
+            (limit) => ContentSchema.find().sort({ rating: -1, likes: -1 }).limit(limit),
+            'Top Rated'
+        );
+    }
+
+    static async getContentByGenre(req, res) {
+        const { genre } = req.params;
+        if (!genre) {
+            return res.status(400).json({
+                success: false,
+                error: 'Genre parameter is required'
+            });
+        }
+        
+        await this.handleSectionRequest(req, res,
+            (limit) => ContentSchema.find({
+                genre: { $regex: genre, $options: 'i' }
+            }).sort({ likes: -1, popularity: -1 }).limit(limit),
+            `${genre} Movies & Shows`
+        );
+    }
+
+    /**
+     * Get continue watching content for a profile
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static async getContinueWatching(req, res) {
+        try {
+            console.log('▶️ Getting continue watching content...');
+            
+            const { profileId } = req.params;
+            const { limit = 10 } = req.query;
+            
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
+            
+            // Get profile interactions with watch progress
+            const ProfileInteractionSchema = require('../schemas/ProfileInteractionSchema');
+            const interaction = await ProfileInteractionSchema.findOne({ profileId });
+            
+            if (!interaction || !interaction.watchProgress || interaction.watchProgress.size === 0) {
+                return res.json({
+                    success: true,
+                    data: {
+                        content: [],
+                        section: 'Continue Watching',
+                        total: 0,
+                        message: 'No content in progress'
+                    }
+                });
+            }
+            
+            // Get content IDs from watch progress
+            const contentIds = Array.from(interaction.watchProgress.keys());
+            const continueContent = await ContentSchema.find({
+                _id: { $in: contentIds }
+            }).limit(parseInt(limit));
+            
+            // Sort by most recent watch time
+            const sortedContent = continueContent.sort((a, b) => {
+                const aProgress = interaction.watchProgress.get(a._id.toString());
+                const bProgress = interaction.watchProgress.get(b._id.toString());
+                return new Date(bProgress.lastWatched) - new Date(aProgress.lastWatched);
+            });
+            
+            res.json({
+                success: true,
+                data: {
+                    content: sortedContent,
+                    section: 'Continue Watching',
+                    total: sortedContent.length
+                }
+            });
+        } catch (error) {
+            console.error('Error getting continue watching content:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to fetch continue watching content',
+                message: error.message
+            });
+        }
+    }
+
+    /**
+     * Get all available genres
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static async getAvailableGenres(req, res) {
+        try {
+            const genres = await ContentSchema.distinct('genre');
+            const uniqueGenres = [...new Set(
+                genres.join(',').split(',').map(g => g.trim()).filter(g => g)
+            )];
+            
+            res.json({
+                success: true,
+                data: { genres: uniqueGenres, total: uniqueGenres.length }
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Failed to fetch available genres',
+                message: error.message
+            });
+        }
     }
 }
 

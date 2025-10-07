@@ -17,7 +17,17 @@ const profileInteractionSchema = new mongoose.Schema({
     }],
     watchProgress: {
         type: Map,
-        of: Number, // contentId -> progress percentage (0-100)
+        of: {
+            progress: {
+                type: Number,
+                min: 0,
+                max: 100
+            },
+            lastWatched: {
+                type: Date,
+                default: Date.now
+            }
+        },
         default: new Map()
     },
     searchHistory: [{

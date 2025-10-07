@@ -13,7 +13,24 @@ class Content {
         try {
             const content = await this.model.find();
             const profiles = await this.interactionModel.find();
-            return { content, profiles };
+            
+            // Organize content by sections
+            const sections = {
+                continue: content.filter(item => item.section === 'continue'),
+                trending: content.filter(item => item.section === 'trending'),
+                movies: content.filter(item => item.section === 'movies'),
+                series: content.filter(item => item.section === 'series')
+            };
+            
+            // Add metadata
+            const metadata = {
+                totalContent: content.length,
+                totalMovies: sections.movies.length,
+                totalSeries: sections.series.length,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            return { content, sections, metadata };
         } catch (error) {
             console.error('Error reading content data:', error);
             throw new Error('Failed to load content data');
