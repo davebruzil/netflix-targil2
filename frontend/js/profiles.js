@@ -58,6 +58,12 @@
             return;
         }
 
+        // Update profile count
+        const profileCountEl = document.getElementById('profileCount');
+        if (profileCountEl) {
+            profileCountEl.textContent = allProfiles.length;
+        }
+
         // Clear existing content
         profilesContainer.innerHTML = '';
 
@@ -72,8 +78,8 @@
             profilesContainer.appendChild(profileElement);
         });
 
-        // Add "Add Profile" button if less than max profiles (increased limit to 10)
-        if (allProfiles.length < 10) {
+        // Add "Add Profile" button if less than max profiles (5 max)
+        if (allProfiles.length < 5) {
             const addProfileElement = createAddProfileElement();
             profilesContainer.appendChild(addProfileElement);
         }
@@ -87,12 +93,13 @@
         profileDiv.className = 'profile-item';
 
         if (isManageMode) {
-            // In manage mode, show delete button
+            // In manage mode, show edit and delete buttons
             profileDiv.innerHTML = `
                 <div style="position: relative;">
                     <div class="profile-avatar">
-                        <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
-                        <button onclick="window.deleteProfile('${profile.id}', '${profile.name}')" style="position: absolute; top: -10px; right: -10px; background: #e50914; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">×</button>
+                        <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://via.placeholder.com/150/333/fff?text=${profile.name.charAt(0).toUpperCase()}'">
+                        <button onclick="window.editProfile('${profile.id}')" style="position: absolute; top: -10px; left: -10px; background: #555; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" title="Edit Profile">✎</button>
+                        <button onclick="window.deleteProfile('${profile.id}', '${profile.name}')" style="position: absolute; top: -10px; right: -10px; background: #e50914; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" title="Delete Profile">×</button>
                     </div>
                     <div class="profile-name">${profile.name}</div>
                 </div>
@@ -102,7 +109,7 @@
             profileDiv.innerHTML = `
                 <a href="#" onclick="selectProfile('${profile.id}', '${profile.name}', '${profile.avatar}')" style="text-decoration: none; color: inherit;">
                     <div class="profile-avatar">
-                        <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
+                        <img src="${profile.avatar}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='https://via.placeholder.com/150/333/fff?text=${profile.name.charAt(0).toUpperCase()}'">
                     </div>
                     <div class="profile-name">${profile.name}</div>
                 </a>
@@ -197,9 +204,27 @@
      * Show add profile modal
      */
     window.showAddProfileModal = function() {
+        if (allProfiles.length >= 5) {
+            alert('Maximum of 5 profiles reached. Please delete a profile before adding a new one.');
+            return;
+        }
+
+        const avatarOptions = [
+            'https://i.pravatar.cc/150?img=1',
+            'https://i.pravatar.cc/150?img=2',
+            'https://i.pravatar.cc/150?img=3',
+            'https://i.pravatar.cc/150?img=4',
+            'https://i.pravatar.cc/150?img=5',
+            'https://i.pravatar.cc/150?img=6',
+            'https://i.pravatar.cc/150?img=7',
+            'https://i.pravatar.cc/150?img=8',
+            'https://i.pravatar.cc/150?img=9',
+            'https://i.pravatar.cc/150?img=10'
+        ];
+
         const modalHtml = `
             <div id="add-profile-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 0.3s ease-in;">
-                <div style="background: linear-gradient(135deg, #141414 0%, #2a2a2a 100%); padding: 40px; border-radius: 12px; max-width: 450px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; animation: slideIn 0.3s ease-out;">
+                <div style="background: linear-gradient(135deg, #141414 0%, #2a2a2a 100%); padding: 40px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; animation: slideIn 0.3s ease-out; max-height: 90vh; overflow-y: auto;">
                     <div style="text-align: center; margin-bottom: 30px;">
                         <div style="background: #e50914; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; color: white;">+</div>
                         <h3 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">Add New Profile</h3>
@@ -210,6 +235,25 @@
                             <label style="color: white; display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Profile Name:</label>
                             <input type="text" id="profile-name" required maxlength="15" style="width: 100%; padding: 12px 15px; border: 1px solid #555; background: #333; color: white; border-radius: 6px; font-size: 16px; box-sizing: border-box; transition: border-color 0.3s ease;" placeholder="Enter a unique name" oninput="validateProfileName(this)">
                             <div id="name-feedback" style="color: #888; font-size: 12px; margin-top: 5px;"></div>
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <label style="color: white; display: block; margin-bottom: 12px; font-weight: 500; font-size: 14px;">Select Avatar:</label>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px;" id="avatar-grid">
+                                ${avatarOptions.map((url, i) => `
+                                    <img src="${url}"
+                                         data-avatar="${url}"
+                                         class="avatar-option ${i === 0 ? 'selected' : ''}"
+                                         style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; border: 3px solid ${i === 0 ? '#e50914' : 'transparent'}; transition: all 0.2s ease; object-fit: cover;"
+                                         onclick="selectAddAvatar('${url}')">
+                                `).join('')}
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <label style="color: #999; display: block; margin-bottom: 8px; font-size: 13px;">Or upload custom image:</label>
+                                <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                                <button type="button" onclick="document.getElementById('avatar-upload').click()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; width: 100%;">Choose File</button>
+                                <div id="upload-preview" style="margin-top: 10px; text-align: center;"></div>
+                            </div>
+                            <input type="hidden" id="selected-avatar" value="${avatarOptions[0]}">
                         </div>
                         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 30px;">
                             <button type="button" onclick="closeAddProfileModal()" style="background: #444; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.background='#555'" onmouseout="this.style.background='#444'">Cancel</button>
@@ -240,15 +284,66 @@
         `;
         
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
+
+        // Setup avatar selection
+        window.selectAddAvatar = function(url) {
+            document.querySelectorAll('.avatar-option').forEach(img => {
+                img.style.border = '3px solid transparent';
+                img.classList.remove('selected');
+            });
+            const selected = document.querySelector(`[data-avatar="${url}"]`);
+            if (selected) {
+                selected.style.border = '3px solid #e50914';
+                selected.classList.add('selected');
+            }
+            document.getElementById('selected-avatar').value = url;
+            document.getElementById('upload-preview').innerHTML = '';
+        };
+
+        // Handle file upload
+        document.getElementById('avatar-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image file is too large. Please choose an image smaller than 5MB.');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    e.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const dataUrl = event.target.result;
+                    document.getElementById('selected-avatar').value = dataUrl;
+                    document.getElementById('upload-preview').innerHTML = `
+                        <img src="${dataUrl}" style="width: 80px; height: 80px; border-radius: 8px; border: 3px solid #e50914; object-fit: cover;">
+                        <p style="color: #4ecdc4; font-size: 12px; margin-top: 5px;">Custom image selected</p>
+                    `;
+                    // Deselect preset avatars
+                    document.querySelectorAll('.avatar-option').forEach(img => {
+                        img.style.border = '3px solid transparent';
+                        img.classList.remove('selected');
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         // Focus on input field
         setTimeout(() => {
             document.getElementById('profile-name').focus();
         }, 100);
-        
+
         // Handle form submission
         document.getElementById('add-profile-form').addEventListener('submit', handleAddProfile);
-        
+
         // Add ESC key handler
         document.addEventListener('keydown', handleEscapeKey);
     };
@@ -310,22 +405,30 @@
      */
     async function handleAddProfile(e) {
         e.preventDefault();
-        
+
         const nameInput = document.getElementById('profile-name');
         const name = nameInput.value.trim();
-        
+        const avatar = document.getElementById('selected-avatar')?.value;
+
         if (!name) {
             alert('Please enter a profile name');
             return;
         }
-        
-        // Generate profile ID from name
-        const profileId = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-        
+
+        if (name.length < 2) {
+            alert('Profile name must be at least 2 characters');
+            return;
+        }
+
+        if (!avatar) {
+            alert('Please select an avatar');
+            return;
+        }
+
         try {
             const profileData = {
                 name: name,
-                avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}`,
+                avatar: avatar,
                 isChild: false
             };
             
@@ -402,10 +505,200 @@
     };
 
     /**
+     * Edit profile - Show edit modal
+     */
+    window.editProfile = async function(profileId) {
+        const profile = allProfiles.find(p => p.id === profileId);
+        if (!profile) {
+            alert('Profile not found');
+            return;
+        }
+
+        const avatarOptions = [
+            'https://i.pravatar.cc/150?img=1',
+            'https://i.pravatar.cc/150?img=2',
+            'https://i.pravatar.cc/150?img=3',
+            'https://i.pravatar.cc/150?img=4',
+            'https://i.pravatar.cc/150?img=5',
+            'https://i.pravatar.cc/150?img=6',
+            'https://i.pravatar.cc/150?img=7',
+            'https://i.pravatar.cc/150?img=8',
+            'https://i.pravatar.cc/150?img=9',
+            'https://i.pravatar.cc/150?img=10'
+        ];
+
+        const modalHtml = `
+            <div id="edit-profile-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 0.3s ease-in;">
+                <div style="background: linear-gradient(135deg, #141414 0%, #2a2a2a 100%); padding: 40px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; animation: slideIn 0.3s ease-out; max-height: 90vh; overflow-y: auto;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="background: #555; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; color: white;">✎</div>
+                        <h3 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">Edit Profile</h3>
+                        <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Update profile information</p>
+                    </div>
+                    <form id="edit-profile-form">
+                        <div style="margin-bottom: 25px;">
+                            <label style="color: white; display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Profile Name:</label>
+                            <input type="text" id="edit-profile-name" value="${profile.name}" required maxlength="15" style="width: 100%; padding: 12px 15px; border: 1px solid #555; background: #333; color: white; border-radius: 6px; font-size: 16px; box-sizing: border-box; transition: border-color 0.3s ease;" placeholder="Enter a unique name">
+                            <div id="edit-name-feedback" style="color: #888; font-size: 12px; margin-top: 5px;"></div>
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <label style="color: white; display: block; margin-bottom: 12px; font-weight: 500; font-size: 14px;">Select Avatar:</label>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px;" id="edit-avatar-grid">
+                                ${avatarOptions.map((url, i) => `
+                                    <img src="${url}"
+                                         data-avatar="${url}"
+                                         class="edit-avatar-option ${profile.avatar === url ? 'selected' : ''}"
+                                         style="width: 60px; height: 60px; border-radius: 8px; cursor: pointer; border: 3px solid ${profile.avatar === url ? '#e50914' : 'transparent'}; transition: all 0.2s ease; object-fit: cover;"
+                                         onclick="selectEditAvatar('${url}')">
+                                `).join('')}
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <label style="color: #999; display: block; margin-bottom: 8px; font-size: 13px;">Or upload custom image:</label>
+                                <input type="file" id="edit-avatar-upload" accept="image/*" style="display: none;">
+                                <button type="button" onclick="document.getElementById('edit-avatar-upload').click()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; width: 100%;">Choose File</button>
+                                <div id="edit-upload-preview" style="margin-top: 10px; text-align: center;"></div>
+                            </div>
+                            <input type="hidden" id="edit-selected-avatar" value="${profile.avatar}">
+                        </div>
+                        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 30px;">
+                            <button type="button" onclick="closeEditProfileModal()" style="background: #444; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">Cancel</button>
+                            <button type="submit" id="edit-profile-btn" style="background: #e50914; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Setup avatar selection
+        window.selectEditAvatar = function(url) {
+            document.querySelectorAll('.edit-avatar-option').forEach(img => {
+                img.style.border = '3px solid transparent';
+                img.classList.remove('selected');
+            });
+            const selected = document.querySelector(`[data-avatar="${url}"]`);
+            if (selected) {
+                selected.style.border = '3px solid #e50914';
+                selected.classList.add('selected');
+            }
+            document.getElementById('edit-selected-avatar').value = url;
+            document.getElementById('edit-upload-preview').innerHTML = '';
+        };
+
+        // Handle file upload
+        document.getElementById('edit-avatar-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image file is too large. Please choose an image smaller than 5MB.');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    e.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const dataUrl = event.target.result;
+                    document.getElementById('edit-selected-avatar').value = dataUrl;
+                    document.getElementById('edit-upload-preview').innerHTML = `
+                        <img src="${dataUrl}" style="width: 80px; height: 80px; border-radius: 8px; border: 3px solid #e50914; object-fit: cover;">
+                        <p style="color: #4ecdc4; font-size: 12px; margin-top: 5px;">Custom image selected</p>
+                    `;
+                    // Deselect preset avatars
+                    document.querySelectorAll('.edit-avatar-option').forEach(img => {
+                        img.style.border = '3px solid transparent';
+                        img.classList.remove('selected');
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('edit-profile-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const newName = document.getElementById('edit-profile-name').value.trim();
+            const newAvatar = document.getElementById('edit-selected-avatar').value;
+
+            if (!newName || newName.length < 2) {
+                alert('Profile name must be at least 2 characters');
+                return;
+            }
+
+            const editBtn = document.getElementById('edit-profile-btn');
+            const originalText = editBtn.textContent;
+            editBtn.textContent = 'Saving...';
+            editBtn.disabled = true;
+
+            try {
+                const updateData = {
+                    name: newName,
+                    avatar: newAvatar
+                };
+
+                const updated = await NetflixAPI.updateProfile(profileId, updateData);
+
+                if (updated) {
+                    editBtn.textContent = '✓ Saved!';
+                    editBtn.style.background = '#4ecdc4';
+
+                    setTimeout(() => {
+                        closeEditProfileModal();
+                        loadProfilesFromAPI().then(() => {
+                            renderProfiles();
+                            showSuccessToast(`Profile "${newName}" updated successfully!`);
+                        });
+                    }, 800);
+                } else {
+                    editBtn.textContent = originalText;
+                    editBtn.disabled = false;
+                    alert('Failed to update profile. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                editBtn.textContent = originalText;
+                editBtn.disabled = false;
+                alert('Error updating profile. Please try again.');
+            }
+        });
+
+        // ESC key handler
+        document.addEventListener('keydown', handleEscapeKey);
+    };
+
+    /**
+     * Close edit profile modal
+     */
+    window.closeEditProfileModal = function() {
+        const modal = document.getElementById('edit-profile-modal');
+        if (modal) {
+            modal.style.animation = 'fadeOut 0.2s ease-out';
+            setTimeout(() => {
+                modal.remove();
+            }, 200);
+        }
+        document.removeEventListener('keydown', handleEscapeKey);
+    };
+
+    /**
      * Delete profile with confirmation
      */
     window.deleteProfile = async function(profileId, profileName) {
-        if (!confirm(`Are you sure you want to delete the profile "${profileName}"?`)) {
+        if (allProfiles.length <= 1) {
+            alert('Cannot delete the last profile. You must have at least one profile.');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to delete the profile "${profileName}"?\n\nThis action cannot be undone.`)) {
             return;
         }
 

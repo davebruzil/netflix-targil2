@@ -8,12 +8,10 @@ const profileInteractionSchema = new mongoose.Schema({
         required: true
     },
     likedContent: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Content'
+        type: mongoose.Schema.Types.Mixed
     }],
     myList: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Content'
+        type: mongoose.Schema.Types.Mixed
     }],
     watchProgress: {
         type: Map,

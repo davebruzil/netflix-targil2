@@ -28,8 +28,9 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Increase body parser limit for base64 image uploads (10MB)
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Session middleware with MongoDB store
 app.use(session({

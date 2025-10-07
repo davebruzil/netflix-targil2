@@ -39,8 +39,19 @@ async function getRecommendations(profileId, limit = 10) {
             return await getPopularContent(limit);
         }
 
+        // Filter to only MongoDB ObjectIds (24-char hex strings)
+        const validLikedIds = likedContentIds.filter(id =>
+            typeof id === 'string' && id.match(/^[0-9a-fA-F]{24}$/)
+        );
+
+        // If no valid MongoDB IDs, return popular content
+        if (validLikedIds.length === 0) {
+            console.log('No valid MongoDB IDs in liked content, returning popular content');
+            return await getPopularContent(limit);
+        }
+
         // Get liked content details
-        const likedContent = await ContentSchema.find({ _id: { $in: likedContentIds } });
+        const likedContent = await ContentSchema.find({ _id: { $in: validLikedIds } });
         
         // Get search history for additional context
         const searchHistory = interaction.searchHistory || [];
