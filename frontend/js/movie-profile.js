@@ -282,13 +282,6 @@ class MovieProfile {
         this.saveLikesToStorage();
     }
 
-    toggleMyList() {
-        // Placeholder for My List functionality
-        const listBtn = document.getElementById('movieListBtn');
-        const text = listBtn.textContent.includes('✓') ? '+ My List' : '✓ Added';
-        listBtn.innerHTML = `<span>${text.charAt(0)}</span> ${text.slice(2)}`;
-    }
-
     updateLikeButton() {
         if (!this.movieData) return;
 

@@ -112,18 +112,18 @@
         <!-- Netflix Content Sections -->
         <div class="netflix-content-container" style="max-width: 1400px; margin: 0 auto;">
             
-            <!-- My List Section (Dev #2 - Yaron) -->
-            <div class="netflix-row" id="myListSection" style="display: none;">
-                <h3 class="row-title">My List</h3>
-                <div class="netflix-slider-container" role="region" aria-label="My List">
-                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('myListSlider', 'left')"
-                            aria-label="Scroll to previous items" tabindex="0">‹</button>
-                    <div class="netflix-slider" id="myListSlider" role="list" tabindex="0"
-                         aria-label="My List of saved content">
+            <!-- Recommendations Section (Dev #3 - Alon) -->
+            <div class="netflix-row" id="recommendationsSection" style="display: none;">
+                <h3 class="row-title">Recommended For You</h3>
+                <div class="netflix-slider-container" role="region" aria-label="Recommended For You">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('recommendationsSlider', 'left')"
+                            aria-label="Scroll to previous recommendations" tabindex="0">‹</button>
+                    <div class="netflix-slider" id="recommendationsSlider" role="list" tabindex="0"
+                         aria-label="Personalized recommendations">
                         <!-- Dynamic content will be inserted here -->
                     </div>
-                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('myListSlider', 'right')"
-                            aria-label="Scroll to next items" tabindex="0">›</button>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('recommendationsSlider', 'right')"
+                            aria-label="Scroll to next recommendations" tabindex="0">›</button>
                 </div>
             </div>
 

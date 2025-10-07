@@ -130,6 +130,76 @@ class NetflixAPI {
         return content;
     }
 
+    // ===== RECOMMENDATION API METHODS =====
+
+    static async getRecommendations(profileId, limit = 10) {
+        try {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/content/recommendations/${profileId}?limit=${limit}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data;
+            } else {
+                console.error('Failed to get recommendations:', data.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Error getting recommendations:', error);
+            return [];
+        }
+    }
+
+    static async getTrendingContent(limit = 10) {
+        try {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/content/trending?limit=${limit}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data;
+            } else {
+                console.error('Failed to get trending content:', data.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Error getting trending content:', error);
+            return [];
+        }
+    }
+
+    static async getRelatedContent(contentId, limit = 6) {
+        try {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/content/${contentId}/related?limit=${limit}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data;
+            } else {
+                console.error('Failed to get related content:', data.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Error getting related content:', error);
+            return [];
+        }
+    }
+
+    static async getSearchHistory(profileId, limit = 20) {
+        try {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/content/profile/${profileId}/search-history?limit=${limit}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.data;
+            } else {
+                console.error('Failed to get search history:', data.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Error getting search history:', error);
+            return [];
+        }
+    }
+
     // ===== AUTHENTICATION =====
 
     static async register(userData) {
@@ -570,6 +640,73 @@ class NetflixAPI {
             console.error('Error fetching My List:', error);
             return [];
         }
+    }
+
+    // =============================================================================
+    // DYNAMIC CONTENT SECTIONS API METHODS
+    // =============================================================================
+
+    // Helper method to reduce code duplication
+    static async fetchSection(endpoint, sectionName, limit = 10) {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/content/sections/${endpoint}?limit=${limit}`);
+            const data = await response.json();
+            return data.success ? data.data : { content: [], section: sectionName, total: 0 };
+        } catch (error) {
+            console.error(`Error fetching ${sectionName.toLowerCase()}:`, error);
+            return { content: [], section: sectionName, total: 0 };
+        }
+    }
+
+    static async getTrendingSection(limit = 10) {
+        return this.fetchSection('trending', 'Trending Now', limit);
+    }
+
+    static async getNewReleasesSection(limit = 10) {
+        return this.fetchSection('new-releases', 'New Releases', limit);
+    }
+
+    static async getTopRatedSection(limit = 10) {
+        return this.fetchSection('top-rated', 'Top Rated', limit);
+    }
+
+    static async getGenreSection(genre, limit = 10) {
+        return this.fetchSection(`genre/${encodeURIComponent(genre)}`, `${genre} Movies & Shows`, limit);
+    }
+
+    static async getContinueWatchingSection(limit = 10) {
+        const profileId = localStorage.getItem('netflix:profileId');
+        if (!profileId) return { content: [], section: 'Continue Watching', total: 0 };
+        return this.fetchSection(`continue-watching/${profileId}`, 'Continue Watching', limit);
+    }
+
+    static async getAvailableGenres() {
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/content/sections/genres`);
+            const data = await response.json();
+            return data.success ? data.data.genres : [];
+        } catch (error) {
+            console.error('Error fetching available genres:', error);
+            return [];
+        }
+    }
+
+    static async loadDynamicSections(sectionTypes = ['trending', 'newReleases', 'topRated']) {
+        const sectionMap = {
+            trending: () => this.getTrendingSection(),
+            newReleases: () => this.getNewReleasesSection(),
+            topRated: () => this.getTopRatedSection(),
+            continueWatching: () => this.getContinueWatchingSection()
+        };
+
+        const sections = await Promise.all(
+            sectionTypes.map(async (type) => ({
+                type,
+                data: sectionMap[type] ? await sectionMap[type]() : { content: [], section: 'Unknown', total: 0 }
+            }))
+        );
+
+        return sections.reduce((acc, { type, data }) => ({ ...acc, [type]: data }), {});
     }
 }
 
