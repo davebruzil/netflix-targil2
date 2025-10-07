@@ -111,34 +111,52 @@ class Content {
                 });
             }
 
-            // Find content
-            const content = await this.model.findById(contentId);
-            if (!content) {
-                throw new Error('Content not found');
+            // Find content - handle both ObjectId and string IDs (like "movie_634649")
+            let content;
+            if (contentId.match(/^[0-9a-fA-F]{24}$/)) {
+                // It's a MongoDB ObjectId
+                content = await this.model.findById(contentId);
+            } else {
+                // It's a custom string ID - try to find or create it
+                // For now, we'll store the interaction but skip updating content likes
+                console.log(`⚠️ Content ID "${contentId}" is not a MongoDB ObjectId, storing in profile interaction only`);
             }
 
-            // Update like status
+            // If content doesn't exist in DB, we still track the like in profile interaction
+            if (!content) {
+                console.log(`⚠️ Content not found in database: ${contentId}, tracking in profile only`);
+            }
+
+            // Update like status in profile interaction
             if (liked) {
                 if (!interaction.likedContent.includes(contentId)) {
                     interaction.likedContent.push(contentId);
-                    content.likes += 1;
+                    // Only update content likes if content exists in DB
+                    if (content) {
+                        content.likes += 1;
+                    }
                 }
             } else {
                 const index = interaction.likedContent.indexOf(contentId);
                 if (index > -1) {
                     interaction.likedContent.splice(index, 1);
-                    content.likes = Math.max(0, content.likes - 1);
+                    // Only update content likes if content exists in DB
+                    if (content) {
+                        content.likes = Math.max(0, content.likes - 1);
+                    }
                 }
             }
 
-            // Save both
+            // Save interaction (always) and content (if exists)
             await interaction.save();
-            await content.save();
+            if (content) {
+                await content.save();
+            }
 
             return {
                 contentId,
                 liked: interaction.likedContent.includes(contentId),
-                totalLikes: content.likes
+                totalLikes: content ? content.likes : 0
             };
         } catch (error) {
             console.error('Error toggling like:', error);

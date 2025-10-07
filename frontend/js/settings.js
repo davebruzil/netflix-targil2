@@ -138,7 +138,7 @@ class SettingsManager {
         const card = document.createElement('div');
         card.className = 'profile-card';
         card.innerHTML = `
-            <img src="${profile.avatar}" alt="${profile.name}" class="profile-card-avatar" onerror="this.src='https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 20) + 1}'">
+            <img src="${profile.avatar}" alt="${profile.name}" class="profile-card-avatar" onerror="this.src='https://via.placeholder.com/150/333/fff?text=${profile.name.charAt(0).toUpperCase()}'">
             <div class="profile-card-info">
                 <div class="profile-card-name">${profile.name}</div>
                 ${profile.isChild ? '<span class="profile-card-badge">Kids</span>' : ''}

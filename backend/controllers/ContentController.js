@@ -534,156 +534,136 @@ class ContentController {
     }
 
     /**
-     * Advanced search with filters
-     * TODO: Enhance existing searchContent() with advanced filters
-     * Filters: genre, type (movie/series), year range, rating
-     *
-     * @route GET /api/content/search (enhanced with filter params)
+     * Get trending content section
+     * @route GET /api/content/sections/trending
      */
-    async advancedSearch(req, res) {
-        // TODO: Get search query from req.query.q
-
-        // TODO: Get filter params: genre, type, yearFrom, yearTo, minRating
-
-        // TODO: Get limit from query params (default: 20)
-
-        // TODO: Call contentModel.searchContent() to get base results
-
-        // TODO: Apply genre filter if provided
-
-        // TODO: Apply type filter (movie/series) if provided
-
-        // TODO: Apply year range filter if provided
-
-        // TODO: Apply rating filter if provided
-
-        // TODO: Return filtered results
-
-        // TODO: Track search with filters in history
-
-        // TODO: Handle errors with 500 status
+    async getTrendingContent(req, res) {
+        return this.getTrending(req, res);
     }
 
-    // Helper method to reduce code duplication
-    static async handleSectionRequest(req, res, queryFn, sectionName) {
+    /**
+     * Get new releases section
+     * @route GET /api/content/sections/new-releases
+     */
+    async getNewReleases(req, res) {
         try {
             const { limit = 10 } = req.query;
-            const content = await queryFn(parseInt(limit));
-            
+            const ContentSchema = require('../schemas/ContentSchema');
+
+            const newReleases = await ContentSchema.find()
+                .sort({ createdAt: -1 })
+                .limit(parseInt(limit));
+
             res.json({
                 success: true,
                 data: {
-                    content,
-                    section: sectionName,
-                    total: content.length
+                    content: newReleases,
+                    section: 'New Releases',
+                    total: newReleases.length
                 }
             });
         } catch (error) {
-            console.error(`Error getting ${sectionName.toLowerCase()}:`, error);
+            console.error('Error getting new releases:', error);
             res.status(500).json({
                 success: false,
-                error: `Failed to fetch ${sectionName.toLowerCase()}`,
+                error: 'Failed to fetch new releases',
                 message: error.message
             });
         }
     }
 
-    static async getTrendingContent(req, res) {
-        await this.handleSectionRequest(req, res, 
-            (limit) => RecommendationEngine.getPopularContent(limit), 
-            'Trending Now'
-        );
-    }
+    /**
+     * Get top rated section
+     * @route GET /api/content/sections/top-rated
+     */
+    async getTopRated(req, res) {
+        try {
+            const { limit = 10 } = req.query;
+            const ContentSchema = require('../schemas/ContentSchema');
 
-    static async getNewReleases(req, res) {
-        await this.handleSectionRequest(req, res,
-            (limit) => ContentSchema.find().sort({ createdAt: -1 }).limit(limit),
-            'New Releases'
-        );
-    }
+            const topRated = await ContentSchema.find()
+                .sort({ rating: -1, likes: -1 })
+                .limit(parseInt(limit));
 
-    static async getTopRated(req, res) {
-        await this.handleSectionRequest(req, res,
-            (limit) => ContentSchema.find().sort({ rating: -1, likes: -1 }).limit(limit),
-            'Top Rated'
-        );
-    }
-
-    static async getContentByGenre(req, res) {
-        const { genre } = req.params;
-        if (!genre) {
-            return res.status(400).json({
+            res.json({
+                success: true,
+                data: {
+                    content: topRated,
+                    section: 'Top Rated',
+                    total: topRated.length
+                }
+            });
+        } catch (error) {
+            console.error('Error getting top rated:', error);
+            res.status(500).json({
                 success: false,
-                error: 'Genre parameter is required'
+                error: 'Failed to fetch top rated content',
+                message: error.message
             });
         }
-        
-        await this.handleSectionRequest(req, res,
-            (limit) => ContentSchema.find({
-                genre: { $regex: genre, $options: 'i' }
-            }).sort({ likes: -1, popularity: -1 }).limit(limit),
-            `${genre} Movies & Shows`
-        );
     }
 
     /**
-     * Get continue watching content for a profile
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
+     * Get continue watching section
+     * @route GET /api/content/sections/continue-watching/:profileId
      */
-    static async getContinueWatching(req, res) {
+    async getContinueWatching(req, res) {
         try {
-            console.log('▶️ Getting continue watching content...');
-            
             const { profileId } = req.params;
             const { limit = 10 } = req.query;
-            
+
             if (!profileId) {
                 return res.status(400).json({
                     success: false,
                     error: 'Profile ID is required'
                 });
             }
-            
-            // Get profile interactions with watch progress
+
             const ProfileInteractionSchema = require('../schemas/ProfileInteractionSchema');
+            const ContentSchema = require('../schemas/ContentSchema');
+
             const interaction = await ProfileInteractionSchema.findOne({ profileId });
-            
+
             if (!interaction || !interaction.watchProgress || interaction.watchProgress.size === 0) {
                 return res.json({
                     success: true,
                     data: {
                         content: [],
                         section: 'Continue Watching',
-                        total: 0,
-                        message: 'No content in progress'
+                        total: 0
                     }
                 });
             }
-            
-            // Get content IDs from watch progress
-            const contentIds = Array.from(interaction.watchProgress.keys());
+
+            // Get only MongoDB ObjectIds from watch progress
+            const contentIds = Array.from(interaction.watchProgress.keys())
+                .filter(id => id.match(/^[0-9a-fA-F]{24}$/));
+
+            if (contentIds.length === 0) {
+                return res.json({
+                    success: true,
+                    data: {
+                        content: [],
+                        section: 'Continue Watching',
+                        total: 0
+                    }
+                });
+            }
+
             const continueContent = await ContentSchema.find({
                 _id: { $in: contentIds }
             }).limit(parseInt(limit));
-            
-            // Sort by most recent watch time
-            const sortedContent = continueContent.sort((a, b) => {
-                const aProgress = interaction.watchProgress.get(a._id.toString());
-                const bProgress = interaction.watchProgress.get(b._id.toString());
-                return new Date(bProgress.lastWatched) - new Date(aProgress.lastWatched);
-            });
-            
+
             res.json({
                 success: true,
                 data: {
-                    content: sortedContent,
+                    content: continueContent,
                     section: 'Continue Watching',
-                    total: sortedContent.length
+                    total: continueContent.length
                 }
             });
         } catch (error) {
-            console.error('Error getting continue watching content:', error);
+            console.error('Error getting continue watching:', error);
             res.status(500).json({
                 success: false,
                 error: 'Failed to fetch continue watching content',
@@ -693,25 +673,30 @@ class ContentController {
     }
 
     /**
-     * Get all available genres
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
+     * Get available genres
+     * @route GET /api/content/sections/genres
      */
-    static async getAvailableGenres(req, res) {
+    async getAvailableGenres(req, res) {
         try {
+            const ContentSchema = require('../schemas/ContentSchema');
             const genres = await ContentSchema.distinct('genre');
+
             const uniqueGenres = [...new Set(
-                genres.join(',').split(',').map(g => g.trim()).filter(g => g)
-            )];
-            
+                genres.flatMap(g => g.split(',').map(genre => genre.trim())).filter(g => g)
+            )].sort();
+
             res.json({
                 success: true,
-                data: { genres: uniqueGenres, total: uniqueGenres.length }
+                data: {
+                    genres: uniqueGenres,
+                    total: uniqueGenres.length
+                }
             });
         } catch (error) {
+            console.error('Error getting genres:', error);
             res.status(500).json({
                 success: false,
-                error: 'Failed to fetch available genres',
+                error: 'Failed to fetch genres',
                 message: error.message
             });
         }
