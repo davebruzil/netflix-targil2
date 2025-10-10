@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Admin - Content Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: white;
+        }
+        
+        .admin-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .admin-form {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #e50914;
+            box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25);
+            color: white;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .file-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #e50914;
+            background: rgba(229, 9, 20, 0.1);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #e50914;
+            background: rgba(229, 9, 20, 0.2);
+        }
+        
+        .btn-admin {
+            background: #e50914;
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-admin:hover {
+            background: #b8070f;
+            color: white;
+        }
+        
+        .ratings-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .rating-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rating-item:last-child {
+            border-bottom: none;
+        }
+        
+        .rating-badge {
+            background: #e50914;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .admin-login {
+            max-width: 400px;
+            margin: 5rem auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div id="adminLogin" class="admin-login" style="display: block;">
+            <div class="text-center mb-4">
+                <img src="images/better.png" alt="NETFLIX" class="logo-login" style="width: 150px;">
+                <h2 class="mt-3">Admin Login</h2>
+            </div>
+            
+            <form id="adminLoginForm">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="adminUsername" placeholder="Username" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" id="adminPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-admin w-100">Login</button>
+            </form>
+            
+            <div id="adminError" class="alert alert-danger mt-3" style="display: none;"></div>
+        </div>
+
+        <div id="adminPanel" style="display: none;">
+            <div class="admin-header">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <img src="images/better.png" alt="NETFLIX" style="width: 120px;">
+                        </div>
+                        <div class="col-auto">
+                            <span class="me-3">Welcome, Admin</span>
+                            <button class="btn btn-outline-light btn-sm" onclick="adminLogout()">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="mt-4 mb-4">Content Management</h1>
+                        
+                        <div class="admin-form">
+                            <h3 class="mb-4">Add New Content</h3>
+                            
+                            <form id="contentForm" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Title *</label>
+                                            <input type="text" class="form-control" id="contentTitle" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Category</label>
+                                            <select class="form-control" id="contentCategory">
+                                                <option value="Movie">Movie</option>
+                                                <option value="Series">Series</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Year</label>
+                                            <input type="number" class="form-control" id="contentYear" min="1900" max="2030" value="2024">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Genre</label>
+                                            <input type="text" class="form-control" id="contentGenre" placeholder="e.g., Action, Drama, Comedy" value="Action">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Director</label>
+                                            <input type="text" class="form-control" id="contentDirector">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Cast</label>
+                                            <input type="text" class="form-control" id="contentCast" placeholder="e.g., Actor 1, Actor 2, Actor 3">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Runtime</label>
+                                            <input type="text" class="form-control" id="contentRuntime" placeholder="e.g., 2h 15min">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Section</label>
+                                            <select class="form-control" id="contentSection">
+                                                <option value="movies">Movies</option>
+                                                <option value="series">Series</option>
+                                                <option value="trending">Trending</option>
+                                                <option value="continue">Continue Watching</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" id="contentDescription" rows="3" placeholder="Enter movie description...">A sample movie for testing purposes.</textarea>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Poster Image</label>
+                                            <div class="file-upload-area" onclick="document.getElementById('posterFile').click()">
+                                                <input type="file" id="posterFile" accept="image/*" style="display: none;">
+                                                <div id="posterUploadText">
+                                                    <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                                    <p>Click to upload poster image</p>
+                                                    <small>JPG, PNG, GIF up to 10MB</small>
+                                                </div>
+                                                <div id="posterPreview" style="display: none;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Backdrop Image</label>
+                                            <div class="file-upload-area" onclick="document.getElementById('backdropFile').click()">
+                                                <input type="file" id="backdropFile" accept="image/*" style="display: none;">
+                                                <div id="backdropUploadText">
+                                                    <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                                    <p>Click to upload backdrop image</p>
+                                                    <small>JPG, PNG, GIF up to 10MB</small>
+                                                </div>
+                                                <div id="backdropPreview" style="display: none;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Video File (MP4)</label>
+                                    <div class="file-upload-area" onclick="document.getElementById('videoFile').click()">
+                                        <input type="file" id="videoFile" accept="video/mp4" style="display: none;">
+                                        <div id="videoUploadText">
+                                            <i class="fas fa-video fa-2x mb-2"></i>
+                                            <p>Click to upload video file</p>
+                                            <small>MP4 files up to 100MB</small>
+                                        </div>
+                                        <div id="videoPreview" style="display: none;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-outline-light me-2" onclick="fetchRatings()">
+                                        <i class="fas fa-star me-1"></i> Fetch Ratings
+                                    </button>
+                                    <small class="text-muted">Get IMDB and Rotten Tomatoes ratings</small>
+                                </div>
+                                
+                                <div id="ratingsDisplay" class="ratings-display" style="display: none;">
+                                    <h5>External Ratings</h5>
+                                    <div class="rating-item">
+                                        <span>IMDB Rating:</span>
+                                        <span id="imdbRating" class="rating-badge">-</span>
+                                    </div>
+                                    <div class="rating-item">
+                                        <span>Rotten Tomatoes:</span>
+                                        <span id="rtRating" class="rating-badge">-</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-admin">
+                                        <i class="fas fa-plus me-1"></i> Add Content
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div id="formMessage" class="alert mt-3" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="config.js"></script>
+    <script src="api/netflix-api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
