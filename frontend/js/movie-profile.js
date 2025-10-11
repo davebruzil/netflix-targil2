@@ -46,19 +46,33 @@ class MovieProfile {
 
     async loadMovieData() {
         try {
+            console.log('🎬 Loading movie data for ID:', this.movieId);
+            console.log('🎬 ID length:', this.movieId.length);
+            console.log('🎬 Contains underscore:', this.movieId.includes('_'));
+
             // Check if this is an uploaded content ID (MongoDB ObjectId format)
             if (this.movieId.length === 24 && !this.movieId.includes('_')) {
+                console.log('🎬 Detected uploaded content, fetching from backend...');
                 // This is uploaded content
                 const uploadedData = await NetflixAPI.getUploadedContent(this.movieId);
+                console.log('🎬 Uploaded content result:', uploadedData);
+
                 if (uploadedData) {
+                    console.log('✅ Successfully loaded uploaded content');
                     this.movieData = uploadedData;
                     this.renderMovieProfile();
+                    return;
+                } else {
+                    console.error('❌ getUploadedContent returned null/undefined');
+                    this.showError('Failed to load uploaded content - content not found');
                     return;
                 }
             }
 
+            console.log('🎬 Detected TMDB content, parsing ID...');
             // Parse movie ID to get type and TMDB ID
             const [type, tmdbId] = this.movieId.split('_');
+            console.log('🎬 TMDB type:', type, 'ID:', tmdbId);
 
             // Fetch detailed movie data from TMDB
             const movieData = await this.fetchTMDBMovieDetails(tmdbId, type);
@@ -433,11 +447,38 @@ class MovieProfile {
 
     async loadWatchProgress() {
         try {
-            // Load progress from localStorage
+            console.log('📊 Loading watch progress for movieId:', this.movieId);
+
+            // Try to load from backend first
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (profileId) {
+                console.log('📊 Fetching watch history from backend for profile:', profileId);
+                const watchHistory = await NetflixAPI.getWatchHistory(profileId);
+                console.log('📊 Watch history:', watchHistory);
+
+                if (watchHistory && watchHistory.length > 0) {
+                    // Find the watch item for this movie
+                    const watchItem = watchHistory.find(item => item.contentId === this.movieId);
+                    console.log('📊 Found watch item for this movie:', watchItem);
+
+                    if (watchItem) {
+                        this.watchProgress = watchItem.progress || 0;
+                        console.log('📊 Loaded progress from backend:', this.watchProgress);
+                        return;
+                    }
+                }
+            }
+
+            // Fallback to localStorage if backend fails or no data
+            console.log('📊 Trying localStorage fallback...');
             const progressData = localStorage.getItem(`netflix:progress:${this.movieId}`);
             if (progressData) {
                 const data = JSON.parse(progressData);
                 this.watchProgress = data.progress || 0;
+                console.log('📊 Loaded progress from localStorage:', this.watchProgress);
+            } else {
+                console.log('📊 No watch progress found, starting at 0%');
+                this.watchProgress = 0;
             }
         } catch (error) {
             console.warn('Failed to load watch progress:', error);
@@ -467,20 +508,53 @@ class MovieProfile {
         const playIcon = playBtn.querySelector('span');
         const playText = playBtn.childNodes[playBtn.childNodes.length - 1];
 
+        console.log('🎮 Updating play button - Progress:', this.watchProgress, 'Is Playing:', this.isPlaying);
+
         if (this.isPlaying) {
             playIcon.textContent = '⏸';
             playText.textContent = ' Pause';
-        } else if (this.watchProgress > 0 && this.watchProgress < 95) {
+        } else if (this.watchProgress >= 90) {
+            // Show Replay for progress >= 90%
+            playIcon.textContent = '↻';
+            playText.textContent = ' Replay';
+            console.log('🎮 Button set to: Replay');
+        } else if (this.watchProgress > 0 && this.watchProgress < 90) {
+            // Show Continue for progress between 1% and 89%
             playIcon.textContent = '▶';
             playText.textContent = ' Continue';
+            console.log('🎮 Button set to: Continue');
         } else {
+            // Show Play for 0% progress
             playIcon.textContent = '▶';
             playText.textContent = ' Play';
+            console.log('🎮 Button set to: Play');
         }
     }
 
     async handlePlay() {
         if (!this.movieData) return;
+
+        console.log('🎬 handlePlay clicked - Current progress:', this.watchProgress);
+
+        // If progress >= 90%, this is a replay - reset progress to 0
+        if (this.watchProgress >= 90) {
+            console.log('↻ Replay detected - resetting progress to 0');
+            this.watchProgress = 0;
+
+            // Save the reset progress to backend
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (profileId) {
+                try {
+                    await NetflixAPI.saveWatchProgress(profileId, this.movieId, 0, 0, 60);
+                    console.log('✅ Progress reset saved to backend');
+                } catch (error) {
+                    console.error('❌ Failed to reset progress:', error);
+                }
+            }
+
+            // Also clear localStorage
+            localStorage.removeItem(`netflix:progress:${this.movieId}`);
+        }
 
         // Redirect to player with movie ID
         window.location.href = `player.html?id=${this.movieId}`;

@@ -783,6 +783,131 @@ class NetflixAPI {
             return null;
         }
     }
+
+    // =============================================================================
+    // WATCH PROGRESS API METHODS
+    // =============================================================================
+
+    /**
+     * Save watch progress for content
+     * @param {string} profileId - Profile ID
+     * @param {string} contentId - Content ID
+     * @param {number} progress - Progress percentage (0-100)
+     * @param {number} currentTime - Current playback time in seconds
+     * @param {number} totalDuration - Total duration in seconds
+     * @returns {Promise<Object|null>} Result object or null
+     */
+    static async saveWatchProgress(profileId, contentId, progress, currentTime, totalDuration) {
+        try {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/profiles/${profileId}/watch-progress`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    contentId,
+                    progress,
+                    currentTime,
+                    totalDuration
+                })
+            });
+
+            const data = await response.json();
+            return data.success ? data.data : null;
+        } catch (error) {
+            console.error('Error saving watch progress:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get watch history for profile
+     * @param {string} profileId - Profile ID
+     * @returns {Promise<Array>} Array of watch history items
+     */
+    static async getWatchHistory(profileId) {
+        try {
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/profiles/${profileId}/watch-history`);
+            const data = await response.json();
+            return data.success ? data.data : [];
+        } catch (error) {
+            console.error('Error getting watch history:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get continue watching content for profile
+     * @param {string} profileId - Profile ID
+     * @returns {Promise<Array>} Array of content items with watch progress
+     */
+    static async getContinueWatching(profileId) {
+        try {
+            console.log('🎯 getContinueWatching called for profileId:', profileId);
+            const response = await this.fetchWithCredentials(`${this.BACKEND_URL}/profiles/${profileId}/continue-watching`);
+            const data = await response.json();
+
+            console.log('🎯 Continue watching response:', data);
+
+            if (data.success && data.data) {
+                // Fetch full content details for each item in continue watching
+                const contentPromises = data.data.map(async (watchItem) => {
+                    console.log('🎯 Processing watch item:', watchItem);
+
+                    // Check if it's a TMDB content ID
+                    if (watchItem.contentId.startsWith('movie_') || watchItem.contentId.startsWith('tv_')) {
+                        // Extract the TMDB ID and type
+                        const [type, id] = watchItem.contentId.split('_');
+                        console.log('🎯 Fetching TMDB content - type:', type, 'id:', id);
+
+                        const tmdbContent = await this.fetchTMDBData(id, type);
+                        if (tmdbContent) {
+                            tmdbContent.progress = watchItem.progress;
+                            tmdbContent.currentTime = watchItem.currentTime;
+                            tmdbContent.isCompleted = watchItem.isCompleted;
+                            console.log('🎯 TMDB content loaded, id:', tmdbContent.id);
+                            return tmdbContent;
+                        }
+                    } else {
+                        // It's an uploaded content ID
+                        console.log('🎯 Fetching uploaded content for ID:', watchItem.contentId);
+
+                        const uploadedContent = await this.getUploadedContent(watchItem.contentId);
+                        if (uploadedContent) {
+                            uploadedContent.progress = watchItem.progress;
+                            uploadedContent.currentTime = watchItem.currentTime;
+                            uploadedContent.isCompleted = watchItem.isCompleted;
+
+                            // Ensure id is set (should be set by formatUploadedContent, but verify)
+                            if (!uploadedContent.id) {
+                                uploadedContent.id = watchItem.contentId;
+                                console.warn('⚠️ Uploaded content missing id, using contentId:', watchItem.contentId);
+                            }
+
+                            console.log('🎯 Uploaded content loaded, id:', uploadedContent.id);
+                            return uploadedContent;
+                        } else {
+                            console.error('❌ Failed to load uploaded content for ID:', watchItem.contentId);
+                        }
+                    }
+                    return null;
+                });
+
+                const contentList = await Promise.all(contentPromises);
+                const filtered = contentList.filter(item => item !== null);
+
+                console.log('🎯 Final Continue Watching content:', filtered);
+                filtered.forEach(item => {
+                    console.log('🎯   - Item:', item.title, 'ID:', item.id, 'Progress:', item.progress);
+                });
+
+                return filtered;
+            }
+
+            console.log('🎯 No continue watching data found');
+            return [];
+        } catch (error) {
+            console.error('Error getting continue watching:', error);
+            return [];
+        }
+    }
 }
 
 // Export for global use

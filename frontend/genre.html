@@ -31,6 +31,71 @@
             padding: 20px 0;
         }
 
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .genre-hero {
+                padding: 80px 0 30px;
+            }
+
+            .filter-controls {
+                padding: 15px;
+            }
+
+            .content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .content-card img {
+                height: 225px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .genre-hero {
+                padding: 70px 0 20px;
+            }
+
+            .genre-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .filter-controls {
+                padding: 12px;
+                position: relative;
+                top: 0;
+            }
+
+            .content-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 10px 0;
+            }
+
+            .content-card img {
+                height: 200px;
+            }
+
+            .content-card-overlay h4 {
+                font-size: 12px !important;
+            }
+
+            .content-card-overlay div {
+                font-size: 10px !important;
+            }
+
+            .filter-badge {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
         .loading-spinner {
             text-align: center;
             padding: 40px;
@@ -86,6 +151,17 @@
             right: 10px;
             background: rgba(0, 0, 0, 0.8);
             color: #46d369;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .continue-watching-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #e50914;
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 12px;

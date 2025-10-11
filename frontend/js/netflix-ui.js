@@ -6,15 +6,35 @@ class NetflixUI {
      * Create a Netflix movie/show card HTML
      * @param {Object} item - Content item
      * @param {Set} likedItems - Set of liked item IDs
+     * @param {boolean} showPlayButton - Whether to show the play button overlay (default: false)
      * @returns {string} HTML string for the card
      */
-    static createNetflixCard(item, likedItems) {
+    static createNetflixCard(item, likedItems, showPlayButton = false) {
+        // Debug logging for Continue Watching items
+        if (item.progress > 0) {
+            console.log('📺 Creating card for Continue Watching item:', {
+                id: item.id,
+                title: item.title,
+                progress: item.progress,
+                hasId: !!item.id,
+                itemKeys: Object.keys(item)
+            });
+        }
+
         const isLiked = likedItems.has(item.id);
         const likeCount = item.likes + (isLiked ? 1 : 0);
         const progress = item.progress || 0;
         const rating = item.rating && item.rating !== 'N/A' ? item.rating : '';
         const year = item.year ? item.year : '';
         const runtime = item.runtime || (item.category === 'Movie' ? '120 min' : '45 min');
+
+        // Determine button label based on progress - ONLY for movie profile pages
+        let playButtonHTML = '<span>▶</span> Play';
+        if (progress > 0 && progress < 90) {
+            playButtonHTML = '<span>▶</span> Continue';
+        } else if (progress >= 90) {
+            playButtonHTML = '<span>↻</span> Replay';
+        }
 
         return `
             <div class="netflix-card" data-id="${item.id}" onclick="netflixFeed.navigateToMovie('${item.id}')">
@@ -30,6 +50,26 @@ class NetflixUI {
                             </span>
                         </button>
 
+                        ${showPlayButton && progress > 0 ? `
+                            <div class="netflix-play-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; opacity: 0; transition: opacity 0.3s;">
+                                <button class="netflix-play-btn" style="
+                                    background: rgba(255, 255, 255, 0.95);
+                                    border: none;
+                                    border-radius: 4px;
+                                    padding: 12px 24px;
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                    color: #000;
+                                    cursor: pointer;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+                                " onclick="event.stopPropagation(); netflixFeed.navigateToMovie('${item.id}')">
+                                    ${playButtonHTML}
+                                </button>
+                            </div>
+                        ` : ''}
 
                         <div class="netflix-card-info-overlay">
                             <div class="netflix-card-description">${item.description}</div>
@@ -49,6 +89,17 @@ class NetflixUI {
                     </div>
                 </div>
             </div>
+            ${showPlayButton ? `
+                <style>
+                    .netflix-card:hover .netflix-play-overlay {
+                        opacity: 1 !important;
+                    }
+                    .netflix-play-btn:hover {
+                        background: rgba(255, 255, 255, 1) !important;
+                        transform: scale(1.05);
+                    }
+                </style>
+            ` : ''}
         `;
     }
 

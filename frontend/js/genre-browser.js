@@ -143,12 +143,17 @@ class GenreBrowser {
         this.showLoading();
 
         try {
+            // Always include profileId for watch status filtering
+            const profileId = localStorage.getItem('netflix:profileId');
+
             const url = `${API_BASE}/api/content/browse/genre/${encodeURIComponent(this.currentGenre)}?` +
                 `page=${this.currentPage}&` +
                 `limit=20&` +
                 `sort=${this.currentSort}&` +
-                `watchStatus=${this.currentWatchStatus}&` +
-                `profileId=${this.profileId}`;
+                `watchStatus=${this.currentWatchStatus}` +
+                (profileId ? `&profileId=${profileId}` : '');
+
+            console.log('🎬 Loading genre content:', { genre: this.currentGenre, watchStatus: this.currentWatchStatus, profileId });
 
             const response = await fetch(url, {
                 credentials: 'include'
@@ -214,11 +219,20 @@ class GenreBrowser {
 
         const imageUrl = item.image || item.poster || '/images/placeholder.jpg';
         const isWatched = item.watched || false;
+        const inContinueWatching = item.inContinueWatching || false;
+
+        // Determine badge to show
+        let badge = '';
+        if (isWatched) {
+            badge = '<div class="watched-badge"><i class="fas fa-check"></i> Watched</div>';
+        } else if (inContinueWatching) {
+            badge = '<div class="continue-watching-badge"><i class="fas fa-play"></i> Continue Watching</div>';
+        }
 
         card.innerHTML = `
             <img src="${imageUrl}" alt="${item.title || 'Content'}"
                  onerror="this.src='/images/placeholder.jpg'">
-            ${isWatched ? '<div class="watched-badge"><i class="fas fa-check"></i> Watched</div>' : ''}
+            ${badge}
             <div class="content-card-overlay">
                 <h4 style="font-size: 14px; margin-bottom: 5px;">${item.title || 'Untitled'}</h4>
                 <div style="font-size: 12px; color: #46d369;">

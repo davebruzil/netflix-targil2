@@ -729,11 +729,12 @@ class ContentController {
                 profileId
             } = req.query;
 
-            console.log(`🎬 GET /api/content/browse/genre/${genre} - Page: ${page}, Sort: ${sort}, Status: ${watchStatus}`);
+            console.log(`🎬 GET /api/content/browse/genre/${genre} - Page: ${page}, Sort: ${sort}, Status: ${watchStatus}, ProfileId: ${profileId}`);
 
             const axios = require('axios');
             const ContentSchema = require('../schemas/ContentSchema');
             const ProfileInteractionSchema = require('../schemas/ProfileInteractionSchema');
+            const ProfileSchema = require('../schemas/ProfileSchema');
 
             // Map genre names to TMDB genre IDs
             const genreMap = {
@@ -816,31 +817,66 @@ class ContentController {
                 console.error('MongoDB error:', dbError.message);
             }
 
-            // Get watched content IDs if profileId provided
+            // Get watched content IDs and continue watching IDs if profileId provided
             let watchedIds = [];
+            let continueWatchingIds = [];
             if (profileId) {
+                console.log(`📊 Checking watch progress for profile: ${profileId}`);
+
+                // Check Profile.watchHistory (primary source)
+                const profile = await ProfileSchema.findById(profileId);
+                if (profile && profile.watchHistory && profile.watchHistory.length > 0) {
+                    console.log(`📚 Found ${profile.watchHistory.length} items in watch history`);
+                    profile.watchHistory.forEach(item => {
+                        const progress = item.progress || 0;
+                        console.log(`  - Content: ${item.contentId}, Progress: ${progress}%, Completed: ${item.isCompleted}`);
+
+                        if (item.isCompleted || progress >= 90) {
+                            watchedIds.push(item.contentId);
+                        } else if (progress > 0) {
+                            continueWatchingIds.push(item.contentId);
+                        }
+                    });
+                }
+
+                // Also check ProfileInteraction.watchProgress (secondary source)
                 const interaction = await ProfileInteractionSchema.findOne({ profileId });
                 if (interaction && interaction.watchProgress) {
-                    watchedIds = Array.from(interaction.watchProgress.keys())
-                        .filter(id => {
-                            const progressData = interaction.watchProgress.get(id);
-                            if (typeof progressData === 'object' && progressData.progress) {
-                                return progressData.progress >= 90;
-                            }
-                            return progressData >= 90; // Legacy format
-                        });
+                    console.log(`📝 Found ${interaction.watchProgress.size} items in profile interaction`);
+                    Array.from(interaction.watchProgress.keys()).forEach(id => {
+                        const progressData = interaction.watchProgress.get(id);
+                        let progress = 0;
+
+                        if (typeof progressData === 'object' && progressData.progress !== undefined) {
+                            progress = progressData.progress;
+                        } else if (typeof progressData === 'number') {
+                            progress = progressData;
+                        }
+
+                        if (progress >= 90 && !watchedIds.includes(id)) {
+                            watchedIds.push(id);
+                        } else if (progress > 0 && progress < 90 && !continueWatchingIds.includes(id)) {
+                            continueWatchingIds.push(id);
+                        }
+                    });
                 }
+
+                console.log(`✅ Watched IDs (${watchedIds.length}):`, watchedIds);
+                console.log(`▶️ Continue Watching IDs (${continueWatchingIds.length}):`, continueWatchingIds);
             }
 
             // Apply watch status filter
             if (watchStatus === 'watched') {
+                // Show only content marked as watched (>=90% progress)
                 allContent = allContent.filter(item =>
                     watchedIds.includes(item._id?.toString()) || watchedIds.includes(item.id)
                 );
             } else if (watchStatus === 'unwatched') {
-                allContent = allContent.filter(item =>
-                    !watchedIds.includes(item._id?.toString()) && !watchedIds.includes(item.id)
-                );
+                // Filter out BOTH watched content AND content in continue watching
+                allContent = allContent.filter(item => {
+                    const itemId = item._id?.toString() || item.id;
+                    return !watchedIds.includes(itemId) && !continueWatchingIds.includes(itemId);
+                });
             }
 
             // Apply sorting
@@ -865,11 +901,15 @@ class ContentController {
             const skip = (pageNum - 1) * limitNum;
             const paginatedContent = allContent.slice(skip, skip + limitNum);
 
-            // Mark which items are watched
-            const contentWithStatus = paginatedContent.map(item => ({
-                ...item,
-                watched: watchedIds.includes(item._id?.toString()) || watchedIds.includes(item.id)
-            }));
+            // Mark which items are watched or in continue watching
+            const contentWithStatus = paginatedContent.map(item => {
+                const itemId = item._id?.toString() || item.id;
+                return {
+                    ...item,
+                    watched: watchedIds.includes(itemId),
+                    inContinueWatching: continueWatchingIds.includes(itemId)
+                };
+            });
 
             res.json({
                 success: true,

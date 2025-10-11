@@ -27,6 +27,10 @@ class VideoPlayer {
         this.isTMDBContent = false;
         this.progressSaveInterval = null;
         this.lastSavedProgress = 0;
+        this.isMockPlayback = false;
+        this.mockCurrentTime = 0;
+        this.mockDuration = 60;
+        this.mockInterval = null;
 
         this.init();
     }
@@ -77,6 +81,8 @@ class VideoPlayer {
         const urlParams = new URLSearchParams(window.location.search);
         const contentId = urlParams.get('id');
 
+        console.log('🎬 Loading content from URL:', contentId);
+
         if (contentId) {
             this.loadContent(contentId);
         } else {
@@ -87,9 +93,11 @@ class VideoPlayer {
     async loadContent(contentId) {
         try {
             this.contentId = contentId;
+            console.log('📺 loadContent called with ID:', contentId);
 
             // Check if it's a TMDB content (movie_xxx or tv_xxx)
             if (contentId.startsWith('movie_') || contentId.startsWith('tv_')) {
+                console.log('🎥 Detected TMDB content, using mock playback');
                 this.isTMDBContent = true;
                 await this.loadTMDBContent(contentId);
             } else {
@@ -107,6 +115,17 @@ class VideoPlayer {
 
             // Load saved progress and resume if available
             await this.loadSavedProgress();
+
+            // Save initial progress (0%) to mark content as started
+            // This ensures content appears in Continue Watching even if user doesn't click play
+            console.log('⏰ Setting timeout to save initial progress in 1 second...');
+            setTimeout(() => {
+                console.log('⏰ Timeout fired! Calling saveWatchProgress for initial 0% save');
+                console.log('⏰ contentId:', this.contentId);
+                console.log('⏰ isMockPlayback:', this.isMockPlayback);
+                console.log('⏰ mockCurrentTime:', this.mockCurrentTime);
+                this.saveWatchProgress();
+            }, 1000);
         } catch (error) {
             console.error('Error loading content:', error);
             this.loadSampleContent();
@@ -167,7 +186,7 @@ class VideoPlayer {
                 this.generateSampleVideo();
             }
         } else {
-            // No video file, generate sample
+            // No video file, generate sample (60 seconds for TMDB content)
             this.generateSampleVideo();
         }
 
@@ -175,59 +194,32 @@ class VideoPlayer {
     }
 
     generateSampleVideo() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1920;
-        canvas.height = 1080;
-        const ctx = canvas.getContext('2d');
+        // Use mock playback for TMDB content (no real video file)
+        this.isMockPlayback = true;
+        this.mockDuration = 60; // 60 seconds
+        this.mockCurrentTime = 0;
 
-        // Create a black canvas
+        // Set a black background for the video element
+        this.video.style.display = 'block';
+        this.video.style.background = '#000';
+
+        // Create a minimal black frame as the video source
+        const canvas = document.createElement('canvas');
+        canvas.width = 1280;
+        canvas.height = 720;
+        const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Add Netflix-style text in center (for TMDB content)
-        if (this.isTMDBContent) {
-            ctx.fillStyle = '#e50914';
-            ctx.font = 'bold 72px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Preview', canvas.width / 2, canvas.height / 2 - 40);
-
-            ctx.fillStyle = '#999';
-            ctx.font = '36px Arial';
-            ctx.fillText('Content Not Available', canvas.width / 2, canvas.height / 2 + 40);
-        } else {
-            ctx.fillStyle = '#e50914';
-            ctx.font = '48px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Sample Video', canvas.width / 2, canvas.height / 2);
-
-            ctx.fillStyle = '#fff';
-            ctx.font = '24px Arial';
-            ctx.fillText(this.currentContent.title, canvas.width / 2, canvas.height / 2 + 40);
-        }
-
-        const stream = canvas.captureStream(30);
-        const mediaRecorder = new MediaRecorder(stream);
-        const chunks = [];
-
-        mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'video/webm' });
+        // Convert to blob and set as video source
+        canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
-            this.video.src = url;
+            this.video.poster = url;
+        }, 'image/png');
 
-            // Manually set duration to 60 seconds for TMDB content
-            if (this.isTMDBContent) {
-                this.video.addEventListener('loadedmetadata', () => {
-                    // Override duration display
-                    this.totalTimeEl.textContent = '1:00';
-                }, { once: true });
-            }
-        };
-
-        mediaRecorder.start();
-        // Record for 60 seconds (1 minute) for TMDB content, 5 seconds for others
-        const recordDuration = this.isTMDBContent ? 60000 : 5000;
-        setTimeout(() => mediaRecorder.stop(), recordDuration);
+        // Set initial duration display
+        this.totalTimeEl.textContent = '1:00';
+        this.currentTimeEl.textContent = '0:00';
     }
 
     generateEpisodes() {
@@ -279,36 +271,146 @@ class VideoPlayer {
     }
 
     togglePlayPause() {
-        if (this.isPlaying) {
-            this.video.pause();
+        console.log('▶️ togglePlayPause called');
+        console.log('▶️ isMockPlayback:', this.isMockPlayback);
+        console.log('▶️ isPlaying:', this.isPlaying);
+
+        if (this.isMockPlayback) {
+            if (this.isPlaying) {
+                console.log('⏸️ Pausing mock playback');
+                this.pauseMock();
+            } else {
+                console.log('▶️ Starting mock playback');
+                this.playMock();
+            }
         } else {
-            this.video.play();
+            if (this.isPlaying) {
+                this.video.pause();
+            } else {
+                this.video.play();
+            }
         }
     }
 
+    playMock() {
+        console.log('🎬 playMock started');
+        console.log('🎬 mockCurrentTime:', this.mockCurrentTime);
+        console.log('🎬 mockDuration:', this.mockDuration);
+
+        if (this.mockCurrentTime >= this.mockDuration) {
+            this.mockCurrentTime = 0;
+        }
+
+        this.isPlaying = true;
+        this.updatePlayPauseButton(true);
+        this.startProgressTracking();
+
+        // Start mock playback interval
+        this.mockInterval = setInterval(() => {
+            this.mockCurrentTime += 1;
+            console.log(`⏱️ Mock time: ${this.mockCurrentTime}s / ${this.mockDuration}s`);
+
+            // Update UI
+            const progress = (this.mockCurrentTime / this.mockDuration) * 100;
+            this.progressFill.style.width = `${progress}%`;
+            this.progressHandle.style.left = `${progress}%`;
+            this.currentTimeEl.textContent = this.formatTime(this.mockCurrentTime);
+
+            // Check if ended
+            if (this.mockCurrentTime >= this.mockDuration) {
+                this.pauseMock();
+                this.onVideoEnded();
+            }
+        }, 1000);
+
+        console.log('🎬 Mock interval started with ID:', this.mockInterval);
+    }
+
+    pauseMock() {
+        this.isPlaying = false;
+        this.updatePlayPauseButton(false);
+        this.stopProgressTracking();
+
+        if (this.mockInterval) {
+            clearInterval(this.mockInterval);
+            this.mockInterval = null;
+        }
+
+        // Save progress
+        this.saveWatchProgress();
+    }
+
     updatePlayPauseButton(playing) {
+        console.log('🎮 updatePlayPauseButton called, playing:', playing);
         this.isPlaying = playing;
-        const icon = this.playPauseBtn.querySelector('i');
-        icon.className = playing ? 'fas fa-pause' : 'fas fa-play';
+
+        if (!this.playPauseBtn) {
+            console.warn('❌ playPauseBtn not found!');
+            return;
+        }
+
+        // Try to find icon element (could be <i> or Font Awesome might convert it)
+        let icon = this.playPauseBtn.querySelector('i');
+
+        // If icon doesn't exist, create it
+        if (!icon) {
+            console.log('⚠️ Icon element not found, creating new one');
+            this.playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            icon = this.playPauseBtn.querySelector('i');
+        }
+
+        if (!icon) {
+            console.warn('❌ Still cannot find/create icon element');
+            return;
+        }
+
+        console.log('🎮 Current icon class:', icon.className);
+        const newClass = playing ? 'fas fa-pause' : 'fas fa-play';
+        icon.className = newClass;
+        console.log('🎮 Updated icon class to:', newClass);
     }
 
     rewind(seconds) {
-        this.video.currentTime = Math.max(0, this.video.currentTime - seconds);
+        if (this.isMockPlayback) {
+            this.mockCurrentTime = Math.max(0, this.mockCurrentTime - seconds);
+            const progress = (this.mockCurrentTime / this.mockDuration) * 100;
+            this.progressFill.style.width = `${progress}%`;
+            this.progressHandle.style.left = `${progress}%`;
+            this.currentTimeEl.textContent = this.formatTime(this.mockCurrentTime);
+        } else {
+            this.video.currentTime = Math.max(0, this.video.currentTime - seconds);
+        }
     }
 
     forward(seconds) {
-        this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + seconds);
+        if (this.isMockPlayback) {
+            this.mockCurrentTime = Math.min(this.mockDuration, this.mockCurrentTime + seconds);
+            const progress = (this.mockCurrentTime / this.mockDuration) * 100;
+            this.progressFill.style.width = `${progress}%`;
+            this.progressHandle.style.left = `${progress}%`;
+            this.currentTimeEl.textContent = this.formatTime(this.mockCurrentTime);
+        } else {
+            this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + seconds);
+        }
     }
 
     toggleMute() {
         this.video.muted = !this.video.muted;
+        if (!this.muteBtn) return;
+
         const icon = this.muteBtn.querySelector('i');
-        icon.className = this.video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+        if (icon) {
+            icon.className = this.video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+        }
     }
 
     setVolume(value) {
         this.video.volume = value / 100;
+        if (!this.muteBtn) return;
+
         const icon = this.muteBtn.querySelector('i');
+        if (!icon) return;
+
         if (value == 0) {
             icon.className = 'fas fa-volume-mute';
         } else if (value < 50) {
@@ -341,7 +443,16 @@ class VideoPlayer {
     seekTo(e) {
         const rect = this.progressBar.getBoundingClientRect();
         const pos = (e.clientX - rect.left) / rect.width;
-        this.video.currentTime = pos * this.video.duration;
+
+        if (this.isMockPlayback) {
+            this.mockCurrentTime = pos * this.mockDuration;
+            const progress = pos * 100;
+            this.progressFill.style.width = `${progress}%`;
+            this.progressHandle.style.left = `${progress}%`;
+            this.currentTimeEl.textContent = this.formatTime(this.mockCurrentTime);
+        } else {
+            this.video.currentTime = pos * this.video.duration;
+        }
     }
 
     startDragging() {
@@ -361,10 +472,16 @@ class VideoPlayer {
 
     stopDragging() {
         if (!this.isDragging) return;
-        
+
         this.isDragging = false;
         const progress = parseFloat(this.progressFill.style.width) / 100;
-        this.video.currentTime = progress * this.video.duration;
+
+        if (this.isMockPlayback) {
+            this.mockCurrentTime = progress * this.mockDuration;
+            this.currentTimeEl.textContent = this.formatTime(this.mockCurrentTime);
+        } else {
+            this.video.currentTime = progress * this.video.duration;
+        }
     }
 
     toggleFullscreen() {
@@ -441,6 +558,152 @@ class VideoPlayer {
                 }
                 this.closeEpisodesDrawer();
                 break;
+        }
+    }
+
+    async saveWatchProgress() {
+        console.log('💾 saveWatchProgress called');
+        try {
+            const profileId = localStorage.getItem('netflix:profileId');
+            console.log('💾 profileId:', profileId);
+            console.log('💾 contentId:', this.contentId);
+
+            if (!profileId || !this.contentId) {
+                console.warn('💾 Missing profileId or contentId, skipping save');
+                return;
+            }
+
+            let currentTime, duration;
+
+            if (this.isMockPlayback) {
+                console.log('💾 Using mock playback data');
+                currentTime = this.mockCurrentTime;
+                duration = this.mockDuration;
+            } else {
+                currentTime = this.video.currentTime || 0;
+                duration = this.video.duration || 60;
+
+                // Skip if video hasn't loaded yet
+                if (isNaN(duration) || duration === 0) {
+                    console.warn('💾 Video not loaded yet, skipping save');
+                    return;
+                }
+            }
+
+            const progress = (currentTime / duration) * 100;
+            console.log(`💾 Progress: ${Math.round(progress)}% (${currentTime}s / ${duration}s)`);
+            console.log(`💾 lastSavedProgress: ${this.lastSavedProgress}`);
+
+            // Only save if progress has changed significantly (more than 1%)
+            // Allow initial save at 0% (when lastSavedProgress === 0)
+            if (Math.abs(progress - this.lastSavedProgress) < 1 && progress < 99 && this.lastSavedProgress > 0) {
+                console.log('💾 Progress change < 1%, skipping save');
+                return;
+            }
+
+            console.log('💾 Sending POST request to save progress...');
+            const requestBody = {
+                contentId: this.contentId,
+                progress: Math.round(progress),
+                currentTime: currentTime,
+                totalDuration: duration
+            };
+            console.log('💾 Request body:', requestBody);
+
+            const url = `/api/profiles/${profileId}/watch-progress`;
+            console.log('💾 Full URL:', url);
+            console.log('💾 URL length:', url.length);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(requestBody)
+            });
+
+            console.log('💾 Response status:', response.status);
+            console.log('💾 Response headers:', response.headers);
+            console.log('💾 Response ok:', response.ok);
+            console.log('💾 Response Content-Type:', response.headers.get('Content-Type'));
+
+            // If not OK, log the text response
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('💾 Error response (first 500 chars):', text.substring(0, 500));
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('💾 Response data:', data);
+
+            if (data.success) {
+                this.lastSavedProgress = progress;
+                console.log(`✅ Progress saved: ${Math.round(progress)}%`);
+            } else {
+                console.error('💾 Save failed:', data);
+            }
+        } catch (error) {
+            console.error('Error saving watch progress:', error);
+            console.error('Error stack:', error.stack);
+        }
+    }
+
+    async loadSavedProgress() {
+        try {
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (!profileId || !this.contentId) return;
+
+            const response = await fetch(`/api/profiles/${profileId}/watch-history`, {
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+            if (data.success && data.data) {
+                // Find progress for current content
+                const savedProgress = data.data.find(item => item.contentId === this.contentId);
+
+                if (savedProgress && savedProgress.currentTime > 0) {
+                    console.log(`📼 Resuming from ${Math.round(savedProgress.progress)}%`);
+
+                    if (this.isMockPlayback) {
+                        // Restore mock playback position
+                        this.mockCurrentTime = savedProgress.currentTime;
+                        const progress = (this.mockCurrentTime / this.mockDuration) * 100;
+                        this.progressFill.style.width = `${progress}%`;
+                        this.progressHandle.style.left = `${progress}%`;
+                        this.currentTimeEl.textContent = this.formatTime(this.mockCurrentTime);
+                    } else {
+                        // Restore real video position
+                        if (this.video.readyState >= 2) {
+                            this.video.currentTime = savedProgress.currentTime;
+                        } else {
+                            this.video.addEventListener('loadedmetadata', () => {
+                                this.video.currentTime = savedProgress.currentTime;
+                            }, { once: true });
+                        }
+                    }
+
+                    this.lastSavedProgress = savedProgress.progress;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading saved progress:', error);
+        }
+    }
+
+    startProgressTracking() {
+        // Save progress every 5 seconds
+        this.progressSaveInterval = setInterval(() => {
+            this.saveWatchProgress();
+        }, 5000);
+    }
+
+    stopProgressTracking() {
+        if (this.progressSaveInterval) {
+            clearInterval(this.progressSaveInterval);
+            this.progressSaveInterval = null;
         }
     }
 }

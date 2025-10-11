@@ -63,11 +63,12 @@ class NetflixFeed {
             // Step 3: Load hero section immediately for better UX
             this.loadFeaturedHero();
 
-            // Step 4: Load liked items, recommendations, and dynamic sections from backend (parallel)
+            // Step 4: Load liked items, recommendations, continue watching, and dynamic sections from backend (parallel)
             await Promise.all([
                 this.loadLikedItemsFromBackend(),
                 this.loadRecommendations(), // Dev #3 - Alon: Load personalized recommendations
                 this.loadTrendingContent(), // Dev #3 - Alon: Load trending content
+                this.loadContinueWatching(), // Load continue watching from backend
                 this.loadDynamicSections() // Dev #3 - Alon: Load dynamic content sections
             ]);
 
@@ -81,6 +82,34 @@ class NetflixFeed {
         } finally {
             this.isLoading = false;
             NetflixUI.hideLoadingState();
+        }
+    }
+
+    /**
+     * Load continue watching content from backend
+     */
+    async loadContinueWatching() {
+        try {
+            const profileId = localStorage.getItem('netflix:profileId');
+            if (!profileId) {
+                console.log('No profile ID found, skipping continue watching');
+                return;
+            }
+
+            console.log('▶️ Loading continue watching...');
+            const continueWatching = await NetflixAPI.getContinueWatching(profileId);
+
+            if (continueWatching.length > 0) {
+                // Update continue watching section
+                this.sections.continue = continueWatching;
+                console.log(`✅ Loaded ${continueWatching.length} items in continue watching`);
+            } else {
+                console.log('No continue watching content available');
+                this.sections.continue = [];
+            }
+        } catch (error) {
+            console.warn('Failed to load continue watching:', error);
+            this.sections.continue = [];
         }
     }
 
@@ -521,18 +550,26 @@ class NetflixFeed {
             return null;
         }
 
-        const mainContainer = document.querySelector('.main-content');
+        const netflixContentContainer = document.querySelector('.netflix-content-container');
+        if (!netflixContentContainer) return null;
 
         const sectionHTML = `
-            <div class="netflix-section" id="${sectionId}Section">
-                <h2 class="section-title">${sectionTitle}</h2>
-                <div class="netflix-slider" id="${sectionId}Slider">
-                    <!-- Content will be loaded here -->
+            <div class="netflix-row" id="${sectionId}Section">
+                <h3 class="row-title">${sectionTitle}</h3>
+                <div class="netflix-slider-container" role="region" aria-label="${sectionTitle}">
+                    <button class="slider-nav prev" onclick="netflixFeed.scrollSlider('${sectionId}Slider', 'left')"
+                            aria-label="Scroll to previous items" tabindex="0">‹</button>
+                    <div class="netflix-slider" id="${sectionId}Slider" role="list" tabindex="0"
+                         aria-label="${sectionTitle}">
+                        <!-- Content will be loaded here -->
+                    </div>
+                    <button class="slider-nav next" onclick="netflixFeed.scrollSlider('${sectionId}Slider', 'right')"
+                            aria-label="Scroll to next items" tabindex="0">›</button>
                 </div>
             </div>
         `;
 
-        mainContainer.insertAdjacentHTML('beforeend', sectionHTML);
+        netflixContentContainer.insertAdjacentHTML('beforeend', sectionHTML);
         return document.getElementById(`${sectionId}Section`);
     }
 

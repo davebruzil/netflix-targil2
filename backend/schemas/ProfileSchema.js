@@ -22,6 +22,34 @@ const profileSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    watchHistory: [{
+        contentId: {
+            type: String,
+            required: true
+        },
+        progress: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 100
+        },
+        currentTime: {
+            type: Number,
+            default: 0
+        },
+        totalDuration: {
+            type: Number,
+            default: 60
+        },
+        lastWatchedAt: {
+            type: Date,
+            default: Date.now
+        },
+        isCompleted: {
+            type: Boolean,
+            default: false
+        }
+    }],
     createdAt: {
         type: Date,
         default: Date.now

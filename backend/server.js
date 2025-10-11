@@ -104,7 +104,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Serve frontend files for any non-API routes
+// Serve frontend files for any non-API routes (GET requests only)
 app.get('*', (req, res) => {
     // Don't serve for API routes
     if (req.path.startsWith('/api/')) {
@@ -125,7 +125,7 @@ app.get('*', (req, res) => {
             }
         });
     }
-    
+
     // Serve admin.html for admin panel
     if (req.path === '/admin' || req.path === '/admin.html') {
         return res.sendFile(path.join(__dirname, '..', 'frontend', 'admin.html'), (err) => {
@@ -135,7 +135,7 @@ app.get('*', (req, res) => {
             }
         });
     }
-    
+
     // Serve player.html for video player
     if (req.path === '/player' || req.path === '/player.html') {
         return res.sendFile(path.join(__dirname, '..', 'frontend', 'player.html'), (err) => {
@@ -164,6 +164,16 @@ app.get('*', (req, res) => {
             }
         });
     }
+});
+
+// Catch-all for non-GET API requests (POST, PUT, DELETE, etc.)
+// This ensures proper JSON 404 responses for all API methods
+app.all('/api/*', (req, res) => {
+    res.status(404).json({
+        error: 'API endpoint not found',
+        method: req.method,
+        path: req.path
+    });
 });
 
 // Error handling middleware

@@ -291,6 +291,85 @@ body {
     min-width: 110px;
 }
 
+/* Hero Section Responsive */
+@media (max-width: 1024px) {
+    .hero-section {
+        height: 80vh !important;
+        margin-bottom: 40px !important;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem !important;
+    }
+
+    .hero-section p {
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        height: 70vh !important;
+        margin-bottom: 30px !important;
+    }
+
+    .hero-section .container {
+        padding-bottom: 60px !important;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .hero-section p {
+        font-size: 0.95rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .hero-buttons .btn {
+        padding: 10px 20px !important;
+        font-size: 0.95rem !important;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        height: 60vh !important;
+        margin-bottom: 20px !important;
+    }
+
+    .hero-section .container {
+        padding-bottom: 40px !important;
+    }
+
+    .hero-section h1 {
+        font-size: 1.75rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .hero-section p {
+        font-size: 0.875rem !important;
+        margin-bottom: 1rem !important;
+        line-height: 1.4;
+    }
+
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .hero-buttons .btn {
+        padding: 10px 18px !important;
+        font-size: 0.9rem !important;
+        width: 100%;
+        max-width: 250px;
+    }
+}
+
 /* Movie Card Styles */
 .movie-card {
     background-color: #333 !important;
@@ -1010,6 +1089,47 @@ body {
     color: white !important;
 }
 
+/* Responsive Search Controls */
+@media (max-width: 1024px) {
+    .netflix-search-controls {
+        padding: 0 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .netflix-search-controls {
+        padding: 0 20px;
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .search-container {
+        max-width: 100% !important;
+        width: 100%;
+    }
+
+    .netflix-sort-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .netflix-search-controls {
+        padding: 0 15px;
+        margin-bottom: 20px;
+    }
+
+    .netflix-search {
+        font-size: 14px !important;
+        padding: 10px 14px !important;
+    }
+
+    .netflix-sort-btn {
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+    }
+}
+
 /* Loading Animation */
 @keyframes netflixLikeAnimation {
     0% { transform: scale(1); }
@@ -1445,6 +1565,11 @@ body {
     .movie-details-section {
         padding: 40px 40px 80px;
     }
+
+    .movie-metadata-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1454,6 +1579,7 @@ body {
 
     .movie-description {
         font-size: 1rem;
+        line-height: 1.5;
     }
 
     .movie-poster {
@@ -1469,14 +1595,74 @@ body {
         padding: 30px 20px 60px;
     }
 
+    .movie-metadata-section {
+        padding: 30px 20px;
+    }
+
+    .movie-metadata-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
     .movie-actions {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .movie-play-btn,
+    .movie-list-btn,
+    .movie-like-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .similar-movies-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .movie-hero-section {
+        min-height: 60vh;
+    }
+
+    .movie-title {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .movie-description {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .movie-hero-content {
+        padding: 15px 15px 30px;
+    }
+
+    .movie-details-section {
+        padding: 20px 15px 40px;
+    }
+
+    .movie-metadata-section {
+        padding: 20px 15px;
     }
 
     .movie-play-btn {
-        width: 100%;
-        justify-content: center;
+        font-size: 1rem;
+        padding: 10px 24px;
+    }
+
+    .movie-list-btn,
+    .movie-like-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .similar-movies-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
     }
 }
 

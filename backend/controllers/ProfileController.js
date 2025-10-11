@@ -171,7 +171,7 @@ class ProfileController {
     async deleteProfile(req, res) {
         try {
             const { id } = req.params;
-            
+
             if (!id) {
                 return res.status(400).json({
                     success: false,
@@ -181,7 +181,7 @@ class ProfileController {
             }
 
             await this.profileModel.deleteProfile(id);
-            
+
             res.status(200).json({
                 success: true,
                 message: 'Profile deleted successfully'
@@ -191,6 +191,97 @@ class ProfileController {
             res.status(500).json({
                 success: false,
                 error: 'Failed to delete profile',
+                message: error.message
+            });
+        }
+    }
+
+    async saveWatchProgress(req, res) {
+        try {
+            const { id: profileId } = req.params;
+            const { contentId, progress, currentTime, totalDuration } = req.body;
+
+            if (!profileId || !contentId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID and Content ID are required'
+                });
+            }
+
+            const result = await this.profileModel.saveWatchProgress(
+                profileId,
+                contentId,
+                progress || 0,
+                currentTime || 0,
+                totalDuration || 60
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'Watch progress saved successfully',
+                data: result
+            });
+        } catch (error) {
+            console.error('Error saving watch progress:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to save watch progress',
+                message: error.message
+            });
+        }
+    }
+
+    async getWatchHistory(req, res) {
+        try {
+            const { id: profileId } = req.params;
+
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
+
+            const watchHistory = await this.profileModel.getWatchHistory(profileId);
+
+            res.status(200).json({
+                success: true,
+                data: watchHistory,
+                count: watchHistory.length
+            });
+        } catch (error) {
+            console.error('Error getting watch history:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get watch history',
+                message: error.message
+            });
+        }
+    }
+
+    async getContinueWatching(req, res) {
+        try {
+            const { id: profileId } = req.params;
+
+            if (!profileId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Profile ID is required'
+                });
+            }
+
+            const continueWatching = await this.profileModel.getContinueWatching(profileId);
+
+            res.status(200).json({
+                success: true,
+                data: continueWatching,
+                count: continueWatching.length
+            });
+        } catch (error) {
+            console.error('Error getting continue watching:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get continue watching',
                 message: error.message
             });
         }
