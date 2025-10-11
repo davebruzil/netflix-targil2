@@ -1112,7 +1112,7 @@ class ContentController {
             
             // Try OMDB API for IMDB ratings
             try {
-                const omdbResponse = await axios.get(`https://www.omdbapi.com/?t=${searchQuery}&apikey=trilogy`);
+                const omdbResponse = await axios.get(`https://www.omdbapi.com/?t=${searchQuery}&apikey=${process.env.OMDB_API_KEY}`);
                 if (omdbResponse.data.Response === 'True') {
                     ratings.imdb = {
                         rating: omdbResponse.data.imdbRating,

@@ -1,7 +1,8 @@
 // MongoDB Atlas Connection Configuration
 const mongoose = require('mongoose');
 
-const MONGODB_URI = 'mongodb+srv://davidbruzil_db_user:HsDK9gcjmf5jdBSj@cluster0.uvfwkum.mongodb.net/netflix?retryWrites=true&w=majority&appName=Cluster0';
+// Load MongoDB URI from environment variables
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const connectDB = async () => {
     try {

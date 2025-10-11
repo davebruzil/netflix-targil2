@@ -1,6 +1,9 @@
 // Netflix Clone Backend Server
 // Main server file handling API routes and static file serving
 
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -49,11 +52,11 @@ app.use((req, res, next) => {
 
 // Session middleware with MongoDB store
 app.use(session({
-    secret: 'netflix-clone-secret-key-change-in-production',
+    secret: process.env.SESSION_SECRET || 'netflix-clone-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: 'mongodb+srv://davidbruzil_db_user:HsDK9gcjmf5jdBSj@cluster0.uvfwkum.mongodb.net/netflix?retryWrites=true&w=majority&appName=Cluster0',
+        mongoUrl: process.env.MONGODB_URI,
         touchAfter: 24 * 3600 // Lazy session update (24 hours)
     }),
     cookie: {
