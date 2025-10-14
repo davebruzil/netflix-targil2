@@ -516,16 +516,6 @@ class SettingsManager {
 
         this.renderDailyViewsChart(demoDailyViews);
         this.renderGenreChart(demoGenreData);
-
-        // Show message that this is demo data
-        const statsSection = document.querySelector('.statistics-section');
-        if (statsSection) {
-            const demoNote = document.createElement('div');
-            demoNote.className = 'alert alert-info mt-3';
-            demoNote.style.cssText = 'background-color: #1a4d6d; border-color: #2a5d7d; color: #a8d8ff;';
-            demoNote.innerHTML = '<strong>Note:</strong> Showing demo data. Start watching content and liking shows to see your real statistics!';
-            statsSection.appendChild(demoNote);
-        }
     }
 
     /**
