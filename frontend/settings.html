@@ -187,6 +187,30 @@
             border-color: #e50914;
             box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
         }
+
+        /* Statistics Section Styles */
+        .statistics-section {
+            margin-top: 40px;
+        }
+
+        .statistics-section .profile-form {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .statistics-section canvas {
+            max-height: 320px !important;
+            height: 320px !important;
+        }
+
+        #dailyViewsChart {
+            max-width: 100%;
+        }
+
+        #genreChart {
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -257,7 +281,7 @@
             </div>
 
             <!-- Existing Profiles List -->
-            <div class="profiles-list-section">
+            <div class="profiles-list-section mb-5">
                 <h3 class="text-white mb-3">Your Profiles</h3>
                 <div id="profilesList">
                     <!-- Profiles will be rendered here dynamically -->
@@ -266,10 +290,38 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Statistics Section -->
+            <div class="statistics-section">
+                <h3 class="text-white mb-4">Statistics</h3>
+
+                <div class="row">
+                    <!-- Daily Views Bar Chart -->
+                    <div class="col-md-7 mb-4">
+                        <div class="profile-form">
+                            <h5 class="text-white mb-3">Daily Views by Profile</h5>
+                            <div style="position: relative; height: 320px;">
+                                <canvas id="dailyViewsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Genre Popularity Pie Chart -->
+                    <div class="col-md-5 mb-4">
+                        <div class="profile-form">
+                            <h5 class="text-white mb-3">Content Popularity by Genre</h5>
+                            <div style="position: relative; height: 320px;">
+                                <canvas id="genreChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="config.js"></script>
     <script src="api/api-config.js"></script>
     <script src="api/netflix-api.js"></script>

@@ -1,4 +1,5 @@
 const Profile = require('../models/Profile');
+const ProfileInteraction = require('../schemas/ProfileInteractionSchema');
 
 class ProfileController {
     constructor() {
@@ -282,6 +283,167 @@ class ProfileController {
             res.status(500).json({
                 success: false,
                 error: 'Failed to get continue watching',
+                message: error.message
+            });
+        }
+    }
+
+    async getStatistics(req, res) {
+        try {
+            const { userId } = req.params;
+
+            if (!userId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'User ID is required'
+                });
+            }
+
+            // Get all profiles for this user
+            const profiles = await this.profileModel.getProfilesByUserId(userId);
+
+            if (!profiles || profiles.length === 0) {
+                return res.json({
+                    success: true,
+                    data: {
+                        dailyViews: {
+                            labels: [],
+                            datasets: []
+                        },
+                        genrePopularity: {
+                            labels: [],
+                            data: []
+                        }
+                    }
+                });
+            }
+
+            const profileIds = profiles.map(p => p._id);
+
+            // Get daily views for each profile (last 7 days)
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            const dailyViewsData = await ProfileInteraction.aggregate([
+                {
+                    $match: {
+                        profileId: { $in: profileIds },
+                        'activityLog.timestamp': { $gte: sevenDaysAgo },
+                        'activityLog.action': 'watch'
+                    }
+                },
+                { $unwind: '$activityLog' },
+                {
+                    $match: {
+                        'activityLog.action': 'watch',
+                        'activityLog.timestamp': { $gte: sevenDaysAgo }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            profileId: '$profileId',
+                            date: {
+                                $dateToString: {
+                                    format: '%Y-%m-%d',
+                                    date: '$activityLog.timestamp'
+                                }
+                            }
+                        },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $sort: { '_id.date': 1 }
+                }
+            ]);
+
+            // Format daily views for Chart.js
+            const dailyViews = {};
+            profiles.forEach(profile => {
+                dailyViews[profile.name] = [];
+            });
+
+            const dates = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                dates.push(dateStr);
+
+                profiles.forEach(profile => {
+                    dailyViews[profile.name].push(0);
+                });
+            }
+
+            dailyViewsData.forEach(item => {
+                const profile = profiles.find(p => p._id.toString() === item._id.profileId.toString());
+                if (profile) {
+                    const dateIndex = dates.indexOf(item._id.date);
+                    if (dateIndex !== -1) {
+                        dailyViews[profile.name][dateIndex] = item.count;
+                    }
+                }
+            });
+
+            // Get genre popularity (from liked content)
+            const genreData = await ProfileInteraction.aggregate([
+                {
+                    $match: {
+                        profileId: { $in: profileIds }
+                    }
+                },
+                { $unwind: '$likedContent' },
+                {
+                    $lookup: {
+                        from: 'contents',
+                        localField: 'likedContent',
+                        foreignField: '_id',
+                        as: 'contentInfo'
+                    }
+                },
+                { $unwind: { path: '$contentInfo', preserveNullAndEmptyArrays: true } },
+                {
+                    $group: {
+                        _id: '$contentInfo.genre',
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $match: {
+                        _id: { $ne: null }
+                    }
+                },
+                {
+                    $sort: { count: -1 }
+                }
+            ]);
+
+            res.json({
+                success: true,
+                data: {
+                    dailyViews: {
+                        labels: dates.map(d => {
+                            const date = new Date(d);
+                            return `${date.getMonth() + 1}/${date.getDate()}`;
+                        }),
+                        datasets: Object.keys(dailyViews).map((profileName, index) => ({
+                            label: profileName,
+                            data: dailyViews[profileName],
+                            backgroundColor: `hsl(${index * 60}, 70%, 50%)`
+                        }))
+                    },
+                    genrePopularity: {
+                        labels: genreData.map(g => g._id || 'Unknown'),
+                        data: genreData.map(g => g.count)
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error getting statistics:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get statistics',
                 message: error.message
             });
         }

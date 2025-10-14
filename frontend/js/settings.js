@@ -19,6 +19,8 @@ class SettingsManager {
             'https://i.pravatar.cc/150?img=9',
             'https://i.pravatar.cc/150?img=10'
         ];
+        this.dailyViewsChart = null;
+        this.genreChart = null;
         this.init();
     }
 
@@ -100,6 +102,9 @@ class SettingsManager {
 
             this.updateProfileCount();
             this.renderProfiles();
+
+            // Load statistics after profiles are loaded
+            await this.loadStatistics();
         } catch (error) {
             console.error('Error loading profiles:', error);
             this.showError('Failed to load profiles. Please refresh the page.');
@@ -439,6 +444,200 @@ class SettingsManager {
             toast.remove();
             style.remove();
         }, 4000);
+    }
+
+    /**
+     * Load and render statistics charts
+     */
+    async loadStatistics() {
+        try {
+            console.log('Loading statistics for user:', this.currentUser.id);
+
+            const response = await fetch(`${API_CONFIG.BASE_URL}/profiles/statistics/${this.currentUser.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch statistics');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log('Statistics data:', result.data);
+
+                // Check if there's any data
+                const hasViews = result.data.dailyViews.datasets && result.data.dailyViews.datasets.some(d => d.data.some(v => v > 0));
+                const hasGenres = result.data.genrePopularity.data && result.data.genrePopularity.data.length > 0;
+
+                if (!hasViews && !hasGenres) {
+                    // Show demo data if no real data exists
+                    console.log('No real data, showing demo data');
+                    this.renderDemoStatistics();
+                } else {
+                    this.renderDailyViewsChart(result.data.dailyViews);
+                    this.renderGenreChart(result.data.genrePopularity);
+                }
+            } else {
+                console.error('Failed to load statistics:', result.error);
+                this.renderDemoStatistics();
+            }
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+            this.renderDemoStatistics();
+        }
+    }
+
+    /**
+     * Render demo statistics when no real data is available
+     */
+    renderDemoStatistics() {
+        // Demo daily views data
+        const demoDailyViews = {
+            labels: ['10/8', '10/9', '10/10', '10/11', '10/12', '10/13', '10/14'],
+            datasets: [
+                {
+                    label: 'Demo Profile',
+                    data: [5, 8, 3, 12, 7, 9, 15],
+                    backgroundColor: 'hsl(0, 70%, 50%)'
+                }
+            ]
+        };
+
+        // Demo genre data
+        const demoGenreData = {
+            labels: ['Action', 'Drama', 'Comedy', 'Thriller', 'Romance'],
+            data: [25, 18, 12, 10, 8]
+        };
+
+        this.renderDailyViewsChart(demoDailyViews);
+        this.renderGenreChart(demoGenreData);
+
+        // Show message that this is demo data
+        const statsSection = document.querySelector('.statistics-section');
+        if (statsSection) {
+            const demoNote = document.createElement('div');
+            demoNote.className = 'alert alert-info mt-3';
+            demoNote.style.cssText = 'background-color: #1a4d6d; border-color: #2a5d7d; color: #a8d8ff;';
+            demoNote.innerHTML = '<strong>Note:</strong> Showing demo data. Start watching content and liking shows to see your real statistics!';
+            statsSection.appendChild(demoNote);
+        }
+    }
+
+    /**
+     * Render daily views bar chart
+     */
+    renderDailyViewsChart(data) {
+        const ctx = document.getElementById('dailyViewsChart');
+        if (!ctx) return;
+
+        // Destroy existing chart if it exists
+        if (this.dailyViewsChart) {
+            this.dailyViewsChart.destroy();
+        }
+
+        this.dailyViewsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels || [],
+                datasets: data.datasets || []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            color: '#e5e5e5',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#e5e5e5',
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#e5e5e5'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Render genre popularity pie chart
+     */
+    renderGenreChart(data) {
+        const ctx = document.getElementById('genreChart');
+        if (!ctx) return;
+
+        // Destroy existing chart if it exists
+        if (this.genreChart) {
+            this.genreChart.destroy();
+        }
+
+        // Generate colors for pie chart
+        const colors = data.labels ? data.labels.map((_, index) => {
+            const hue = (index * 360 / data.labels.length);
+            return `hsl(${hue}, 70%, 60%)`;
+        }) : [];
+
+        this.genreChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.labels || [],
+                datasets: [{
+                    data: data.data || [],
+                    backgroundColor: colors,
+                    borderColor: '#2a2a2a',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            color: '#e5e5e5',
+                            font: {
+                                size: 11
+                            },
+                            padding: 10
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
     }
 }
 
