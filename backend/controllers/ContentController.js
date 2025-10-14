@@ -61,18 +61,31 @@ class ContentController {
                 });
             }
 
-            const results = await this.contentModel.searchContent(query, limit);
+            // Search both MongoDB and TMDB in parallel
+            const [dbResults, tmdbResults] = await Promise.all([
+                this.contentModel.searchContent(query, Math.ceil(limit / 2)),
+                this.searchTMDB(query, Math.ceil(limit / 2))
+            ]);
+
+            // Combine results (DB results first, then TMDB)
+            const combinedResults = [...dbResults, ...tmdbResults].slice(0, parseInt(limit));
+
+            console.log(`🔍 Search results: ${dbResults.length} from DB, ${tmdbResults.length} from TMDB`);
 
             // Track search history if profileId provided
-            if (profileId && results.length > 0) {
-                await this.trackSearchHistory(profileId, query.trim(), results.length);
+            if (profileId && combinedResults.length > 0) {
+                await this.trackSearchHistory(profileId, query.trim(), combinedResults.length);
             }
 
             res.json({
                 success: true,
-                data: results,
+                data: combinedResults,
                 query: query,
-                resultsCount: results.length
+                resultsCount: combinedResults.length,
+                sources: {
+                    database: dbResults.length,
+                    tmdb: tmdbResults.length
+                }
             });
         } catch (error) {
             res.status(500).json({
@@ -80,6 +93,51 @@ class ContentController {
                 error: 'Search failed',
                 message: error.message
             });
+        }
+    }
+
+    // Helper method to search TMDB API
+    async searchTMDB(query, limit = 10) {
+        try {
+            const axios = require('axios');
+
+            const response = await axios.get('https://api.themoviedb.org/3/search/multi', {
+                params: {
+                    api_key: process.env.TMDB_API_KEY,
+                    query: query,
+                    page: 1
+                }
+            });
+
+            if (!response.data || !response.data.results) {
+                return [];
+            }
+
+            // Format TMDB results to match our content structure
+            const formattedResults = response.data.results
+                .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
+                .slice(0, limit)
+                .map(item => ({
+                    id: `${item.media_type}_${item.id}`,
+                    _id: `${item.media_type}_${item.id}`,
+                    title: item.title || item.name,
+                    description: item.overview || 'No description available.',
+                    image: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null,
+                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : null,
+                    rating: item.vote_average ? parseFloat(item.vote_average.toFixed(1)) : 0,
+                    year: item.release_date ? new Date(item.release_date).getFullYear() :
+                          item.first_air_date ? new Date(item.first_air_date).getFullYear() : null,
+                    genre: item.media_type === 'movie' ? 'Movie' : 'TV Show',
+                    category: item.media_type === 'movie' ? 'Movie' : 'Series',
+                    popularity: item.popularity || 0,
+                    likes: Math.floor(item.vote_count / 100) || 0,
+                    source: 'tmdb'
+                }));
+
+            return formattedResults;
+        } catch (error) {
+            console.error('TMDB search error:', error.message);
+            return [];
         }
     }
 
@@ -206,48 +264,58 @@ class ContentController {
         }
     }
 
-    // Helper method to track search history
-    async trackSearchHistory(profileId, query, resultsCount) {
-        try {
-            console.log(`📝 Tracking search history for profile: ${profileId}, Query: "${query}", Results: ${resultsCount}`);
+    // Helper method to track search history with retry logic for version conflicts
+    async trackSearchHistory(profileId, query, resultsCount, retries = 3) {
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                console.log(`📝 Tracking search history for profile: ${profileId}, Query: "${query}", Results: ${resultsCount} (Attempt ${attempt + 1})`);
 
-            // Find or create profile interaction
-            let interaction = await this.contentModel.interactionModel.findOne({ profileId });
-            if (!interaction) {
-                interaction = new this.contentModel.interactionModel({
-                    profileId,
-                    likedContent: [],
-                    watchProgress: new Map(),
-                    searchHistory: [],
-                    activityLog: []
-                });
+                // Use findOneAndUpdate with atomic operations to avoid version conflicts
+                const result = await this.contentModel.interactionModel.findOneAndUpdate(
+                    { profileId },
+                    {
+                        $push: {
+                            searchHistory: {
+                                $each: [{
+                                    query: query,
+                                    resultsCount: resultsCount,
+                                    timestamp: new Date()
+                                }],
+                                $position: 0,
+                                $slice: 50 // Keep only last 50 searches
+                            },
+                            activityLog: {
+                                $each: [{
+                                    action: 'search',
+                                    query: query,
+                                    resultsCount: resultsCount,
+                                    timestamp: new Date()
+                                }],
+                                $position: 0,
+                                $slice: 100 // Keep only last 100 activities
+                            }
+                        }
+                    },
+                    {
+                        upsert: true, // Create if doesn't exist
+                        new: true,
+                        setDefaultsOnInsert: true
+                    }
+                );
+
+                console.log(`✅ Search history saved for profile: ${profileId}`);
+                return; // Success, exit retry loop
+            } catch (error) {
+                if (error.name === 'VersionError' && attempt < retries - 1) {
+                    console.warn(`⚠️ Version conflict on attempt ${attempt + 1}, retrying...`);
+                    // Wait a bit before retrying to reduce conflicts
+                    await new Promise(resolve => setTimeout(resolve, 50 * (attempt + 1)));
+                    continue;
+                } else {
+                    console.error('Failed to track search history:', error.message);
+                    return; // Give up after retries
+                }
             }
-
-            // Add to search history
-            interaction.searchHistory.unshift({
-                query: query,
-                resultsCount: resultsCount,
-                timestamp: new Date()
-            });
-
-            // Keep only last 50 searches
-            interaction.searchHistory = interaction.searchHistory.slice(0, 50);
-
-            // Add to activity log
-            interaction.activityLog.unshift({
-                action: 'search',
-                query: query,
-                resultsCount: resultsCount,
-                timestamp: new Date()
-            });
-
-            // Keep only last 100 activities
-            interaction.activityLog = interaction.activityLog.slice(0, 100);
-
-            await interaction.save();
-            console.log(`✅ Search history saved for profile: ${profileId}`);
-        } catch (error) {
-            console.error('Failed to track search history:', error);
         }
     }
 

@@ -167,11 +167,16 @@ class Content {
     // Get liked content for profile
     async getLikedContent(profileId) {
         try {
-            const interaction = await this.interactionModel.findOne({ profileId }).populate('likedContent');
-            if (!interaction) {
+            const interaction = await this.interactionModel.findOne({ profileId });
+            if (!interaction || !interaction.likedContent || interaction.likedContent.length === 0) {
                 return [];
             }
-            return interaction.likedContent;
+
+            // Return array of objects with id field for frontend compatibility
+            // This ensures the frontend can use likedItems.has(item.id)
+            return interaction.likedContent.map(contentId => ({
+                id: contentId.toString()
+            }));
         } catch (error) {
             console.error('Error getting liked content:', error);
             return [];

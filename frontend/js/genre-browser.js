@@ -52,12 +52,26 @@ class GenreBrowser {
             });
             const result = await response.json();
 
-            if (result.success && result.data.genres) {
+            if (result.success && result.data.genres && result.data.genres.length > 0) {
                 this.genres = result.data.genres;
+                console.log('✅ Loaded genres from API:', this.genres.length, 'genres');
+            } else {
+                console.warn('⚠️ API returned no genres, using comprehensive fallback list');
+                this.genres = [
+                    'Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
+                    'Documentary', 'Drama', 'Family', 'Fantasy', 'History',
+                    'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction',
+                    'Thriller', 'War', 'Western', 'TV Movie'
+                ];
             }
         } catch (error) {
-            console.error('Failed to load genres:', error);
-            this.genres = ['Action', 'Comedy', 'Drama', 'Thriller', 'Crime'];
+            console.error('❌ Failed to load genres:', error);
+            this.genres = [
+                'Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
+                'Documentary', 'Drama', 'Family', 'Fantasy', 'History',
+                'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction',
+                'Thriller', 'War', 'Western', 'TV Movie'
+            ];
         }
     }
 
@@ -66,11 +80,23 @@ class GenreBrowser {
         document.getElementById('genreTitle').textContent = this.currentGenre;
         document.getElementById('genreDescription').textContent = `Explore ${this.currentGenre} content`;
 
-        // Populate genre selector
+        // Update genre selector - ONLY set the selected value, don't overwrite HTML options
         const genreSelect = document.getElementById('genreSelect');
-        genreSelect.innerHTML = this.genres.map(genre =>
-            `<option value="${genre}" ${genre === this.currentGenre ? 'selected' : ''}>${genre}</option>`
-        ).join('');
+
+        // Check if the HTML dropdown already has options (hardcoded in HTML)
+        const existingOptions = genreSelect.querySelectorAll('option');
+
+        if (existingOptions.length === 0 && this.genres && this.genres.length > 0) {
+            // Only populate if HTML has no options (shouldn't happen with current HTML)
+            genreSelect.innerHTML = this.genres.map(genre =>
+                `<option value="${genre}" ${genre === this.currentGenre ? 'selected' : ''}>${genre}</option>`
+            ).join('');
+            console.log('📋 Populated genre dropdown with', this.genres.length, 'genres');
+        } else {
+            // HTML already has options, just set the selected value
+            genreSelect.value = this.currentGenre;
+            console.log('📋 Using HTML dropdown options (' + existingOptions.length + ' genres), selected:', this.currentGenre);
+        }
 
         // Set initial sort value
         document.getElementById('sortSelect').value = this.currentSort;

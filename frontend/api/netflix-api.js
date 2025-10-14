@@ -283,7 +283,7 @@ class NetflixAPI {
 
     // ===== BACKEND INTEGRATION =====
 
-    static async searchContent(query, limit = 20) {
+    static async searchContentBackend(query, limit = 20) {
         try {
             const profileId = this.getCurrentProfileId();
             const url = `${this.BACKEND_URL}/content/search?q=${encodeURIComponent(query)}&limit=${limit}${profileId ? `&profileId=${profileId}` : ''}`;
