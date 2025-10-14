@@ -18,6 +18,9 @@ router.post('/', (req, res) => profileController.createProfile(req, res));
 // This MUST come before /:id to avoid route conflicts
 router.get('/user/:userId', (req, res) => profileController.getUserProfiles(req, res));
 
+// GET /api/profiles/statistics/:userId - Get statistics for user's profiles
+router.get('/statistics/:userId', (req, res) => profileController.getStatistics(req, res));
+
 // GET /api/profiles/:id - Get specific profile by ID
 router.get('/:id', (req, res) => profileController.getProfileById(req, res));
 

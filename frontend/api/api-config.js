@@ -6,7 +6,8 @@ const API_CONFIG = {
     get TMDB_BASE_URL() { return window.AppConfig?.get('TMDB_BASE_URL') || 'https://api.themoviedb.org/3'; },
     get API_KEY() { return window.AppConfig?.get('TMDB_API_KEY') || ''; },
     get IMAGE_BASE_URL() { return window.AppConfig?.get('IMAGE_BASE_URL') || 'https://image.tmdb.org/t/p/w500'; },
-    get BACKDROP_BASE_URL() { return window.AppConfig?.get('BACKDROP_BASE_URL') || 'https://image.tmdb.org/t/p/w1280'; }
+    get BACKDROP_BASE_URL() { return window.AppConfig?.get('BACKDROP_BASE_URL') || 'https://image.tmdb.org/t/p/w1280'; },
+    get BASE_URL() { return window.AppConfig?.get('BACKEND_URL') || 'http://localhost:5000/api'; }
 };
 
 // Popular movie/TV show IDs from TMDB
