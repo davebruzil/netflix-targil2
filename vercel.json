@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/video/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot))",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/main.html",
+      "dest": "/frontend/main.html"
+    },
+    {
+      "src": "/admin.html",
+      "dest": "/frontend/admin.html"
+    },
+    {
+      "src": "/settings.html",
+      "dest": "/frontend/settings.html"
+    },
+    {
+      "src": "/genre.html",
+      "dest": "/frontend/genre.html"
+    },
+    {
+      "src": "/movie-profile.html",
+      "dest": "/frontend/movie-profile.html"
+    },
+    {
+      "src": "/profiles.html",
+      "dest": "/frontend/profiles.html"
+    },
+    {
+      "src": "/player.html",
+      "dest": "/frontend/player.html"
+    },
+    {
+      "src": "/content-manager.html",
+      "dest": "/frontend/content-manager.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
