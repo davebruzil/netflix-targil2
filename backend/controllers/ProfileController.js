@@ -320,70 +320,62 @@ class ProfileController {
 
             const profileIds = profiles.map(p => p._id);
 
-            // Get daily views for each profile (last 7 days)
+            // Get daily watch activity for each profile (last 7 days)
+            // This tracks watchProgress updates (every time someone watches content)
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-            const dailyViewsData = await ProfileInteraction.aggregate([
-                {
-                    $match: {
-                        profileId: { $in: profileIds },
-                        'activityLog.timestamp': { $gte: sevenDaysAgo },
-                        'activityLog.action': 'watch'
-                    }
-                },
-                { $unwind: '$activityLog' },
-                {
-                    $match: {
-                        'activityLog.action': 'watch',
-                        'activityLog.timestamp': { $gte: sevenDaysAgo }
-                    }
-                },
-                {
-                    $group: {
-                        _id: {
-                            profileId: '$profileId',
-                            date: {
-                                $dateToString: {
-                                    format: '%Y-%m-%d',
-                                    date: '$activityLog.timestamp'
-                                }
-                            }
-                        },
-                        count: { $sum: 1 }
-                    }
-                },
-                {
-                    $sort: { '_id.date': 1 }
+            // Get all interactions and process watchProgress Map
+            const interactions = await ProfileInteraction.find({
+                profileId: { $in: profileIds }
+            });
+
+            // Process watchProgress to count daily activities
+            const dailyWatchCounts = {};
+
+            interactions.forEach(interaction => {
+                const profile = profiles.find(p => p._id.toString() === interaction.profileId.toString());
+                if (!profile) return;
+
+                if (!dailyWatchCounts[profile.name]) {
+                    dailyWatchCounts[profile.name] = {};
                 }
-            ]);
+
+                // Convert Map to array and process
+                if (interaction.watchProgress && interaction.watchProgress.size > 0) {
+                    Array.from(interaction.watchProgress.entries()).forEach(([contentId, progressData]) => {
+                        const lastWatchedDate = new Date(progressData.lastWatched);
+
+                        // Only count if within last 7 days
+                        if (lastWatchedDate >= sevenDaysAgo) {
+                            const dateStr = lastWatchedDate.toISOString().split('T')[0];
+                            dailyWatchCounts[profile.name][dateStr] = (dailyWatchCounts[profile.name][dateStr] || 0) + 1;
+                        }
+                    });
+                }
+            });
 
             // Format daily views for Chart.js
             const dailyViews = {};
-            profiles.forEach(profile => {
-                dailyViews[profile.name] = [];
-            });
-
             const dates = [];
+
+            // Create date labels for last 7 days
             for (let i = 6; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const dateStr = date.toISOString().split('T')[0];
                 dates.push(dateStr);
-
-                profiles.forEach(profile => {
-                    dailyViews[profile.name].push(0);
-                });
             }
 
-            dailyViewsData.forEach(item => {
-                const profile = profiles.find(p => p._id.toString() === item._id.profileId.toString());
-                if (profile) {
-                    const dateIndex = dates.indexOf(item._id.date);
-                    if (dateIndex !== -1) {
-                        dailyViews[profile.name][dateIndex] = item.count;
-                    }
-                }
+            // Initialize data arrays for each profile
+            profiles.forEach(profile => {
+                dailyViews[profile.name] = [];
+
+                // Fill in the counts for each date
+                dates.forEach(dateStr => {
+                    const count = (dailyWatchCounts[profile.name] && dailyWatchCounts[profile.name][dateStr]) || 0;
+                    dailyViews[profile.name].push(count);
+                });
             });
 
             // Get genre popularity (from liked content)
