@@ -19,6 +19,9 @@ class GenreBrowser {
         // Check authentication
         this.checkAuth();
 
+        // Load profile photo
+        this.loadProfile();
+
         // Load genres
         await this.loadGenres();
 
@@ -35,6 +38,12 @@ class GenreBrowser {
 
         // Setup infinite scroll
         this.setupInfiniteScroll();
+    }
+
+    loadProfile() {
+        const profileId = localStorage.getItem('netflix:profileId');
+        const profileName = localStorage.getItem('netflix:profileName') || 'User';
+        NetflixUI.loadProfile(profileId, profileName);
     }
 
     checkAuth() {

@@ -45,12 +45,21 @@ class SettingsManager {
             return;
         }
 
+        // Load profile photo
+        this.loadProfile();
+
         // Setup UI
         this.renderAvatarOptions();
         this.setupEventListeners();
 
         // Load profiles
         await this.loadProfiles();
+    }
+
+    loadProfile() {
+        const profileId = localStorage.getItem('netflix:profileId');
+        const profileName = localStorage.getItem('netflix:profileName') || 'User';
+        NetflixUI.loadProfile(profileId, profileName);
     }
 
     /**
@@ -453,8 +462,7 @@ class SettingsManager {
         try {
             console.log('Loading statistics for user:', this.currentUser.id);
 
-            const baseUrl = window.AppConfig?.get('BACKEND_URL') || 'http://localhost:5000/api';
-            const response = await fetch(`${baseUrl}/profiles/statistics/${this.currentUser.id}`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/profiles/statistics/${this.currentUser.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -471,63 +479,58 @@ class SettingsManager {
             if (result.success) {
                 console.log('Statistics data:', result.data);
 
-                // Always render real data (even if empty)
+                // Always render real data from DB (even if empty)
                 this.renderDailyViewsChart(result.data.dailyViews);
                 this.renderGenreChart(result.data.genrePopularity);
+
+                // Check if there's any actual data
+                const hasViews = result.data.dailyViews.datasets && result.data.dailyViews.datasets.some(d => d.data && d.data.some(v => v > 0));
+                const hasGenres = result.data.genrePopularity.data && result.data.genrePopularity.data.length > 0;
+
+                // Show informational message if no data yet
+                if (!hasViews && !hasGenres) {
+                    this.showNoDataMessage();
+                }
             } else {
                 console.error('Failed to load statistics:', result.error);
-                // Show empty charts on error
+                // Show empty charts
                 this.renderDailyViewsChart({ labels: [], datasets: [] });
                 this.renderGenreChart({ labels: [], data: [] });
+                this.showNoDataMessage('Error loading statistics. Please try again later.');
             }
         } catch (error) {
             console.error('Error loading statistics:', error);
-            // Show empty charts on error
+            // Show empty charts
             this.renderDailyViewsChart({ labels: [], datasets: [] });
             this.renderGenreChart({ labels: [], data: [] });
+            this.showNoDataMessage('Error loading statistics. Please try again later.');
         }
     }
 
     /**
-     * Render demo statistics when no real data is available
+     * Show message when there's no statistics data
      */
-    renderDemoStatistics() {
-        // Generate demo data based on actual user profiles
-        const datasets = this.profiles.map((profile, index) => {
-            // Generate random demo data for each profile
-            const data = [];
-            for (let i = 0; i < 7; i++) {
-                data.push(Math.floor(Math.random() * 15) + 1); // Random 1-15 views
-            }
+    showNoDataMessage(customMessage = null) {
+        const statsSection = document.querySelector('.statistics-section');
+        if (!statsSection) return;
 
-            return {
-                label: profile.name,
-                data: data,
-                backgroundColor: `hsl(${index * 60}, 70%, 50%)`
-            };
-        });
-
-        // Generate date labels for last 7 days
-        const labels = [];
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+        // Remove existing note if any
+        const existingNote = statsSection.querySelector('.no-data-note');
+        if (existingNote) {
+            existingNote.remove();
         }
 
-        const demoDailyViews = {
-            labels: labels,
-            datasets: datasets
-        };
+        const infoNote = document.createElement('div');
+        infoNote.className = 'alert alert-info mt-3 no-data-note';
+        infoNote.style.cssText = 'background-color: #1a4d6d; border-color: #2a5d7d; color: #a8d8ff; border-radius: 8px; padding: 15px;';
 
-        // Demo genre data
-        const demoGenreData = {
-            labels: ['Action', 'Drama', 'Comedy', 'Thriller', 'Romance'],
-            data: [25, 18, 12, 10, 8]
-        };
+        if (customMessage) {
+            infoNote.innerHTML = `<strong>⚠️ Notice:</strong> ${customMessage}`;
+        } else {
+            infoNote.innerHTML = '<strong>📊 No Data Yet:</strong> Start watching content and liking shows to see your statistics here!';
+        }
 
-        this.renderDailyViewsChart(demoDailyViews);
-        this.renderGenreChart(demoGenreData);
+        statsSection.appendChild(infoNote);
     }
 
     /**
@@ -540,41 +543,6 @@ class SettingsManager {
         // Destroy existing chart if it exists
         if (this.dailyViewsChart) {
             this.dailyViewsChart.destroy();
-        }
-
-        // Check if there's any data
-        const hasData = data.datasets && data.datasets.length > 0 &&
-                       data.datasets.some(d => d.data && d.data.some(v => v > 0));
-
-        if (!hasData) {
-            // Show "No data yet" message
-            const canvas = ctx;
-            const parent = canvas.parentElement;
-            parent.style.position = 'relative';
-
-            let noDataMsg = parent.querySelector('.no-data-message');
-            if (!noDataMsg) {
-                noDataMsg = document.createElement('div');
-                noDataMsg.className = 'no-data-message';
-                noDataMsg.style.cssText = `
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: #999;
-                    font-size: 14px;
-                    text-align: center;
-                `;
-                noDataMsg.innerHTML = '📊 No viewing activity yet<br><small>Watch some content to see statistics!</small>';
-                parent.appendChild(noDataMsg);
-            }
-            noDataMsg.style.display = 'block';
-            canvas.style.opacity = '0.1';
-        } else {
-            // Hide no data message if it exists
-            const noDataMsg = ctx.parentElement.querySelector('.no-data-message');
-            if (noDataMsg) noDataMsg.style.display = 'none';
-            ctx.style.opacity = '1';
         }
 
         this.dailyViewsChart = new Chart(ctx, {
@@ -635,40 +603,6 @@ class SettingsManager {
         // Destroy existing chart if it exists
         if (this.genreChart) {
             this.genreChart.destroy();
-        }
-
-        // Check if there's any data
-        const hasData = data.data && data.data.length > 0 && data.data.some(v => v > 0);
-
-        if (!hasData) {
-            // Show "No data yet" message
-            const canvas = ctx;
-            const parent = canvas.parentElement;
-            parent.style.position = 'relative';
-
-            let noDataMsg = parent.querySelector('.no-data-message-genre');
-            if (!noDataMsg) {
-                noDataMsg = document.createElement('div');
-                noDataMsg.className = 'no-data-message-genre';
-                noDataMsg.style.cssText = `
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: #999;
-                    font-size: 14px;
-                    text-align: center;
-                `;
-                noDataMsg.innerHTML = '❤️ No liked content yet<br><small>Like some content to see genre preferences!</small>';
-                parent.appendChild(noDataMsg);
-            }
-            noDataMsg.style.display = 'block';
-            canvas.style.opacity = '0.1';
-        } else {
-            // Hide no data message if it exists
-            const noDataMsg = ctx.parentElement.querySelector('.no-data-message-genre');
-            if (noDataMsg) noDataMsg.style.display = 'none';
-            ctx.style.opacity = '1';
         }
 
         // Generate colors for pie chart

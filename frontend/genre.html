@@ -191,11 +191,19 @@
                 <div class="d-flex align-items-center">
                     <div class="dropdown">
                         <div class="profile-dropdown-container d-flex align-items-center" data-bs-toggle="dropdown" style="cursor: pointer;">
-                            <div class="profile-icon" style="width: 32px; height: 32px; background-color: #666; border-radius: 4px;"></div>
-                            <div class="dropdown-arrow ms-1" style="color: white; font-size: 12px;">▼</div>
+                            <div class="profile-icon" id="currentProfileAvatar" style="width: 32px; height: 32px; background-color: #666; border-radius: 4px; overflow: hidden;">
+                                <img id="profileImage" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            </div>
+                            <div class="dropdown-arrow ms-1" style="color: white; font-size: 12px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 9L12 15L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="main.html">Home</a></li>
+                            <li><a class="dropdown-item" href="profiles.html"><i class="fas fa-user-circle me-2"></i>Switch Profiles</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Manage Profiles & Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" onclick="netflixLogout()">Sign out</a></li>
                         </ul>
                     </div>
@@ -303,8 +311,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="config.js"></script>
     <script src="js/login.js"></script>
+    <!-- API Layer -->
     <script src="api/api-config.js"></script>
     <script src="api/netflix-api.js"></script>
+    <!-- UI Layer -->
+    <script src="js/netflix-ui.js"></script>
     <script src="js/genre-browser.js"></script>
 </body>
 </html>

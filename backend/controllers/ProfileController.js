@@ -1,5 +1,7 @@
 const Profile = require('../models/Profile');
 const ProfileInteraction = require('../schemas/ProfileInteractionSchema');
+const Content = require('../schemas/ContentSchema');
+const { extractGenresFromTMDBLikes } = require('../services/RecommendationEngine');
 
 class ProfileController {
     constructor() {
@@ -306,14 +308,8 @@ class ProfileController {
                 return res.json({
                     success: true,
                     data: {
-                        dailyViews: {
-                            labels: [],
-                            datasets: []
-                        },
-                        genrePopularity: {
-                            labels: [],
-                            data: []
-                        }
+                        dailyViews: [],
+                        genrePopularity: []
                     }
                 });
             }
@@ -378,38 +374,69 @@ class ProfileController {
                 });
             });
 
-            // Get genre popularity (from liked content)
-            const genreData = await ProfileInteraction.aggregate([
+            // Get genre popularity (from activity log likes)
+            // Use activity log to get liked content IDs
+            const likeActivities = await ProfileInteraction.aggregate([
                 {
                     $match: {
-                        profileId: { $in: profileIds }
+                        profileId: { $in: profileIds },
+                        'activityLog.action': 'like'
                     }
                 },
-                { $unwind: '$likedContent' },
+                { $unwind: '$activityLog' },
                 {
-                    $lookup: {
-                        from: 'contents',
-                        localField: 'likedContent',
-                        foreignField: '_id',
-                        as: 'contentInfo'
+                    $match: {
+                        'activityLog.action': 'like'
                     }
                 },
-                { $unwind: { path: '$contentInfo', preserveNullAndEmptyArrays: true } },
                 {
                     $group: {
-                        _id: '$contentInfo.genre',
+                        _id: '$activityLog.contentId',
                         count: { $sum: 1 }
                     }
-                },
-                {
-                    $match: {
-                        _id: { $ne: null }
-                    }
-                },
-                {
-                    $sort: { count: -1 }
                 }
             ]);
+
+            // Get genre statistics from activity log
+            let genreData = [];
+            const genreCounts = {};
+
+            if (likeActivities.length > 0) {
+                // Separate MongoDB IDs from TMDB IDs
+                const mongodbIds = likeActivities
+                    .filter(item => item._id && typeof item._id === 'object')
+                    .map(item => item._id);
+
+                const tmdbIds = likeActivities
+                    .filter(item => typeof item._id === 'string' && (item._id.startsWith('movie_') || item._id.startsWith('tv_')))
+                    .map(item => item._id);
+
+                // Process MongoDB content
+                if (mongodbIds.length > 0) {
+                    const contents = await Content.find({
+                        _id: { $in: mongodbIds }
+                    }).select('genre');
+
+                    contents.forEach(content => {
+                        const genre = content.genre || 'Unknown';
+                        genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+                    });
+                }
+
+                // Process TMDB content
+                if (tmdbIds.length > 0) {
+                    const tmdbGenres = await extractGenresFromTMDBLikes(tmdbIds);
+                    tmdbGenres.forEach(genre => {
+                        genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+                    });
+                }
+
+                // Convert to array and sort
+                genreData = Object.entries(genreCounts)
+                    .map(([genre, count]) => ({ _id: genre, count }))
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 10); // Top 10 genres
+            }
 
             res.json({
                 success: true,

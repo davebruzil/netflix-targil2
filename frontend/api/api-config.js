@@ -3,6 +3,7 @@
 
 // TMDB API Configuration - Using environment config
 const API_CONFIG = {
+    get BASE_URL() { return window.AppConfig?.get('BACKEND_URL') || 'http://localhost:5000/api'; },
     get TMDB_BASE_URL() { return window.AppConfig?.get('TMDB_BASE_URL') || 'https://api.themoviedb.org/3'; },
     get API_KEY() { return window.AppConfig?.get('TMDB_API_KEY') || ''; },
     get IMAGE_BASE_URL() { return window.AppConfig?.get('IMAGE_BASE_URL') || 'https://image.tmdb.org/t/p/w500'; },

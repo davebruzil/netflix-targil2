@@ -41,7 +41,7 @@ const profileInteractionSchema = new mongoose.Schema({
             type: String,
             enum: ['like', 'unlike', 'watch', 'search', 'watch_progress']
         },
-        contentId: mongoose.Schema.Types.ObjectId,
+        contentId: mongoose.Schema.Types.Mixed, // Support both ObjectId and String (for TMDB IDs)
         contentTitle: String,
         timestamp: {
             type: Date,

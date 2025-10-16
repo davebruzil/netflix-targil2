@@ -142,6 +142,31 @@ class Profile {
             }
 
             await profile.save();
+
+            // SYNCHRONIZATION FIX: Also update ProfileInteraction.watchProgress Map
+            // This ensures statistics can track daily views properly
+            const ProfileInteractionSchema = require('../schemas/ProfileInteractionSchema');
+            let interaction = await ProfileInteractionSchema.findOne({ profileId });
+
+            if (!interaction) {
+                interaction = new ProfileInteractionSchema({
+                    profileId,
+                    likedContent: [],
+                    myList: [],
+                    watchProgress: new Map(),
+                    searchHistory: [],
+                    activityLog: []
+                });
+            }
+
+            // Update watchProgress Map for statistics tracking
+            interaction.watchProgress.set(contentId.toString(), {
+                progress: cappedProgress,
+                lastWatched: new Date()
+            });
+
+            await interaction.save();
+
             return profile.watchHistory[existingIndex >= 0 ? existingIndex : profile.watchHistory.length - 1];
         } catch (error) {
             console.error('Error saving watch progress:', error);
