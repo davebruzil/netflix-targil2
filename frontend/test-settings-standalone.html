@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Test - Standalone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #141414;
+            color: white;
+            padding: 20px;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .success { color: #4ecdc4; }
+        .error { color: #e50914; }
+        .warning { color: #ffa500; }
+        button {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #f40612;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #4ecdc4;
+            background: #1a1a1a;
+        }
+        .test-result.error {
+            border-left-color: #e50914;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Settings Page Test Suite</h1>
+    <p>This page tests the Settings functionality without authentication requirements</p>
+
+    <div class="section">
+        <h2>Step 1: Server Connection Test</h2>
+        <button onclick="testServerConnection()">Test Server Connection</button>
+        <div id="serverTest"></div>
+    </div>
+
+    <div class="section">
+        <h2>Step 2: Statistics API Test</h2>
+        <p>Test user ID: <input type="text" id="testUserId" value="68dd8fe8a94a4b0aea31c036" style="width: 300px; background: #333; color: white; border: 1px solid #555; padding: 5px;"></p>
+        <button onclick="testStatistics()">Test Statistics Endpoint</button>
+        <div id="statisticsTest"></div>
+    </div>
+
+    <div class="section">
+        <h2>Step 3: Profile Operations Test</h2>
+        <button onclick="testProfiles()">Test Profile Endpoints</button>
+        <div id="profilesTest"></div>
+    </div>
+
+    <div class="section">
+        <h2>Step 4: Visual Summary</h2>
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        function log(elementId, message, type = 'success') {
+            const el = document.getElementById(elementId);
+            const className = type === 'error' ? 'test-result error' : 'test-result';
+            el.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        async function testServerConnection() {
+            const el = document.getElementById('serverTest');
+            el.innerHTML = '<p>Testing...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/../health`);
+                const data = await response.json();
+
+                if (data.status === 'OK') {
+                    log('serverTest', '✅ Server is running: ' + data.message, 'success');
+                    log('serverTest', '📅 Timestamp: ' + new Date(data.timestamp).toLocaleString(), 'success');
+                } else {
+                    log('serverTest', '❌ Server returned unexpected response', 'error');
+                }
+            } catch (error) {
+                log('serverTest', '❌ Server connection failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testStatistics() {
+            const el = document.getElementById('statisticsTest');
+            el.innerHTML = '<p>Testing statistics endpoint...</p>';
+
+            const userId = document.getElementById('testUserId').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/profiles/statistics/${userId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log('statisticsTest', '✅ Statistics endpoint working!', 'success');
+
+                    // Daily Views
+                    if (data.data.dailyViews && data.data.dailyViews.datasets) {
+                        const totalProfiles = data.data.dailyViews.datasets.length;
+                        log('statisticsTest', `📊 Daily Views: ${totalProfiles} profile(s) tracked`, 'success');
+
+                        data.data.dailyViews.datasets.forEach(dataset => {
+                            const totalViews = dataset.data.reduce((a, b) => a + b, 0);
+                            log('statisticsTest', `  - ${dataset.label}: ${totalViews} views this week`, 'success');
+                        });
+                    }
+
+                    // Genre Popularity
+                    if (data.data.genrePopularity && data.data.genrePopularity.labels) {
+                        const totalGenres = data.data.genrePopularity.labels.length;
+                        log('statisticsTest', `📊 Genre Popularity: ${totalGenres} genre(s)`, 'success');
+
+                        data.data.genrePopularity.labels.forEach((genre, idx) => {
+                            log('statisticsTest', `  - ${genre}: ${data.data.genrePopularity.data[idx]} likes`, 'success');
+                        });
+                    }
+
+                    log('statisticsTest', '<pre>' + JSON.stringify(data.data, null, 2) + '</pre>', 'success');
+                } else {
+                    log('statisticsTest', '⚠️ ' + (data.error || data.message), 'warning');
+                }
+            } catch (error) {
+                log('statisticsTest', '❌ Statistics test failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testProfiles() {
+            const el = document.getElementById('profilesTest');
+            el.innerHTML = '<p>Testing profile endpoints...</p>';
+
+            const userId = document.getElementById('testUserId').value;
+
+            try {
+                // Test GET profiles
+                const response = await fetch(`${API_BASE}/profiles/user/${userId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log('profilesTest', '✅ Profile endpoints working!', 'success');
+                    log('profilesTest', `📊 Found ${data.data.profiles.length} profile(s)`, 'success');
+
+                    data.data.profiles.forEach(profile => {
+                        log('profilesTest', `  - ${profile.name} (${profile.isChild ? 'Kid' : 'Adult'})`, 'success');
+                    });
+
+                    log('profilesTest', '<pre>' + JSON.stringify(data.data.profiles, null, 2) + '</pre>', 'success');
+                } else {
+                    log('profilesTest', '⚠️ ' + (data.error || data.message), 'warning');
+                }
+            } catch (error) {
+                log('profilesTest', '❌ Profile test failed: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testServerConnection();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

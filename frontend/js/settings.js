@@ -469,63 +469,59 @@ class SettingsManager {
 
             if (result.success) {
                 console.log('Statistics data:', result.data);
-                
-                // Check if there's any data
-                const hasViews = result.data.dailyViews.datasets && result.data.dailyViews.datasets.some(d => d.data.some(v => v > 0));
+
+                // Always render real data from DB (even if empty)
+                this.renderDailyViewsChart(result.data.dailyViews);
+                this.renderGenreChart(result.data.genrePopularity);
+
+                // Check if there's any actual data
+                const hasViews = result.data.dailyViews.datasets && result.data.dailyViews.datasets.some(d => d.data && d.data.some(v => v > 0));
                 const hasGenres = result.data.genrePopularity.data && result.data.genrePopularity.data.length > 0;
-                
+
+                // Show informational message if no data yet
                 if (!hasViews && !hasGenres) {
-                    // Show demo data if no real data exists
-                    console.log('No real data, showing demo data');
-                    this.renderDemoStatistics();
-                } else {
-                    this.renderDailyViewsChart(result.data.dailyViews);
-                    this.renderGenreChart(result.data.genrePopularity);
+                    this.showNoDataMessage();
                 }
             } else {
                 console.error('Failed to load statistics:', result.error);
-                this.renderDemoStatistics();
+                // Show empty charts
+                this.renderDailyViewsChart({ labels: [], datasets: [] });
+                this.renderGenreChart({ labels: [], data: [] });
+                this.showNoDataMessage('Error loading statistics. Please try again later.');
             }
         } catch (error) {
             console.error('Error loading statistics:', error);
-            this.renderDemoStatistics();
+            // Show empty charts
+            this.renderDailyViewsChart({ labels: [], datasets: [] });
+            this.renderGenreChart({ labels: [], data: [] });
+            this.showNoDataMessage('Error loading statistics. Please try again later.');
         }
     }
 
     /**
-     * Render demo statistics when no real data is available
+     * Show message when there's no statistics data
      */
-    renderDemoStatistics() {
-        // Demo daily views data
-        const demoDailyViews = {
-            labels: ['10/8', '10/9', '10/10', '10/11', '10/12', '10/13', '10/14'],
-            datasets: [
-                {
-                    label: 'Demo Profile',
-                    data: [5, 8, 3, 12, 7, 9, 15],
-                    backgroundColor: 'hsl(0, 70%, 50%)'
-                }
-            ]
-        };
-
-        // Demo genre data
-        const demoGenreData = {
-            labels: ['Action', 'Drama', 'Comedy', 'Thriller', 'Romance'],
-            data: [25, 18, 12, 10, 8]
-        };
-
-        this.renderDailyViewsChart(demoDailyViews);
-        this.renderGenreChart(demoGenreData);
-
-        // Show message that this is demo data
+    showNoDataMessage(customMessage = null) {
         const statsSection = document.querySelector('.statistics-section');
-        if (statsSection) {
-            const demoNote = document.createElement('div');
-            demoNote.className = 'alert alert-info mt-3';
-            demoNote.style.cssText = 'background-color: #1a4d6d; border-color: #2a5d7d; color: #a8d8ff;';
-            demoNote.innerHTML = '<strong>Note:</strong> Showing demo data. Start watching content and liking shows to see your real statistics!';
-            statsSection.appendChild(demoNote);
+        if (!statsSection) return;
+
+        // Remove existing note if any
+        const existingNote = statsSection.querySelector('.no-data-note');
+        if (existingNote) {
+            existingNote.remove();
         }
+
+        const infoNote = document.createElement('div');
+        infoNote.className = 'alert alert-info mt-3 no-data-note';
+        infoNote.style.cssText = 'background-color: #1a4d6d; border-color: #2a5d7d; color: #a8d8ff; border-radius: 8px; padding: 15px;';
+
+        if (customMessage) {
+            infoNote.innerHTML = `<strong>⚠️ Notice:</strong> ${customMessage}`;
+        } else {
+            infoNote.innerHTML = '<strong>📊 No Data Yet:</strong> Start watching content and liking shows to see your statistics here!';
+        }
+
+        statsSection.appendChild(infoNote);
     }
 
     /**

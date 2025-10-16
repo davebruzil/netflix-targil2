@@ -290,33 +290,56 @@ class ProfileController {
                 }
             });
 
-            // Get genre popularity (from liked content)
-            const genreData = await ProfileInteraction.aggregate([
+            // Get genre popularity (from activity log likes)
+            // Use activity log to get liked content IDs
+            const likeActivities = await ProfileInteraction.aggregate([
                 {
                     $match: {
-                        profileId: { $in: profileIds }
+                        profileId: { $in: profileIds },
+                        'activityLog.action': 'like'
                     }
                 },
-                { $unwind: '$likedContent' },
+                { $unwind: '$activityLog' },
                 {
-                    $lookup: {
-                        from: 'contents',
-                        localField: 'likedContent.id',
-                        foreignField: '_id',
-                        as: 'contentInfo'
+                    $match: {
+                        'activityLog.action': 'like'
                     }
                 },
-                { $unwind: '$contentInfo' },
                 {
                     $group: {
-                        _id: '$contentInfo.genre',
+                        _id: '$activityLog.contentId',
                         count: { $sum: 1 }
                     }
-                },
-                {
-                    $sort: { count: -1 }
                 }
             ]);
+
+            // Get genre statistics from activity log
+            let genreData = [];
+            if (likeActivities.length > 0) {
+                // Extract ObjectIds only (filter out string IDs)
+                const validContentIds = likeActivities
+                    .map(item => item._id)
+                    .filter(id => id && typeof id === 'object'); // Only MongoDB ObjectIds
+
+                if (validContentIds.length > 0) {
+                    const contents = await Content.find({
+                        _id: { $in: validContentIds }
+                    }).select('genre');
+
+                    // Count genres
+                    const genreCounts = {};
+                    contents.forEach(content => {
+                        const genre = content.genre || 'Unknown';
+                        genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+                    });
+
+                    // Convert to array and sort
+                    genreData = Object.entries(genreCounts)
+                        .map(([genre, count]) => ({ _id: genre, count }))
+                        .sort((a, b) => b.count - a.count)
+                        .slice(0, 10); // Top 10 genres
+                }
+            }
 
             res.json({
                 success: true,

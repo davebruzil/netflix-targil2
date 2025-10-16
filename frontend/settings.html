@@ -191,25 +191,36 @@
         /* Statistics Section Styles */
         .statistics-section {
             margin-top: 40px;
+            margin-bottom: 40px;
         }
 
         .statistics-section .profile-form {
-            height: 400px;
+            min-height: 400px;
             display: flex;
             flex-direction: column;
+            padding: 20px;
+        }
+
+        .statistics-section .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
         }
 
         .statistics-section canvas {
-            max-height: 320px !important;
-            height: 320px !important;
+            max-height: 100% !important;
+            width: 100% !important;
         }
 
-        #dailyViewsChart {
-            max-width: 100%;
-        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .statistics-section .profile-form {
+                min-height: 350px;
+            }
 
-        #genreChart {
-            max-width: 100%;
+            .statistics-section .chart-container {
+                height: 280px;
+            }
         }
     </style>
 </head>
@@ -300,7 +311,7 @@
                     <div class="col-md-7 mb-4">
                         <div class="profile-form">
                             <h5 class="text-white mb-3">Daily Views by Profile</h5>
-                            <div style="position: relative; height: 320px;">
+                            <div class="chart-container">
                                 <canvas id="dailyViewsChart"></canvas>
                             </div>
                         </div>
@@ -310,7 +321,7 @@
                     <div class="col-md-5 mb-4">
                         <div class="profile-form">
                             <h5 class="text-white mb-3">Content Popularity by Genre</h5>
-                            <div style="position: relative; height: 320px;">
+                            <div class="chart-container">
                                 <canvas id="genreChart"></canvas>
                             </div>
                         </div>
