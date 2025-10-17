@@ -1207,6 +1207,67 @@ class ContentController {
             };
         }
     }
+
+    /**
+     * Get TV show season with episodes
+     * @route GET /api/content/tv/:tvId/season/:seasonNumber
+     */
+    async getTVSeasons(req, res) {
+        try {
+            const { tvId, seasonNumber } = req.params;
+            const axios = require('axios');
+
+            console.log(`📺 GET /api/content/tv/${tvId}/season/${seasonNumber} - Fetching episodes from TMDB`);
+
+            const response = await axios.get(
+                `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}`,
+                {
+                    params: {
+                        api_key: process.env.TMDB_API_KEY
+                    }
+                }
+            );
+
+            if (!response.data) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Season not found'
+                });
+            }
+
+            // Format episodes for frontend
+            const episodes = response.data.episodes.map(ep => ({
+                episodeNumber: ep.episode_number,
+                seasonNumber: ep.season_number,
+                title: `Episode ${ep.episode_number}: ${ep.name}`,
+                description: ep.overview || 'No description available.',
+                thumbnail: ep.still_path
+                    ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
+                    : null,
+                duration: ep.runtime ? `${ep.runtime} min` : 'N/A',
+                airDate: ep.air_date
+            }));
+
+            console.log(`✅ Found ${episodes.length} episodes for season ${seasonNumber}`);
+
+            res.json({
+                success: true,
+                data: {
+                    seasonNumber: response.data.season_number,
+                    seasonName: response.data.name,
+                    episodes: episodes,
+                    totalEpisodes: episodes.length
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching TV season:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to fetch season episodes',
+                message: error.message
+            });
+        }
+    }
 }
 
 module.exports = ContentController;

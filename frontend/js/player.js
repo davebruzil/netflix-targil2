@@ -190,7 +190,8 @@ class VideoPlayer {
             this.generateSampleVideo();
         }
 
-        this.generateEpisodes();
+        // Load episodes if it's a TV show
+        this.loadRealEpisodes();
     }
 
     generateSampleVideo() {
@@ -222,7 +223,56 @@ class VideoPlayer {
         this.currentTimeEl.textContent = '0:00';
     }
 
-    generateEpisodes() {
+    async loadRealEpisodes() {
+        try {
+            // Check if content is a TV show
+            if (!this.contentId || !this.contentId.startsWith('tv_')) {
+                // Not a TV show, hide episodes section
+                console.log('📺 Not a TV show, hiding episodes section');
+                if (this.episodesBtn) this.episodesBtn.style.display = 'none';
+                if (this.nextEpisodeBtn) this.nextEpisodeBtn.style.display = 'none';
+                return;
+            }
+
+            // Show episodes section for TV shows
+            if (this.episodesBtn) this.episodesBtn.style.display = 'flex';
+            if (this.nextEpisodeBtn) this.nextEpisodeBtn.style.display = 'flex';
+
+            // Extract TV show ID from contentId (format: tv_12345)
+            const tvId = this.contentId.split('_')[1];
+            const seasonNumber = 1; // Default to season 1
+
+            console.log(`📺 Loading episodes for TV show ${tvId}, Season ${seasonNumber}`);
+
+            // Fetch episodes from backend
+            const response = await fetch(`/api/content/tv/${tvId}/season/${seasonNumber}`, {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                console.error('Failed to fetch episodes:', response.statusText);
+                this.loadMockEpisodes(); // Fallback to mock data
+                return;
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.data && data.data.episodes) {
+                this.episodes = data.data.episodes;
+                console.log(`✅ Loaded ${this.episodes.length} episodes from TMDB`);
+                this.renderEpisodes();
+            } else {
+                console.warn('No episodes found, using mock data');
+                this.loadMockEpisodes();
+            }
+        } catch (error) {
+            console.error('Error loading episodes:', error);
+            this.loadMockEpisodes(); // Fallback to mock data
+        }
+    }
+
+    loadMockEpisodes() {
+        console.log('📺 Loading mock episodes as fallback');
         this.episodes = [
             {
                 title: 'Episode 1: The Beginning',
@@ -243,7 +293,7 @@ class VideoPlayer {
                 thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iNDUiIHZpZXdCb3g9IjAgMCA4MCA0NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjQwIiB5PSIyNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcGlzb2RlIDM8L3RleHQ+Cjwvc3ZnPgo='
             }
         ];
-        
+
         this.renderEpisodes();
     }
 

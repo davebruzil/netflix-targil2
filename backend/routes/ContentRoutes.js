@@ -46,6 +46,9 @@ router.get('/profile/:profileId/search-history', (req, res) => contentController
 // GET /api/content/:id/related - Get related/similar content
 router.get('/:id/related', (req, res) => contentController.getRelatedContent(req, res));
 
+// GET /api/content/tv/:tvId/season/:seasonNumber - Get TV show episodes
+router.get('/tv/:tvId/season/:seasonNumber', (req, res) => contentController.getTVSeasons(req, res));
+
 // =============================================================================
 // GENERIC ROUTES WITH WILDCARDS - MUST BE LAST
 // =============================================================================
