@@ -202,7 +202,15 @@ class ProfileController {
     async saveWatchProgress(req, res) {
         try {
             const { id: profileId } = req.params;
-            const { contentId, progress, currentTime, totalDuration } = req.body;
+            const {
+                contentId,
+                progress,
+                currentTime,
+                totalDuration,
+                episodeNumber,
+                seasonNumber,
+                episodeTitle
+            } = req.body;
 
             if (!profileId || !contentId) {
                 return res.status(400).json({
@@ -216,7 +224,10 @@ class ProfileController {
                 contentId,
                 progress || 0,
                 currentTime || 0,
-                totalDuration || 60
+                totalDuration || 60,
+                episodeNumber,
+                seasonNumber,
+                episodeTitle
             );
 
             res.status(200).json({

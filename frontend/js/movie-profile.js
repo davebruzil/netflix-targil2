@@ -463,7 +463,13 @@ class MovieProfile {
 
                     if (watchItem) {
                         this.watchProgress = watchItem.progress || 0;
+                        this.episodeNumber = watchItem.episodeNumber;
+                        this.seasonNumber = watchItem.seasonNumber;
+                        this.episodeTitle = watchItem.episodeTitle;
                         console.log('📊 Loaded progress from backend:', this.watchProgress);
+                        if (this.episodeNumber) {
+                            console.log(`📺 Last watched: S${this.seasonNumber}E${this.episodeNumber} - ${this.episodeTitle}`);
+                        }
                         return;
                     }
                 }
@@ -521,8 +527,15 @@ class MovieProfile {
         } else if (this.watchProgress > 0 && this.watchProgress < 90) {
             // Show Continue for progress between 1% and 89%
             playIcon.textContent = '▶';
-            playText.textContent = ' Continue';
-            console.log('🎮 Button set to: Continue');
+
+            // For TV shows, display episode information
+            if (this.episodeNumber && this.seasonNumber) {
+                playText.textContent = ` Continue S${this.seasonNumber}E${this.episodeNumber}`;
+                console.log(`🎮 Button set to: Continue S${this.seasonNumber}E${this.episodeNumber}`);
+            } else {
+                playText.textContent = ' Continue';
+                console.log('🎮 Button set to: Continue');
+            }
         } else {
             // Show Play for 0% progress
             playIcon.textContent = '▶';

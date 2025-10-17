@@ -48,6 +48,19 @@ const profileSchema = new mongoose.Schema({
         isCompleted: {
             type: Boolean,
             default: false
+        },
+        // Episode information for TV series
+        episodeNumber: {
+            type: Number,
+            default: null
+        },
+        seasonNumber: {
+            type: Number,
+            default: null
+        },
+        episodeTitle: {
+            type: String,
+            default: null
         }
     }],
     createdAt: {

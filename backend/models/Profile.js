@@ -105,7 +105,7 @@ class Profile {
         }
     }
 
-    async saveWatchProgress(profileId, contentId, progress, currentTime, totalDuration) {
+    async saveWatchProgress(profileId, contentId, progress, currentTime, totalDuration, episodeNumber = null, seasonNumber = null, episodeTitle = null) {
         try {
             const profile = await this.model.findById(profileId);
             if (!profile) {
@@ -129,6 +129,11 @@ class Profile {
                 profile.watchHistory[existingIndex].totalDuration = totalDuration;
                 profile.watchHistory[existingIndex].lastWatchedAt = new Date();
                 profile.watchHistory[existingIndex].isCompleted = isCompleted;
+
+                // Update episode info if provided
+                if (episodeNumber !== null) profile.watchHistory[existingIndex].episodeNumber = episodeNumber;
+                if (seasonNumber !== null) profile.watchHistory[existingIndex].seasonNumber = seasonNumber;
+                if (episodeTitle !== null) profile.watchHistory[existingIndex].episodeTitle = episodeTitle;
             } else {
                 // Add new entry
                 profile.watchHistory.push({
@@ -137,7 +142,10 @@ class Profile {
                     currentTime,
                     totalDuration,
                     lastWatchedAt: new Date(),
-                    isCompleted
+                    isCompleted,
+                    episodeNumber,
+                    seasonNumber,
+                    episodeTitle
                 });
             }
 

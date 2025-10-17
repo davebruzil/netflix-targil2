@@ -562,9 +562,22 @@ class VideoPlayer {
         this.currentEpisodeIndex = index;
         this.renderEpisodes();
         this.closeEpisodesDrawer();
-        
+
+        // Reset progress bar to 0 for new episode
+        this.mockCurrentTime = 0;
+        this.progressFill.style.width = '0%';
+        this.progressHandle.style.left = '0%';
+        this.currentTimeEl.textContent = '0:00';
+        console.log(`📺 Starting new episode ${index + 1}, progress reset to 0`);
+
         this.generateSampleVideo();
-        this.video.play();
+
+        // Auto-play the new episode if mock playback
+        if (this.isMockPlayback) {
+            this.playMock();
+        } else {
+            this.video.play();
+        }
     }
 
     playNextEpisode() {
@@ -658,6 +671,18 @@ class VideoPlayer {
                 currentTime: currentTime,
                 totalDuration: duration
             };
+
+            // Add episode information for TV shows
+            if (this.contentId && this.contentId.startsWith('tv_') && this.episodes.length > 0) {
+                const currentEpisode = this.episodes[this.currentEpisodeIndex];
+                if (currentEpisode) {
+                    requestBody.episodeNumber = currentEpisode.episodeNumber;
+                    requestBody.seasonNumber = currentEpisode.seasonNumber;
+                    requestBody.episodeTitle = currentEpisode.title;
+                    console.log(`📺 Saving episode info: S${currentEpisode.seasonNumber}E${currentEpisode.episodeNumber} - ${currentEpisode.title}`);
+                }
+            }
+
             console.log('💾 Request body:', requestBody);
 
             const url = `/api/profiles/${profileId}/watch-progress`;
@@ -716,6 +741,23 @@ class VideoPlayer {
 
                 if (savedProgress && savedProgress.currentTime > 0) {
                     console.log(`📼 Resuming from ${Math.round(savedProgress.progress)}%`);
+
+                    // If it's a TV show with saved episode info, load that episode
+                    if (this.contentId.startsWith('tv_') && savedProgress.episodeNumber !== null && savedProgress.episodeNumber !== undefined) {
+                        console.log(`📺 Resuming at S${savedProgress.seasonNumber}E${savedProgress.episodeNumber} - ${savedProgress.episodeTitle}`);
+
+                        // Find the episode index that matches
+                        const episodeIndex = this.episodes.findIndex(ep =>
+                            ep.episodeNumber === savedProgress.episodeNumber &&
+                            ep.seasonNumber === savedProgress.seasonNumber
+                        );
+
+                        if (episodeIndex >= 0) {
+                            this.currentEpisodeIndex = episodeIndex;
+                            this.renderEpisodes(); // Update UI to highlight current episode
+                            console.log(`✅ Set current episode index to ${episodeIndex}`);
+                        }
+                    }
 
                     if (this.isMockPlayback) {
                         // Restore mock playback position
