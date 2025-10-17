@@ -14,38 +14,35 @@ router.use((req, res, next) => {
     next();
 });
 
-// Apply auth middleware to all profile routes
-router.use(requireAuth);
+// GET /api/profiles - Get all profiles (requires auth)
+router.get('/', requireAuth, (req, res) => profileController.getAllProfiles(req, res));
 
-// GET /api/profiles - Get all profiles
-router.get('/', (req, res) => profileController.getAllProfiles(req, res));
-
-// POST /api/profiles - Create new profile
+// POST /api/profiles - Create new profile (NO AUTH REQUIRED - user just registered)
 router.post('/', (req, res) => profileController.createProfile(req, res));
 
 // GET /api/profiles/user/:userId - Get profiles for specific user (compatibility route)
-// This MUST come before /:id to avoid route conflicts
+// This MUST come before /:id to avoid route conflicts (NO AUTH - needed after registration)
 router.get('/user/:userId', (req, res) => profileController.getUserProfiles(req, res));
 
 // GET /api/profiles/statistics/:userId - Get statistics for user's profiles
-router.get('/statistics/:userId', (req, res) => profileController.getStatistics(req, res));
+router.get('/statistics/:userId', requireAuth, (req, res) => profileController.getStatistics(req, res));
 
 // GET /api/profiles/:id - Get specific profile by ID
-router.get('/:id', (req, res) => profileController.getProfileById(req, res));
+router.get('/:id', requireAuth, (req, res) => profileController.getProfileById(req, res));
 
 // PUT /api/profiles/:id - Update profile
-router.put('/:id', (req, res) => profileController.updateProfile(req, res));
+router.put('/:id', requireAuth, (req, res) => profileController.updateProfile(req, res));
 
 // DELETE /api/profiles/:id - Delete profile
-router.delete('/:id', (req, res) => profileController.deleteProfile(req, res));
+router.delete('/:id', requireAuth, (req, res) => profileController.deleteProfile(req, res));
 
 // POST /api/profiles/:id/watch-progress - Save/update watch progress
-router.post('/:id/watch-progress', (req, res) => profileController.saveWatchProgress(req, res));
+router.post('/:id/watch-progress', requireAuth, (req, res) => profileController.saveWatchProgress(req, res));
 
 // GET /api/profiles/:id/watch-history - Get watch history
-router.get('/:id/watch-history', (req, res) => profileController.getWatchHistory(req, res));
+router.get('/:id/watch-history', requireAuth, (req, res) => profileController.getWatchHistory(req, res));
 
 // GET /api/profiles/:id/continue-watching - Get continue watching content
-router.get('/:id/continue-watching', (req, res) => profileController.getContinueWatching(req, res));
+router.get('/:id/continue-watching', requireAuth, (req, res) => profileController.getContinueWatching(req, res));
 
 module.exports = router;
