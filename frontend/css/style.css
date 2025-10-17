@@ -1387,6 +1387,13 @@ body {
     color: white;
     margin-bottom: 1rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    word-wrap: break-word;
 }
 
 /* Movie Metadata Section */
@@ -1426,6 +1433,11 @@ body {
     line-height: 1.6;
     margin-bottom: 2rem;
     max-width: 500px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .movie-actions {
