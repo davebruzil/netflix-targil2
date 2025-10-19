@@ -57,10 +57,10 @@ npm install
 
 ### Step 5: Configure Environment Variables
 
-Create a `.env` file in the `backend` directory:
+Create a `.env` file in the **root directory** (not in backend):
 
 ```bash
-cd backend
+# From the project root (netflix-targil2/)
 touch .env  # On Windows use: echo. > .env
 ```
 
@@ -276,6 +276,24 @@ npm test
 ---
 
 ## 🐛 Troubleshooting
+
+### Server Won't Start - Missing .env File
+
+**Error**: `Error: Cannot init client. Please provide correct options` or `Assertion failed: You must provide either mongoUrl|clientPromise|client in options`
+
+**Solution**:
+Make sure you created the `.env` file in the **root directory** of the project (netflix-targil2/), NOT in the backend folder. The file should be at:
+```
+netflix-targil2/.env  ✓ (correct location)
+netflix-targil2/backend/.env  ✗ (wrong location)
+```
+
+If you already have a `.env` file in the `backend/` folder, either:
+1. Move it to the root directory, OR
+2. Update `backend/server.js` line 5 to point to it:
+```javascript
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+```
 
 ### MongoDB Connection Issues
 
